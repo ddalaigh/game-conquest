@@ -127,8 +127,8 @@ function deepBoard() {
 }
 
 /* walk a fresh Dancer in until its dance has ended and the bubbles are down */
-function danceOver(g, d) {
-  const z = g.spawnFoe("bubbledancer");
+function danceOver(g, d, kind = "bubbledancer") {
+  const z = g.spawnFoe(kind);
   let guard = 0;
   while (!z.danced && guard++ < 900) g.step(100);
   return z;
@@ -307,4 +307,14 @@ test("your creatures cannot see the shark while it lurks", () => {
   let fired = false;
   for (let i = 0; i < 40 && !fired; i++) { g.step(100); fired = g.state().bolts.length > 0; }
   assert.ok(fired, "the drakeling would not shoot at anything — the gate itself is broken");
+});
+
+test("the Disco Bubble Dancer's bubbles hold twice the shield", () => {
+  const g = deepBoard();
+  const d = g.FOES.discodancer.dance;
+  danceOver(g, d, "discodancer");
+  const z = g.spawnFoe("drowned", 0, g.midX(d.bubbleCol) + 40);
+  let guard = 0;
+  while (!z.shield && guard++ < 100) g.step(50);
+  assert.equal(z.shield, 60, "a disco bubble did not grant its 60");
 });
