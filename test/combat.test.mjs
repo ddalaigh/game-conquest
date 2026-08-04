@@ -292,3 +292,19 @@ test("the shark cannot be hurt under the seabed, only while the water is broken"
   g.hurtFoe(s, 50);
   assert.equal(s.hp, hp0 - 50, "it could not be hurt while surfaced");
 });
+
+test("your creatures cannot see the shark while it lurks", () => {
+  const g = boot();
+  g.startLevel("caves", 1, true);
+  g.setEnergy(9999);
+  put(g, "drakeling", 2, 0);
+  const s = g.spawnFoe("drownshark");
+  for (let i = 0; i < 30; i++) g.step(100);          /* 3s — too soon for it to surface */
+  assert.equal(s.underground, true, "it surfaced too early for this test to mean anything");
+  assert.equal(g.state().bolts.length, 0, "a creature took aim at the hidden shark");
+  /* the control: the same drakeling fires the moment something visible shows up */
+  g.spawnFoe("drowned", 2, g.midX(4));
+  let fired = false;
+  for (let i = 0; i < 40 && !fired; i++) { g.step(100); fired = g.state().bolts.length > 0; }
+  assert.ok(fired, "the drakeling would not shoot at anything — the gate itself is broken");
+});

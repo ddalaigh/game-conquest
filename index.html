@@ -4212,6 +4212,7 @@
     var best=null;
     for(var i=0;i<foes.length;i++){
       var z=foes[i];
+      if(z.underground) continue;        /* a Sling Roc cannot lob at what it cannot see */
       if(z.row!==row) continue;
       if(!best || z.x>best.x) best=z;
     }
@@ -4314,6 +4315,7 @@
      so it takes a flat amount instead. */
   function crushFoe(z,bossAmt){
     if(z.fireOnly) return;                /* nothing to crush \u2014 only flame works on weather */
+    if(z.underground) return;             /* nothing to crush that is not up here */
     if(z.boss) hurtFoe(z,bossAmt);
     else killFoe(z);
   }
@@ -4338,7 +4340,7 @@
 
   /* thrown clear, lands on somebody else */
   function riderFlatten(rd){
-    var live=foes.filter(function(z){ return z && !z.hypno && !z.fireOnly; });
+    var live=foes.filter(function(z){ return z && !z.hypno && !z.fireOnly && !z.underground; });
     if(!live.length) return;
     var z=live[Math.floor(rnd()*live.length)];
     flare(z.x, z.row*CH+CH/2, CW*1.2);
@@ -4365,6 +4367,7 @@
         var z=foes[j];
         if(z.row!==rd.row) continue;
         if(z.fireOnly) continue;          /* a Stormhead is vapour \u2014 the keg rolls through it */
+        if(z.underground) continue;       /* and the keg rolls straight over what hides below */
         if(Math.abs(z.x-rd.x) < 20){ hit=z; break; }
       }
       if(hit){
@@ -4468,6 +4471,7 @@
         a.el.style.left=pxX(a.x);
         for(var j=foes.length-1;j>=0;j--){
           var z=foes[j];
+          if(z.underground) continue;    /* a turned shot flies over what hides below */
           if(z.row!==a.row) continue;
           if(Math.abs(z.x-a.x) > 15) continue;
           hurtFoe(z, a.dmg);
@@ -4925,6 +4929,7 @@
     var x0=midX(u.col), x1=x0+CW*tiles, out=[];
     for(var i=0;i<foes.length;i++){
       var z=foes[i];
+      if(z.underground) continue;
       if(z.row!==u.row) continue;
       if(z.x>=x0-CW*0.45 && z.x<=x1) out.push(z);
     }
@@ -4965,6 +4970,7 @@
     var ux=midX(u.col);
     for(var i=0;i<foes.length;i++){
       var z=foes[i];
+      if(z.underground) continue;        /* what is under the seabed cannot be seen */
       if(Math.abs(z.row-u.row)>rowSpan) continue;
       var d=z.x-ux;
       if(d>=-CW*0.5 && d<=CW*range) return true;
@@ -4976,6 +4982,7 @@
     var ux=colX(u.col);
     for(var i=0;i<foes.length;i++){
       var z=foes[i];
+      if(z.underground) continue;        /* what is under the seabed cannot be seen */
       if(!allRows && Math.abs(z.row-u.row)>rowSpan) continue;
       if(z.x>ux) return true;
     }
@@ -5170,6 +5177,7 @@
       var gone=false;
       for(var j=foes.length-1;j>=0;j--){
         var z=foes[j];
+        if(z.underground) continue;      /* bolts pass over what is under the seabed */
         if(z.row!==b.row) continue;
         if(Math.abs(z.x-b.x) > 9+b.size/2) continue;
         if(b.pierce && b.hit.indexOf(z)>-1) continue;
