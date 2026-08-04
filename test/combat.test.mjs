@@ -318,3 +318,27 @@ test("the Disco Bubble Dancer's bubbles hold twice the shield", () => {
   while (!z.shield && guard++ < 100) g.step(50);
   assert.equal(z.shield, 60, "a disco bubble did not grant its 60");
 });
+
+test("the Sand Drowned throws sand ahead — two lanes, 80 of shield apiece", () => {
+  const g = deepBoard();
+  const s = g.FOES.sanddrowned.sand;
+  g.spawnFoe("sanddrowned", 2, g.midX(4));
+  const scan = () => {
+    const piles = [], grid = g.state().grid;
+    for (let r = 0; r < g.ROWS; r++) for (let c = 0; c < g.COLS; c++)
+      if (grid[r][c].darkBubble) piles.push({ r, c, amt: grid[r][c].darkShield });
+    return piles;
+  };
+  g.step(s.every - 300);
+  assert.equal(scan().length, 0, "sand flew early");
+  g.step(600);
+  const piles = scan();
+  assert.equal(piles.length, s.lanes, "the wrong number of lanes got sand");
+  assert.ok(piles.every(p => p.amt === s.shield), "a pile holds the wrong shield");
+  assert.ok(piles.every(p => p.c === piles[0].c), "the sand landed across different columns");
+  const t = piles[0];
+  const z = g.spawnFoe("drowned", t.r, g.midX(t.c) + 40);
+  let guard = 0;
+  while (!z.shield && guard++ < 100) g.step(50);
+  assert.equal(z.shield, s.shield, "the sand shield was not picked up");
+});

@@ -220,6 +220,10 @@
   .bubcell.darkbub.disco{
     background:radial-gradient(circle at 34% 28%,rgba(255,120,200,.34),rgba(95,212,255,.22) 55%,rgba(255,210,90,.15) 78%,rgba(10,16,26,.12));
     animation:bobble 3.6s ease-in-out infinite alternate, discoshift 4s linear infinite}
+  .bubcell.darkbub.sandblock{
+    background:radial-gradient(circle at 40% 35%,rgba(232,208,150,.72),rgba(196,168,110,.5) 60%,rgba(138,115,74,.3));
+    box-shadow:inset 0 0 0 2px rgba(94,74,42,.85), 0 0 8px rgba(138,115,74,.45);
+    border-radius:38%;animation:none}
   @keyframes discoshift{from{filter:hue-rotate(0deg)}to{filter:hue-rotate(360deg)}}
   .foe.burrowed .tag{display:none}
   .hole{position:absolute;z-index:1;pointer-events:none;border-radius:50%;
@@ -801,6 +805,12 @@
       its bubbles swirl with colour and hold 60 health of shield apiece. The glasses do
       nothing. It simply likes them.
       </div>
+      <div class="lore hidden" data-foe="sanddrowned">
+      <b>The Sand Drowned.</b> A Drowned that lay so long in the seabed the seabed kept it.
+      It walks at half a dead man's pace and throws itself ahead of the wave, two lanes at a
+      time &mdash; and the dead wade through and come out wearing it, 80 health of sand apiece.
+      It never runs out. There is always more seabed.
+      </div>
       <br><br>
       This world is still being dug. Something lives in it now &mdash; twenty levels of it &mdash;
       but there is no boss at the bottom yet, no items of its own and no fusions.
@@ -1302,6 +1312,16 @@
       "<path d='M10 13.5q10-7 20 0v1.5q-10-5-20 0z' fill='#8a7a62'/>"+
       "<rect x='18.5' y='4' width='3' height='7' rx='1.5' fill='#a89a80'/>"+
       "<path d='M15 27q2 2 4 0M22 31q2 2 4 0' stroke='#b3552f' stroke-width='1.1' fill='none' opacity='.8'/>"+
+      "</g></svg>",
+    sanddrowned:"<svg viewBox='0 0 40 40' width='32' height='32'><g>"+
+      "<path d='M20 7q11 0 12 11 4 2 4 8 0 6-6 8-2 4-10 4T10 34q-6-2-6-8 0-6 4-8Q9 7 20 7z' fill='#d8c08a'/>"+
+      "<path d='M20 10q8 0 9 9 3 2 3 6 0 5-5 6-2 3-7 3t-7-3q-5-1-5-6 0-4 3-6 1-9 9-9z' fill='#c4a86e'/>"+
+      "<path d='M12 30q1 4 0 7M20 32q0 4-1 6M28 30q-1 4 0 7' stroke='#b39b66' stroke-width='2' fill='none' stroke-linecap='round'/>"+
+      "<ellipse cx='15.5' cy='18' rx='2.4' ry='2.8' fill='#5e4a2a'/><ellipse cx='24.5' cy='18' rx='2.4' ry='2.8' fill='#5e4a2a'/>"+
+      "<circle cx='16.1' cy='17.3' r='.8' fill='#ffe9b0'/><circle cx='25.1' cy='17.3' r='.8' fill='#ffe9b0'/>"+
+      "<path d='M15 24q5 3 10 0' stroke='#5e4a2a' stroke-width='1.4' fill='none'/>"+
+      "<path d='M8 22l-3 1M32 22l3 1M11 13l-2-2M29 13l2-2' stroke='#b39b66' stroke-width='1.2' stroke-linecap='round'/>"+
+      "<circle cx='9' cy='27' r='1' fill='#b39b66'/><circle cx='31.5' cy='26' r='1.2' fill='#b39b66'/>"+
       "</g></svg>",
     drownshark:"<svg viewBox='0 0 40 40' width='30' height='30'><g transform='translate(40,0) scale(-1,1)'>"+
       "<path d='M4 26q10-9 24-6 6 1 9 5-6 5-16 5T4 26z' fill='#4a6a84'/>"+
@@ -2849,6 +2869,17 @@
               "first of the dead through each drinks 60 health of shield, not 30. It "+
               "brought a mirror ball. 300 health, and it still cannot dance and fight "+
               "at the same time."},
+    sanddrowned:{name:"Sand Drowned", world:"deep", hp:600, speed:6,
+              art:ART.sanddrowned, tag:"SAND", size:38,
+              /* every ten seconds on the field it throws sand into two random lanes,
+                 landing on the tile ahead of it — 80 of shield for the first enemy
+                 through each pile. The dancer's trick, thrown by the fistful. */
+              sand:{every:10000, lanes:2, shield:80},
+              note:"A Drowned that lay so long in the seabed the seabed kept it. 600 "+
+              "health of wet sand at half a dead man's pace, and every ten seconds it "+
+              "throws two fistfuls into the lanes ahead — the first of the dead through "+
+              "each pile takes 80 of shield. Kill it early, or fight everything behind "+
+              "it twice."},
     drownshark:{name:"Drowned Riding Shark", world:"deep", hp:220, speed:14,
               art:ART.drownshark, tag:"AMBUSH",
               /* it never walks in — it lurks under the seabed, untouchable, and it
@@ -3052,9 +3083,11 @@
     13:{count:66, gap:2000, mix:["drowned","drowned","shielddrowned"],
        rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[3,3],[1,4],[0,1]],
        note:"A breather of plain dead — but twice as many, twice as fast as they once came."},
-    14:{count:72, gap:1950, mix:["drowned","shielddrowned","armourdrowned"],
+    14:{count:72, gap:1950, mix:["drowned","drowned","shielddrowned","armourdrowned","sanddrowned"],
        rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[2,3],[4,2],[0,5],[1,1]],
-       note:"The even mix again, at a pace the third level never dreamt of."},
+       note:"The Sand Drowned arrives — 600 of wet sand at half the usual pace, throwing "+
+            "shields of itself ahead of the wave, two lanes at a time, 80 apiece. Kill it "+
+            "early, or everything behind it comes dressed."},
     15:{count:78, gap:1900, mix:["shielddrowned","shielddrowned","armourdrowned"],
        rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[0,4],[2,1],[4,4],[3,5]],
        note:"Shield-heavy and relentless. Your crocodile recharge is the clock that matters."},
@@ -3678,7 +3711,7 @@
     if(r<0||r>=ROWS||c<0||c>=COLS) return no("offBoard");
     if(isGap(r,c))        return no("trench", trenchMsg());
     if(grid[r][c] && grid[r][c].darkBubble) return no("enemyBubble",
-      "A dark bubble holds that square — it is not yours to fill.");
+      "Something of theirs holds that square — it is not yours to fill.");
 
     var u=unitAt(r,c);
     if(energy<d.cost)     return no("energy");
@@ -5494,6 +5527,29 @@
         continue;
       }
 
+      /* the Sand Drowned throws as it comes — every ten seconds on the field,
+         two random lanes get a fistful of sand on the tile ahead of it. It does
+         not stop to throw, and it never drinks what it threw. */
+      var sdw=FOES[z.kind].sand;
+      if(sdw){
+        z.sandT=(z.sandT||0)+dt;
+        if(z.sandT>=sdw.every){
+          z.sandT-=sdw.every;
+          var fcol=Math.floor((z.x-KEEP)/CW)-1;
+          if(fcol>=0 && fcol<COLS){
+            var lanes=[];
+            for(var lr=0;lr<ROWS;lr++) lanes.push(lr);
+            for(var th=0;th<sdw.lanes && lanes.length;th++){
+              var pick=lanes.splice(Math.floor(rnd()*lanes.length),1)[0];
+              makeDarkBubble(pick, fcol, sdw.shield, "sandblock");
+              flare(midX(fcol), pick*CH+CH/2, CW*0.7);
+            }
+            addFloat(z.x, z.row*CH+CH*0.08, "sand flies", "#d8c08a");
+            SND.sfx("place");
+          }
+        }
+      }
+
       /* the Drowned Riding Shark. It lives under the seabed, untouchable, and it
          strikes exactly once — surfacing in front of your frontmost creature to
          devour it whole. The heartbeat after it eats is the only fight it offers;
@@ -5752,8 +5808,8 @@
       placeFoe(z);
 
       /* a dark bubble waits for the first of its own side to walk into it —
-         except the Dancer, which made it and does not drink its own work */
-      if(!FOES[z.kind].dance){
+         except the givers: a Dancer or a Sand Drowned never drinks its own work */
+      if(!FOES[z.kind].dance && !FOES[z.kind].sand){
         var dbc=Math.floor((z.x-KEEP)/CW);
         if(dbc>=0 && dbc<COLS && grid[z.row][dbc] && grid[z.row][dbc].darkBubble){
           z.shield=(z.shield||0)+(grid[z.row][dbc].darkShield||30);
@@ -6178,7 +6234,7 @@
                       "masterarcher","masterdigger","fireballgoblin","bossking"];
   var SKY_FOE_ORDER=["glob","driftglob","shieldglob","broodglob","globling","armourglob",
                      "globairship","stormhead","skytitan"];
-  var DEEP_FOE_ORDER=["drowned","shielddrowned","armourdrowned","bubbledancer","discodancer","drownshark"];
+  var DEEP_FOE_ORDER=["drowned","shielddrowned","armourdrowned","bubbledancer","discodancer","drownshark","sanddrowned"];
   var ALM_FAMS=[
     ["mythic","Mythic",
      "Since the Flatbird and the Long Bird are only useful in the Sky, due to their ability to "+
