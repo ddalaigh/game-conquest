@@ -407,3 +407,22 @@ test("every 35 seconds the lanes beside the palace are crushed flat", () => {
   assert.equal(g.state().grid[3][4].unit, null, "the lane below was not crushed");
   assert.ok(g.state().grid[2][4].unit, "the palace's own shadow should be safe");
 });
+
+test("the Sandstone Dragon breathes sand three lanes wide", () => {
+  const g = boot();
+  g.startLevel("caves", 1, true);
+  g.setEnergy(9999);
+  const dragon = put(g, "sandstonedragon", 2, 1);
+  assert.ok(dragon, "could not place the dragon");
+  const rows = [1, 2, 3, 0].map(r => {
+    const z = g.spawnFoe("skeleton", r, g.midX(3));
+    z.frozen = 9e9;                     /* hold them in the breath */
+    return z;
+  });
+  const hp0 = rows[0].hp;
+  for (let i = 0; i < 20; i++) g.step(100);   /* two seconds of sand */
+  assert.ok(rows[0].hp < hp0, "the lane above was not breathed on");
+  assert.ok(rows[1].hp < hp0, "its own lane was not breathed on");
+  assert.ok(rows[2].hp < hp0, "the lane below was not breathed on");
+  assert.equal(rows[3].hp, hp0, "row zero is two lanes away and should stay dry");
+});
