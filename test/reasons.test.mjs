@@ -9,14 +9,18 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { boot } from "./harness.mjs";
 
-function level(world = "caves", lv = 1) {
+function level(world = "caves", lv = 1, sand = false) {
   const g = boot();
   for (const k of ["bubbledial", "flatbird", "blowertortoise"]) g.meta.unlocked[k] = 1;
-  g.startLevel(world, lv, false);
+  g.startLevel(world, lv, sand);
   g.setEnergy(9999);
   g.clearCooldowns();
   return g;
 }
+
+/* The Deep has no levels while its enemies are being designed — its refusals
+ * are read off the sandbox instead, where canPlace answers identically. */
+const deepBox = () => level("deep", 1, true);
 
 function openSquare(g, skip = 0) {
   const grid = g.state().grid;
@@ -96,7 +100,7 @@ test("the projection cap is its own refusal", () => {
 });
 
 test("the Deep names the reason there is nowhere to stand", () => {
-  const g = level("deep");
+  const g = deepBox();
   const [r, c] = openSquare(g);
   assert.equal(g.canPlace("forge", r, c).why, "noBubble");
 
@@ -115,7 +119,7 @@ test("the Sky names the reason a flightless creature cannot stand", () => {
 });
 
 test("a keg with nothing to roll along names its missing footing", () => {
-  const g = level("deep");
+  const g = deepBox();
   const [r, c] = openSquare(g);
   assert.equal(g.canPlace("bombrider", r, c).why, "noFooting");
   const s = level("sky");
@@ -166,7 +170,7 @@ test("every refusal a player can hit carries a message", () => {
      level, an empty hand, an unaffordable price greyed out in the tray */
   const silent = new Set(["notRunning", "nothingSelected", "unknownCreature",
                           "offBoard", "energy", "cooldown"]);
-  const g = level("deep");
+  const g = deepBox();
   const [r, c] = openSquare(g);
   const seen = [
     g.canPlace("forge", r, c),

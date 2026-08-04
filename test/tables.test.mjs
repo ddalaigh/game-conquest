@@ -144,5 +144,9 @@ test("each no-ground world has a free carrier you can always fall back on", () =
     assert.ok(mine.some(([, d]) => d.cost === 0),
       `${world}: every carrier costs energy — the board could become unplayable`);
     for (const [k, d] of mine) assert.ok(d.cap > 0, `${k}: no cap`);
+    /* the sandbox keeps its own bindings — a carrier missing from them makes that
+       world's sandbox a board nothing can be placed on. The Deep shipped that way once. */
+    assert.ok(mine.some(([k]) => g.sandMeta.unlocked[k]),
+      `${world}: no carrier in the sandbox bindings — its sandbox would be unplayable`);
   }
 });

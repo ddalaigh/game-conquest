@@ -15,10 +15,10 @@ import { boot } from "./harness.mjs";
 const STEP = 16;
 const MAX_MS = 8 * 60_000;
 
-function open(world, lv, seed = 7) {
+function open(world, lv, seed = 7, sand = false) {
   const g = boot({ seed });
   for (const k of Object.keys(g.CREATURES)) g.meta.unlocked[k] = 1;
-  g.startLevel(world, lv, false);
+  g.startLevel(world, lv, sand);
   return g;
 }
 
@@ -72,7 +72,9 @@ test("a different seed is actually a different game", () => {
 });
 
 test("nothing can be placed in the Deep without the crocodile", () => {
-  const g = open("deep", 1);
+  /* the Deep has no levels while its enemies are being designed — the rule
+     is proved in the sandbox, where placement answers the same */
+  const g = open("deep", 1, 7, true);
   for (let r = 0; r < g.ROWS; r++)
     for (let c = 0; c < g.COLS; c++)
       for (const k of ["forge", "cinderwisp", "tortoise", "phoenix", "drakeling"])

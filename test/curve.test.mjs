@@ -125,6 +125,8 @@ test("an enemy is introduced before it is leaned on", () => {
 
 test("every world opens gently", () => {
   for (const [name, table] of WORLDS) {
+    /* a world with no levels yet has no opening to judge — the Deep, currently */
+    if (!Object.keys(table).length) continue;
     const first = Math.min(...Object.keys(table).map(Number));
     const w = weight(table, first);
     const mix = new Set(table[first].mix || []);

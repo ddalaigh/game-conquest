@@ -738,8 +738,9 @@
     </div>
     <div class="fuseout" id="deepMythic" style="margin-bottom:14px"></div>
     <div class="levels" id="deepGrid"></div>
-    <p>Five levels so far, and nothing at the bottom of them yet. There is no ground down here
-       and nothing floats on its own &mdash; the whole world runs on bubbles.</p>
+    <p>No levels yet &mdash; an empty sea, waiting for enemies worth building levels around.
+       There is no ground down here and nothing floats on its own &mdash; the whole world runs
+       on bubbles.</p>
     <div class="rules">
       <b>The Bubble Dial.</b> A blue crocodile, and it costs nothing. Set one on a bare square and
       it blows a single bubble out through its nose and swims off &mdash; the crocodile does not
@@ -760,15 +761,12 @@
       can forget bubbles entirely. It is the same mercy the Flatbird's boost gives the flock, and
       down here it is worth far more.
       <br><br>
-      <b>Trenches.</b> Every level cuts squares out of the board that hold nothing at all &mdash;
+      <b>Trenches.</b> A level can cut squares out of the board that hold nothing at all &mdash;
       not a creature, not a bubble. They are marked dark, and everything swims straight over them.
       <br><br>
-      <b>Nothing down here flies.</b> The Deep's own creatures all swim at your level, so every
-      creature you own can reach them and everything they do reaches you. Whatever else this world
-      asks of you, it does not ask you to re-learn how a fight works.
-      <br><br>
-      This world is still being dug. There are five levels, four creatures in it and no boss at
-      the bottom yet, no items of its own and no fusions.
+      This world is still being dug. Nothing lives in it yet &mdash; its enemies are still being
+      designed, and its levels will be built around them once they exist. The sandbox works in
+      the meantime: the bubbles are real, there is just nothing to fight.
     </div>
     <div class="bondbar" style="margin-top:14px">
       <button class="btn" id="deepAlm">Almanac</button>
@@ -1233,42 +1231,7 @@
       "<circle cx='37.4' cy='21.4' r='2.1' fill='none' stroke='#bff2ff' stroke-width='1'/>"+
       "<circle cx='36.6' cy='20.7' r='.6' fill='#eafcff'/>"+
       "</g></svg>",
-    /* what lives down there */
-    nipper:"<svg viewBox='0 0 40 40' width='30' height='30'><g>"+
-      "<path d='M9 21q-5-3-7 1 3 4 7 2zM31 21q5-3 7 1-3 4-7 2z' fill='#c4552f'/>"+
-      "<ellipse cx='20' cy='23' rx='11' ry='8' fill='#d9673c'/>"+
-      "<ellipse cx='20' cy='21' rx='8' ry='5' fill='#ef8154'/>"+
-      "<path d='M11 29l-3 5M16 31l-1 5M24 31l1 5M29 29l3 5' stroke='#a8441f' stroke-width='1.6' stroke-linecap='round'/>"+
-      "<circle cx='16' cy='19' r='2' fill='#2b1405'/><circle cx='24' cy='19' r='2' fill='#2b1405'/>"+
-      "<circle cx='16.6' cy='18.4' r='.6' fill='#fff'/><circle cx='24.6' cy='18.4' r='.6' fill='#fff'/>"+
-      "</g></svg>",
-    lanternfish:"<svg viewBox='0 0 40 40' width='30' height='30'><g>"+
-      "<path d='M34 20l6-5v10z' fill='#3b5a72'/>"+
-      "<ellipse cx='21' cy='20' rx='13' ry='8' fill='#2f4d64'/>"+
-      "<ellipse cx='21' cy='19' rx='10' ry='5' fill='#456b86'/>"+
-      "<path d='M14 12q1-6 5-4 0 3-1 5z' fill='#2f4d64'/>"+
-      "<circle cx='11' cy='19' r='2.4' fill='#0d1c28'/><circle cx='11.8' cy='18.3' r='.8' fill='#fff'/>"+
-      "<path d='M11 15q-4-4-6-9' stroke='#7fd4e8' stroke-width='1.3' fill='none'/>"+
-      "<circle cx='5' cy='6' r='3.2' fill='#f0e07a'/>"+
-      "<circle cx='5' cy='6' r='5' fill='none' stroke='#f0e07a' stroke-width='.8' opacity='.5'/>"+
-      "<path d='M14 24q5 3 11 1' stroke='#0d1c28' stroke-width='1.1' fill='none'/>"+
-      "</g></svg>",
-    driftjelly:"<svg viewBox='0 0 40 40' width='30' height='30'><g>"+
-      "<path d='M13 21q0 9-2 14M18 22q0 10 1 15M23 22q0 10-1 15M27 21q1 9 3 13' "+
-        "stroke='#c79be0' stroke-width='1.6' fill='none' stroke-linecap='round' opacity='.85'/>"+
-      "<path d='M20 6q11 0 12 10 0 5-12 5T8 16Q8 6 20 6z' fill='#a678c8'/>"+
-      "<path d='M20 9q8 0 8.5 7 0 3-8.5 3t-8.5-3Q12 9 20 9z' fill='#cda6e4'/>"+
-      "<ellipse cx='20' cy='13' rx='4' ry='2.4' fill='#efe0f8' opacity='.75'/>"+
-      "<circle cx='16.5' cy='16' r='1.5' fill='#3d2452'/><circle cx='23.5' cy='16' r='1.5' fill='#3d2452'/>"+
-      "</g></svg>",
-    armourray:"<svg viewBox='0 0 40 40' width='34' height='30'><g>"+
-      "<path d='M20 10q16 2 19 12-9 5-19 5T1 22Q4 12 20 10z' fill='#3f4a63'/>"+
-      "<path d='M20 13q12 2 14 9-7 3-14 3t-14-3q2-7 14-9z' fill='#5a6884'/>"+
-      "<path d='M20 15q9 1 10 6-5 2-10 2t-10-2q1-5 10-6z' fill='#78879f'/>"+
-      "<path d='M20 27q-1 7-3 11M20 27q1 7 3 11' stroke='#3f4a63' stroke-width='1.8' fill='none' stroke-linecap='round'/>"+
-      "<circle cx='16' cy='17' r='1.7' fill='#131a26'/><circle cx='24' cy='17' r='1.7' fill='#131a26'/>"+
-      "<path d='M8 20l3-2M32 20l-3-2M13 24l2-2M27 24l-2-2' stroke='#99a7bd' stroke-width='1.1'/>"+
-      "</g></svg>",
+    /* what lives down there has not been drawn yet — the Deep's enemies are still to be designed */
     tortoise:"<svg viewBox='0 0 40 40' width='34' height='34'><g>"+
       "<ellipse cx='20' cy='25' rx='15' ry='11' fill='#6b5a3e'/>"+
       "<ellipse cx='20' cy='23' rx='13' ry='9.5' fill='#8a7550'/>"+
@@ -2703,23 +2666,9 @@
               "On its own clock it also throws five bolts at five different creatures anywhere "+
               "on the board, 60 apiece, with no wind-up and no warning at all."},
 
-    /* ---- the Deep Sea. Nothing down here flies; it all swims at your level,
-       so everything you know about fighting in the Caves still holds. ---- */
-    nipper:{name:"Nipper Crab", world:"deep", hp:90, speed:22, art:ART.nipper, tag:"FAST",
-              note:"Quick and slight. It is across the board before a slow wall is worth "+
-              "setting, and there are always more of them than you would like."},
-    driftjelly:{name:"Drift Jelly", world:"deep", hp:160, speed:11, art:ART.driftjelly,
-              tag:"DRIFTS", drift:{every:2600},
-              note:"It has no say in where it goes and neither do you — it takes a new lane "+
-              "every couple of seconds. A lane you answered is not answered for long."},
-    lanternfish:{name:"Lantern Fish", world:"deep", hp:150, speed:10, art:ART.lanternfish,
-              tag:"ARCHER", arrow:{range:3, every:1500, count:1},
-              note:"It stops three tiles short and spits at whatever is lit. A bubble is glass "+
-              "to it: what is inside takes the hit the same as anything else."},
-    armourray:{name:"Armoured Ray", world:"deep", hp:420, speed:8, art:ART.armourray,
-              tag:"ARMOUR", size:38, wide:1.1,
-              note:"420 health of plated hide moving slowly up the lane. Nothing cheap turns "+
-              "one back; you either mass damage on it or you let it eat a bubble."}
+    /* ---- the Deep Sea has no enemies yet. The first four were borrowed shapes
+       from the Caves and the Sky, and the designer struck them out — whatever
+       swims down here will be invented, not recycled. ---- */
   };
 
   /* ============================================================
@@ -2860,23 +2809,9 @@
 
   /* ---- The Deep Sea. Five levels so far, and no boss yet at the bottom. ---- */
   var DEEP_LEVELS={
-    1:{count:14, gap:3800, mix:["nipper"], gaps:[[1,3]],
-       note:"Nipper Crabs, and the first thing you will notice is that you have nowhere to put "+
-            "anything. Set a <b>Bubble Dial</b> down, let the crocodile blow its bubble, and "+
-            "place into the bubble it leaves. One trench here holds nothing at all."},
-    2:{count:18, gap:3500, mix:["nipper","nipper","driftjelly"], gaps:[[0,2],[3,4]],
-       note:"Drift Jellies wander a new lane every couple of seconds. Bubbles do not wander with "+
-            "them, so build breadth rather than one deep lane you are proud of."},
-    3:{count:22, gap:3300, mix:["nipper","driftjelly","lanternfish"], gaps:[[1,1],[2,4],[4,2]],
-       note:"Lantern Fish stop three tiles short and spit. A bubble is no shield — whatever "+
-            "is inside takes the hit — so something has to reach them."},
-    4:{count:26, gap:3100, mix:["nipper","driftjelly","lanternfish","armourray"], gaps:[[0,1],[2,2],[4,4]],
-       note:"Armoured Rays. 420 health apiece and slow with it, which is the one mercy: you have "+
-            "time to mass on one, provided the crabs are not already through."},
-    5:{count:32, gap:2800, mix:["armourray","lanternfish","nipper","driftjelly","armourray"],
-       gaps:[[0,3],[1,1],[3,4],[4,2]],
-       note:"Everything the Deep has so far, four trenches cut through it, and no bottom yet "+
-            "— what waits below this has not come up to meet you."}
+    /* Empty on purpose. A level is a list of which enemies arrive and when, and the
+       Deep has no enemies of its own yet — the levels return when they do. The world
+       itself still works: the door, the sandbox, the crocodile and its bubbles. */
   };
 
   /* ============================================================
@@ -2933,7 +2868,8 @@
   /* Sandbox keeps its own bindings. Anything fused in the sandbox table stays
      in the sandbox — it never reaches the real tray. */
   var sandMeta={
-    unlocked:{flatbird:1,forge:1,leysprite:1,tinyember:1,cinderwisp:1,drakeling:1,tortoise:1,
+    /* each no-ground world's own carrier has to be here, or its sandbox is unplayable */
+    unlocked:{flatbird:1,bubbledial:1,forge:1,leysprite:1,tinyember:1,cinderwisp:1,drakeling:1,tortoise:1,
               thornback:1,frostmoth:1,phoenix:1,slingroc:1},
     bank:{1:9,2:9,3:9}
   };
@@ -5670,7 +5606,7 @@
                       "masterarcher","masterdigger","fireballgoblin","bossking"];
   var SKY_FOE_ORDER=["glob","driftglob","shieldglob","broodglob","globling","armourglob",
                      "globairship","stormhead","skytitan"];
-  var DEEP_FOE_ORDER=["nipper","driftjelly","lanternfish","armourray"];
+  var DEEP_FOE_ORDER=[];   /* fills as the Deep's enemies get designed */
   var ALM_FAMS=[
     ["mythic","Mythic",
      "Since the Flatbird and the Long Bird are only useful in the Sky, due to their ability to "+
@@ -5809,6 +5745,8 @@
   function almEnemies(b){
     [["The Caves",CAVE_FOE_ORDER],["The Sky",SKY_FOE_ORDER],
      ["The Deep Sea",DEEP_FOE_ORDER]].forEach(function(sec){
+      /* a world with no enemies yet gets no heading — nothing to list, nothing to tease */
+      if(!sec[1].length) return;
       almHead(b, sec[0]);
       sec[1].forEach(function(f){
         var d=FOES[f];
@@ -6026,13 +5964,18 @@
 
   var SKY_LAST=Math.max.apply(null,Object.keys(SKY_LEVELS).map(Number));
 
-  function caveOpen(n){ return n===1 || !!meta.cleared[n-1]; }
+  /* DEV: every level and both world doors are open while the designer plays
+     through freely. He turns this on by saying "unlock all levels" and off by
+     saying "lock all levels" — to lock, set this to false. */
+  var DEV_ALL_OPEN=true;
+
+  function caveOpen(n){ return DEV_ALL_OPEN || n===1 || !!meta.cleared[n-1]; }
   /* DEV: the Deep Sea is open from the start while it is being built. Delete the
      `|| true` here and it goes back to being earned off the Thunderhead. */
   function deepWorldOpen(){ return !!meta.cleared["s"+SKY_LAST] || true; }
-  function deepOpen(n){ return n===1 ? deepWorldOpen() : !!meta.cleared["d"+(n-1)]; }
-  function skyOpen(n){ return n===1 ? skyWorldOpen() : !!meta.cleared["s"+(n-1)]; }
-  function skyWorldOpen(){ return !!meta.cleared[CAVE_LAST]; }
+  function deepOpen(n){ return DEV_ALL_OPEN || (n===1 ? deepWorldOpen() : !!meta.cleared["d"+(n-1)]); }
+  function skyOpen(n){ return DEV_ALL_OPEN || (n===1 ? skyWorldOpen() : !!meta.cleared["s"+(n-1)]); }
+  function skyWorldOpen(){ return DEV_ALL_OPEN || !!meta.cleared[CAVE_LAST]; }
 
   function lockBtn(b,why,label){
     b.className="locked";
@@ -6308,7 +6251,7 @@
     window.__game={
       /* tables */
       CREATURES:CREATURES, FOES:FOES, ITEMS:ITEMS, ART:ART,
-      ORDER:ORDER, UPGRADE_ORDER:UPGRADE_ORDER,
+      ORDER:ORDER, UPGRADE_ORDER:UPGRADE_ORDER, sandMeta:sandMeta,
       LEVELS:LEVELS, SKY_LEVELS:SKY_LEVELS, DEEP_LEVELS:DEEP_LEVELS,
       RECIPES:RECIPES, PAIR_RECIPES:PAIR_RECIPES, MYTHICS:MYTHICS,
       CAVE_FOE_ORDER:CAVE_FOE_ORDER, SKY_FOE_ORDER:SKY_FOE_ORDER,
