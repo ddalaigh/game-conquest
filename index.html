@@ -776,9 +776,10 @@
       </div>
       <div class="lore hidden" data-foe="bubbledancer">
       <b>The Bubble Dancer.</b> Something down here watched the crocodile work and learned the
-      trick wrong on purpose. It appears where it pleases, dances once, and leaves a column of
-      black-rimmed bubbles the dead drink like armour &mdash; 30 health apiece, first come,
-      first served. Its bubbles answer to it, not to you.
+      trick wrong on purpose. It takes the middle lane every time, and it dances the moment
+      it is on the board &mdash; at the water's edge, out of easy reach &mdash; and the dance
+      ends in a column of black-rimmed bubbles the dead drink like armour, 30 health apiece,
+      first come, first served. Its bubbles answer to it, not to you.
       </div>
       <br><br>
       This world is still being dug. Something lives in it now &mdash; five levels of it &mdash;
@@ -2740,13 +2741,16 @@
               "damage will not shift one — bring something that hits hard in a single place."},
     bubbledancer:{name:"Bubble Dancer", world:"deep", hp:240, speed:10,
               art:ART.bubbledancer, tag:"DANCER", size:36,
-              /* appears at its tile, dances once, then one dark bubble on its column
-                 in every lane — the first enemy through each drinks 30 of shield */
-              dance:{row:2, col:2, windup:2000, shield:30},
-              note:"It does not walk in — it appears at the middle of the board and dances "+
-              "once. The dance ends in a dark bubble on its column in every lane, and the "+
-              "first of the dead through each drinks 30 health of shield. Its bubbles, not "+
-              "yours. 240 health, so stopping the dance takes damage already standing."}
+              /* takes the middle lane every time, and dances the moment it stands on
+                 its first tile — the water's edge. The dance ends in one dark bubble
+                 on the third tile of every lane; the first enemy through each drinks
+                 30 of shield. */
+              dance:{row:2, bubbleCol:2, windup:2000, shield:30},
+              note:"It takes the middle lane every time, and the moment it stands on its "+
+              "first tile it stops and dances. The dance ends in a dark bubble on the "+
+              "third tile of every lane, and the first of the dead through each drinks "+
+              "30 health of shield. Its bubbles, not yours. It dances at the water's "+
+              "edge, far from your line — reach it there or meet it shielded."}
   };
 
   /* ============================================================
@@ -2902,10 +2906,10 @@
             "whether your answer to the first three was an answer or a fluke."},
     5:{count:30, gap:2800, mix:["drowned","shielddrowned","armourdrowned","bubbledancer","drowned"],
        gaps:[[1,4],[3,1],[0,3],[4,5]],
-       note:"The Bubble Dancer appears mid-board, dances once, and leaves dark bubbles in "+
-            "its column — the first of the dead through each drinks 30 health of shield. "+
-            "Its bubbles, not yours. The dance can be stopped, but not with damage you "+
-            "have not built yet."}
+       note:"The Bubble Dancer takes the middle lane every time and dances the moment it "+
+            "stands on its first tile. When the dance ends, dark bubbles bloom on the third "+
+            "tile of every lane, and the first of the dead through each drinks 30 health of "+
+            "shield. It dances at the water's edge — reach it there, or meet what it blessed."}
   };
 
   /* ============================================================
@@ -3759,7 +3763,8 @@
   }
   function danceBubbles(z){
     var dn=FOES[z.kind].dance;
-    for(var r=0;r<ROWS;r++) makeDarkBubble(r, dn.col, dn.shield);
+    /* it dances where it landed; the bubbles bloom on their own column */
+    for(var r=0;r<ROWS;r++) makeDarkBubble(r, dn.bubbleCol, dn.shield);
     SND.sfx("place");
     addFloat(z.x, z.row*CH+CH*0.1, "the dance ends", "#9b86d8");
   }
@@ -4414,9 +4419,9 @@
 
   function spawnFoe(kind,row,atX,extra){
     var d=FOES[kind];
-    /* the Bubble Dancer does not walk in — wherever it was sent from, it appears
-       at its own tile, already dancing */
-    if(d.dance){ row=d.dance.row; atX=midX(d.dance.col); }
+    /* the Bubble Dancer takes the middle lane, every time — but it walks in
+       from the edge like anything else */
+    if(d.dance){ row=d.dance.row; }
     var sz=d.size||34;
     var wide=d.wide?CW*d.wide:sz;
     var el=document.createElement("div");
@@ -4437,15 +4442,11 @@
            size:sz, wide:wide, extra:!!extra, boss:!!d.boss, summonT:0, slamT:0, winding:0, warnEl:null, laneT:0,
            through:(d.charge?d.charge.through:0), fireTaken:0, grown:false,
            fireImmune:!!d.fireImmune, fireOnly:!!d.fireOnly, flier:!!d.flier, driftT:0,
-           dancing:(d.dance?d.dance.windup:0), shield:0,
+           dancing:0, danced:false, shield:0,
            underground:false, hasDug:false, usedTunnel:false,
            surfaceAt:0, surfaceRow:undefined};
     foes.push(z);
     placeFoe(z);
-    if(z.dancing>0){
-      z.el.classList.add("dancing");
-      flare(z.x, z.row*CH+CH/2, CW*0.9);
-    }
     return z;
   }
 
@@ -5164,14 +5165,23 @@
         continue;
       }
 
-      /* the Bubble Dancer holds its tile until the dance is done — kill it first
-         and no bubbles come. After the dance it walks like everything else. */
-      if(z.dancing>0){
-        z.dancing-=dt;
-        if(z.dancing>0) continue;
-        z.dancing=0;
-        z.el.classList.remove("dancing");
-        danceBubbles(z);
+      /* the Bubble Dancer walks on, and the moment it stands on its first tile —
+         the water's edge — it stops and dances. Kill it mid-dance and no bubbles
+         come; after the dance it walks the whole board like everything else. */
+      var dnc=FOES[z.kind].dance;
+      if(dnc && !z.danced){
+        if(z.dancing>0){
+          z.dancing-=dt;
+          if(z.dancing>0) continue;
+          z.dancing=0;
+          z.danced=true;
+          z.el.classList.remove("dancing");
+          danceBubbles(z);
+        } else if(z.x <= midX(COLS-1)+CW*0.1){
+          z.dancing=dnc.windup;
+          z.el.classList.add("dancing");
+          continue;
+        }
       }
 
       /* a Drift Glob will not stay in the lane you answered */
