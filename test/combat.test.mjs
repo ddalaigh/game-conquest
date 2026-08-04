@@ -357,3 +357,14 @@ test("a sand block stops your shots until 80 damage breaks it", () => {
   for (let i = 0; i < 100 && !hurt; i++) { g.step(100); hurt = z.hp < hp0; }
   assert.ok(hurt, "the broken wall still stopped the shots");
 });
+
+test("a lone sand wall is still worth shooting", () => {
+  const g = boot();
+  g.startLevel("caves", 1, true);
+  g.setEnergy(9999);
+  put(g, "drakeling", 1, 0);
+  g.makeSandBlock(1, 3, 80);
+  let broke = false;
+  for (let i = 0; i < 200 && !broke; i++) { g.step(100); broke = !g.state().grid[1][3].sandBlock; }
+  assert.ok(broke, "with no enemy in range, nobody shot the wall down");
+});

@@ -5104,6 +5104,22 @@
     return false;
   }
 
+  /* a sand block ahead counts as something to shoot — walls do not clear themselves */
+  function sandInRows(u,rowSpan,allRows,range){
+    var ux=midX(u.col);
+    for(var r=0;r<ROWS;r++){
+      if(!allRows && Math.abs(r-u.row)>rowSpan) continue;
+      for(var c=0;c<COLS;c++){
+        var g2=grid[r][c];
+        if(!g2 || !g2.sandBlock) continue;
+        var d2=midX(c)-ux;
+        /* range 0 means unlimited here — that is how statsFor spells "no limit" */
+        if(d2>=-CW*0.5 && (!range || d2<=CW*range)) return true;
+      }
+    }
+    return false;
+  }
+
   function anyFoeAhead(u,rowSpan,allRows){
     var ux=colX(u.col);
     for(var i=0;i<foes.length;i++){
@@ -5279,7 +5295,8 @@
       /* normal fire — range-limited shooters wait for something to come close */
       if(s.every){
         var span2 = s.rows||0;
-        var ready = s.range ? foeInRange(u, s.range, span2) : anyFoeAhead(u, span2, s.allRows);
+        var ready = (s.range ? foeInRange(u, s.range, span2) : anyFoeAhead(u, span2, s.allRows))
+                    || sandInRows(u, span2, s.allRows, s.range);
         if(ready){
           u.shootT+=dt;
           var rate=s.every*auraAt(r,c);
