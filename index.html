@@ -2904,12 +2904,14 @@
        gaps:[[0,4],[2,2],[3,5],[4,3]],
        note:"Every Drowned at once and four trenches. Nothing new arrives — this level asks "+
             "whether your answer to the first three was an answer or a fluke."},
-    5:{count:30, gap:2800, mix:["drowned","shielddrowned","armourdrowned","bubbledancer","drowned"],
+    5:{count:30, gap:2800, mix:["drowned","shielddrowned","armourdrowned","drowned"],
+       /* exactly one Dancer a wave — it was a crowd before, and the designer thinned it */
+       rare:{kind:"bubbledancer", min:1, max:1},
        gaps:[[1,4],[3,1],[0,3],[4,5]],
-       note:"The Bubble Dancer takes the middle lane every time and dances the moment it "+
-            "stands on its first tile. When the dance ends, dark bubbles bloom on the third "+
-            "tile of every lane, and the first of the dead through each drinks 30 health of "+
-            "shield. It dances at the water's edge — reach it there, or meet what it blessed."}
+       note:"One Bubble Dancer comes each wave, late. It takes the middle lane, dances the "+
+            "moment it stands on its first tile, and dark bubbles bloom on the third tile "+
+            "of every lane — the first of the dead through each drinks 30 health of shield. "+
+            "Reach it at the water's edge, or meet what it blessed."}
   };
 
   /* ============================================================
