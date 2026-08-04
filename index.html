@@ -3089,9 +3089,10 @@
   /* Sandbox keeps its own bindings. Anything fused in the sandbox table stays
      in the sandbox — it never reaches the real tray. */
   var sandMeta={
-    /* each no-ground world's own carrier has to be here, or its sandbox is unplayable */
-    unlocked:{flatbird:1,bubbledial:1,forge:1,leysprite:1,tinyember:1,cinderwisp:1,drakeling:1,tortoise:1,
-              thornback:1,frostmoth:1,phoenix:1,slingroc:1},
+    /* the sandbox owns one of everything — every creature, fusion and upgrade,
+       straight from the CREATURES table. A hand-written list here would go stale
+       the day the next creature lands; this one cannot. */
+    unlocked:(function(){ var all={}; for(var k in CREATURES) all[k]=1; return all; })(),
     bank:{1:9,2:9,3:9}
   };
   var sandbox=false;

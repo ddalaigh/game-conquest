@@ -154,3 +154,8 @@ test("each no-ground world has a free carrier you can always fall back on", () =
       `${world}: no carrier in the sandbox bindings — its sandbox would be unplayable`);
   }
 });
+
+test("the sandbox owns one of everything", () => {
+  for (const k of Object.keys(g.CREATURES))
+    assert.ok(g.sandMeta.unlocked[k], `"${k}" is missing from the sandbox bindings`);
+});
