@@ -147,6 +147,8 @@
     box-shadow:0 0 9px rgba(60,80,110,.55)}
   .foe.dancing .art{animation:seadance .46s ease-in-out infinite alternate}
   @keyframes seadance{from{transform:rotate(-9deg) translateY(-4%)}to{transform:rotate(9deg) translateY(4%)}}
+  .foe.kelp .art{filter:sepia(1) hue-rotate(58deg) saturate(1.5) brightness(.92)}
+  .foe.kelp .tag{color:#8fe3a8}
   .unit.inbubble{filter:drop-shadow(0 0 6px rgba(150,230,245,.75))}
   /* the crocodile puffing before it goes */
   /* the puff is decoration only — removeUnit does the disappearing, so a paused
@@ -1310,6 +1312,18 @@
       "<circle cx='18.6' cy='15' r='1.4' fill='#2a4358'/><circle cx='21.4' cy='15' r='1.4' fill='#2a4358'/>"+
       "<path d='M18 12l-3-4M22 12l3-4' stroke='#e8f6ff' stroke-width='1.4' stroke-linecap='round'/>"+
       "</g></svg>",
+    kelpphoenix:"<svg viewBox='0 0 40 40' width='34' height='34'><g>"+
+      "<path d='M18 21q-12-9-16-2 4 9 15 6z' fill='#5c8a5e'/>"+
+      "<path d='M22 21q12-9 16-2-4 9-15 6z' fill='#5c8a5e'/>"+
+      "<path d='M18 22q-9-4-12 1 5 5 12 2z' fill='#7fb069'/>"+
+      "<path d='M22 22q9-4 12 1-5 5-12 2z' fill='#7fb069'/>"+
+      "<ellipse cx='20' cy='22' rx='5' ry='8' fill='#3f6d4e'/>"+
+      "<ellipse cx='20' cy='14' rx='4.6' ry='4.2' fill='#5c8a5e'/>"+
+      "<path d='M20 6q3 4 1 6-3-2-1-6z' fill='#8fe3a8'/>"+
+      "<path d='M24 14l4 1.5-4 1.5z' fill='#8fe3a8'/>"+
+      "<circle cx='18.6' cy='13.4' r='1' fill='#16241c'/>"+
+      "<path d='M17 30q-2 5 0 8M23 30q2 5 0 8' stroke='#3f6d4e' stroke-width='1.6' fill='none' stroke-linecap='round'/>"+
+      "</g></svg>",
     phoenix:"<svg viewBox='0 0 40 40' width='34' height='34'><g>"+
       "<path d='M18 21q-12-9-16-2 4 9 15 6z' fill='#ff8a3d'/>"+
       "<path d='M22 21q12-9 16-2-4 9-15 6z' fill='#ff8a3d'/>"+
@@ -2211,6 +2225,18 @@
             "The Bone King is too big to flatten \u2014 it takes 500 from the blast and 250 from the landing."
     },
 
+    kelpphoenix:{
+      name:"Mystic Kelp Phoenix", fusedOnly:true, family:"winged", cost:300, rc:20000, hp:120,
+      cap:2,
+      glow:"rgba(143,227,168,.9)",
+      /* its one job: every ten seconds it grows a kelp copy of an old enemy —
+         the designer's eight — and the copy marches the other way, for you */
+      kelp:{every:10000, pool:["skeleton","shielded","archer","digger",
+                               "glob","driftglob","shieldglob","broodglob"]},
+      boost:{kind:"kelpburst", count:3},
+      blurb:"Fused from the Ashen Phoenix and the Mystic Kelp. It does not shoot and it does "+
+      "not revive — every ten seconds it grows a soldier of kelp in the shape of an old "+
+      "enemy, and the soldier marches the other way. The dead fighting the dead, in green."},
     ashenphoenix:{
       name:"Ashen Phoenix", fusedOnly:true, family:"winged", cost:250, rc:15000, hp:100,
       glow:"rgba(232,226,240,.95)",
@@ -2375,7 +2401,7 @@
       blurb:"The burst now triggers from the lanes above and below as well."
     }
   };
-  var ORDER=["flatbird","longbird","bubbledial","forge","leysprite","galesprite","stormforge","tinyember","cinderwisp","cinderghoul","egyptiancinder","bonfire","boxingflames","skyboxer","drakeling","colddrakeling","stormdrake","stonedragon","tortoise","thornback","thornbark","blowertortoise","galetortoise","frostmoth","burnmoth","metalbird","phoenix","phoenixphoenix","slingroc","thunderroc","ashenphoenix","bombrider","speedyroller","coldstonedragon","stormmoth","thundermoth"];
+  var ORDER=["flatbird","longbird","bubbledial","forge","leysprite","galesprite","stormforge","tinyember","cinderwisp","cinderghoul","egyptiancinder","bonfire","boxingflames","skyboxer","drakeling","colddrakeling","stormdrake","stonedragon","tortoise","thornback","thornbark","blowertortoise","galetortoise","frostmoth","burnmoth","metalbird","phoenix","phoenixphoenix","slingroc","thunderroc","ashenphoenix","kelpphoenix","bombrider","speedyroller","coldstonedragon","stormmoth","thundermoth"];
   var UPGRADE_ORDER=["twinforge","twindrake","fourdrake","deepshell","brightphoenix","widephoenix"];
 
   /* every upgraded form counts against its base creature's projection cap */
@@ -2405,7 +2431,7 @@
     /* wings */
     drakeling:1, colddrakeling:1, stonedragon:1, coldstonedragon:1,
     twindrake:1, fourdrake:1,
-    phoenix:1, brightphoenix:1, widephoenix:1, ashenphoenix:1, phoenixphoenix:1, slingroc:1,
+    phoenix:1, brightphoenix:1, widephoenix:1, ashenphoenix:1, kelpphoenix:1, phoenixphoenix:1, slingroc:1,
     frostmoth:1, burnmoth:1, stormmoth:1, thundermoth:1, metalbird:1,
     leysprite:1, galesprite:1, flatbird:1, longbird:1,
     /* the Sky's own \u2014 a bird was folded into each of them, or the storm made them */
@@ -2421,6 +2447,16 @@
      Fusion items — one is awarded for each level you clear
      ============================================================ */
   var ITEMS={
+    mystickelp:{name:"Mystic Kelp",
+      desc:"Torn from the Deep's one garden. It remembers being alive, and it is willing to be again.",
+      art:"<svg viewBox='0 0 40 40' width='30' height='30'><g>"+
+        "<path d='M14 36q-3-8 0-14t-1-12' stroke='#3f6d4e' stroke-width='2.6' fill='none' stroke-linecap='round'/>"+
+        "<path d='M20 37q3-9 0-16t2-13' stroke='#5c8a5e' stroke-width='2.8' fill='none' stroke-linecap='round'/>"+
+        "<path d='M27 36q3-7 0-13t1-11' stroke='#3f6d4e' stroke-width='2.4' fill='none' stroke-linecap='round'/>"+
+        "<circle cx='20' cy='10' r='2.2' fill='#8fe3a8'/>"+
+        "<circle cx='14' cy='12' r='1.5' fill='#8fe3a8' opacity='.8'/>"+
+        "<circle cx='27' cy='13' r='1.6' fill='#8fe3a8' opacity='.8'/>"+
+        "</g></svg>"},
     stone:{name:"Stone", desc:"A shard of the old mountain. Heavy, patient, slow to cool.",
       art:"<svg viewBox='0 0 40 40' width='30' height='30'><g>"+
         "<path d='M8 28l4-14 12-5 9 8-3 14-13 4z' fill='#6d6877'/>"+
@@ -2569,6 +2605,8 @@
   /* the Sky is where every rule about the ground stops applying */
   /* the Sky has its own drops */
   var SKY_ITEM={ 1:"galewings", 7:"thunderegg", 10:"cloudkey", 13:"windblower", 15:"birdmask", 17:"stormheart" };
+  /* the Deep's first reward — it took twenty levels and a designer to hand one over */
+  var DEEP_ITEM={ 4:"mystickelp" };
   /* clearing Sky 2 opens the second table */
   var SKY_UNLOCK={
     2:{key:"pairTable", name:"the creature table",
@@ -2603,6 +2641,7 @@
     {creature:"tortoise",   item:"ancientseal",result:"blowertortoise"},
     {creature:"forge",      item:"powderkeg",  result:"bombrider"},
     {creature:"phoenix",    item:"rebirthash", result:"ashenphoenix"},
+    {creature:"ashenphoenix", item:"mystickelp", result:"kelpphoenix"},
     {creature:"stonedragon",item:"frostshard", result:"coldstonedragon"},
     {creature:"frostmoth",  item:"stormcore",  result:"stormmoth"},
     {creature:"stormmoth",  item:"rebirthash", result:"thundermoth"},
@@ -3943,6 +3982,12 @@
       u.volley=Math.max(1,Math.round(d.boost.shots*m));
       u.volleyT=0;
       u.volleyDmg=s.dmg*2;
+    } else if(d.boost.kind==="kelpburst"){
+      var pk=CREATURES[u.key].kelp;
+      var kn=Math.max(1,Math.round(d.boost.count*m));
+      for(var kb2=0;kb2<kn;kb2++)
+        spawnKelp(pk.pool[Math.floor(rnd()*pk.pool.length)], u.row, midX(u.col)+CW*0.4+kb2*8);
+      addFloat(midX(u.col), u.row*CH+CH*0.2, "the kelp rises ×"+kn, "#8fe3a8");
     } else if(d.boost.kind==="flame"){
       u.restT=0; u.burning=true;
       u.forceFlame=Math.round(d.boost.seconds*1000*m);
@@ -4572,6 +4617,120 @@
     if(z.hp<=0) killFoe(z);
   }
 
+  /* ---- the kelp army. The Mystic Kelp Phoenix grows soldiers of seaweed in the
+     shape of the old enemies. They march the wrong way — toward the foe — and
+     fight whatever they meet. Allies, not units: they stand on no square. ---- */
+  var kelps=[];
+  function placeKelp(k){
+    var h=k.size||34;
+    k.el.style.left=pxX(k.x-h/2);
+    k.el.style.top=pxY(k.row*CH+CH/2-h*0.56-(k.flier?CH*0.16:0));
+  }
+  function spawnKelp(kind,row,x){
+    var d=FOES[kind];
+    var el=document.createElement("div");
+    el.className="foe kelp";
+    el.setAttribute("data-kind",kind);
+    el.setAttribute("data-gait", d.flier?"float":"walk");
+    el.style.setProperty("--gait", Math.max(0.34, Math.min(1.6, 9/(d.speed||12))).toFixed(2)+"s");
+    var sz=d.size||34;
+    el.style.width=pxX(sz); el.style.height=pxY(sz);
+    el.innerHTML='<span class="tag">KELP</span>'+
+                 '<div class="art">'+d.art+'</div>'+
+                 '<div class="hpbar"><i style="width:100%"></i></div>';
+    inner.appendChild(el);
+    var k={kind:kind, row:row, x:x, hp:d.hp, maxHp:d.hp, speed:d.speed, size:sz,
+           el:el, fill:el.querySelector(".hpbar i"), biteT:0, shotT:0, driftT:0,
+           flier:!!d.flier};
+    kelps.push(k);
+    placeKelp(k);
+    return k;
+  }
+  function hurtKelp(k,amt){
+    k.hp-=amt;
+    pulse(k.el,"hitflash",90);
+    k.fill.style.width=Math.max(0,k.hp/k.maxHp*100)+"%";
+    if(k.hp<=0) killKelp(k);
+  }
+  function killKelp(k){
+    var i=kelps.indexOf(k);
+    if(i>-1) kelps.splice(i,1);
+    ghostOf(k.el, k.flier?"corpse airy":"corpse", 540);
+    if(k.el.parentNode) k.el.parentNode.removeChild(k.el);
+    /* a kelp Brood Glob comes apart the way the real one does — on your side */
+    var sp=FOES[k.kind] && FOES[k.kind].splits;
+    if(sp && !k.split){
+      for(var b=0;b<sp.count;b++){
+        var nr=Math.max(0, Math.min(ROWS-1, k.row + (b===0?-1:1)));
+        var ch=spawnKelp(sp.kind, nr, Math.max(KEEP+6, k.x + (b===0?-10:10)));
+        ch.split=true;
+      }
+    }
+  }
+  /* the nearest enemy ahead of a kelp — ahead means further right */
+  function foeNear(k,tiles){
+    var best=null;
+    for(var j=0;j<foes.length;j++){
+      var z=foes[j];
+      if(!z || z.row!==k.row || z.underground) continue;
+      var dx=z.x-k.x;
+      if(dx<-6 || dx>CW*tiles+20) continue;
+      if(!best || z.x<best.x) best=z;
+    }
+    return best;
+  }
+  function tickKelps(dt){
+    for(var i=kelps.length-1;i>=0;i--){
+      var k=kelps[i];
+      var d=FOES[k.kind];
+      /* a kelp Drift Glob hops lanes the way the real one does */
+      if(d.drift){
+        k.driftT+=dt;
+        if(k.driftT>=d.drift.every){
+          k.driftT-=d.drift.every;
+          var opts=[];
+          if(k.row>0) opts.push(k.row-1);
+          if(k.row<ROWS-1) opts.push(k.row+1);
+          if(opts.length){ k.row=opts[Math.floor(rnd()*opts.length)]; k.biteT=0; placeKelp(k); }
+        }
+      }
+      /* a kelp archer stops at its range and shoots, and the shot flies your way */
+      if(d.arrow){
+        var mark=foeNear(k, d.arrow.range);
+        if(mark){
+          k.shotT+=dt;
+          if(k.shotT>=d.arrow.every){
+            k.shotT-=d.arrow.every;
+            for(var q=0;q<(d.arrow.count||1);q++){
+              makeArrow(k.row, k.x+10+q*14, BITE_DMG);
+              var a=arrows[arrows.length-1];
+              a.back=true;
+              a.el.classList.add("back");
+            }
+          }
+          continue;
+        }
+        k.shotT=0;
+      }
+      /* whatever stands in the way gets bitten */
+      var target=foeNear(k, 0.08);
+      if(target){
+        k.el.classList.add("chomp");
+        k.biteT+=dt;
+        if(k.biteT>=BITE_EVERY){ k.biteT-=BITE_EVERY; hurtFoe(target, BITE_DMG); }
+        continue;
+      }
+      k.biteT=0;
+      k.el.classList.remove("chomp");
+      k.x += k.speed*dt/1000;
+      placeKelp(k);
+      if(k.x > SPAWN_X+20){
+        if(k.el.parentNode) k.el.parentNode.removeChild(k.el);
+        kelps.splice(i,1);
+      }
+    }
+  }
+
   /* ============================================================
      Waves
      ============================================================ */
@@ -4789,6 +4948,16 @@
           energy+=s.genAmt;
           addFloat(midX(c), r*CH+CH*0.25, "+"+s.genAmt, "#63d6e8");
           updateHud();
+        }
+      }
+
+      /* the Mystic Kelp Phoenix grows its army on a slow clock */
+      if(d.kelp){
+        u.kelpT=(u.kelpT||0)+dt;
+        if(u.kelpT>=d.kelp.every){
+          u.kelpT-=d.kelp.every;
+          spawnKelp(d.kelp.pool[Math.floor(rnd()*d.kelp.pool.length)], r, midX(c)+CW*0.4);
+          addFloat(midX(c), r*CH+CH*0.1, "kelp rises", "#8fe3a8");
         }
       }
 
@@ -5377,6 +5546,21 @@
         z.shotT=0;
       }
 
+      /* a kelp soldier in the road is fought like anything else */
+      var kb=null;
+      for(var kq=0;kq<kelps.length;kq++){
+        var kk=kelps[kq];
+        if(kk.row!==z.row) continue;
+        var kdx=z.x-kk.x;
+        if(kdx>-6 && kdx<CW*0.08+20){ kb=kk; break; }
+      }
+      if(kb){
+        z.el.classList.add("chomp");
+        z.biteT+=dt;
+        if(z.biteT>=BITE_EVERY){ z.biteT-=BITE_EVERY; hurtKelp(kb, BITE_DMG); }
+        continue;
+      }
+
       /* is something in front of it? */
       var col=Math.floor((z.x-KEEP)/CW);
       var target=null;
@@ -5458,6 +5642,7 @@
     tickStones(dt);
     tickBirds(dt);
     tickArrows(dt);
+    tickKelps(dt);
     tickFoes(dt);
     tickFloats(dt);
     tickEffects(dt);
@@ -5483,7 +5668,7 @@
     lastOutcome=null;
     selected=null; boostSel=null;
     supportLeft=supportUses();
-    cd={}; foes=[]; bolts=[]; floats=[]; drops=[]; effects=[]; riders=[]; stones=[]; birds=[]; arrows=[]; tunnels=[];
+    cd={}; foes=[]; kelps=[]; bolts=[]; floats=[]; drops=[]; effects=[]; riders=[]; stones=[]; birds=[]; arrows=[]; tunnels=[];
     blankGrid();
     buildField();
     wave=sandbox?[]:buildWave(level);
@@ -5527,8 +5712,15 @@
     buildLevelGrid();          /* the next level, and maybe the Sky, just opened */
     if(WORLD==="deep"){
       document.getElementById("endTitle").textContent="Deep "+level+" cleared";
+      var dtxt="";
+      if(first && DEEP_ITEM[level]){
+        var dit=DEEP_ITEM[level];
+        meta.items[dit]=1;
+        dtxt='<span class="upg">You found the '+ITEMS[dit].name+'.</span> '+
+             'Yours for good \u2014 take it to the fusion table.<br><br>';
+      }
       document.getElementById("endBody").innerHTML=
-        "Held. The Deep Sea gives up nothing yet \u2014 its items and its bottom are still to come.";
+        dtxt+"Held. The Deep Sea gives up little else yet \u2014 its bottom is still to come.";
       var nxd=document.getElementById("endNext");
       if(DEEP_LEVELS[level+1]){ nxd.textContent="Deep "+(level+1); nxd.style.display=""; }
       else nxd.style.display="none";
@@ -6477,13 +6669,13 @@
       LEVELS:LEVELS, SKY_LEVELS:SKY_LEVELS, DEEP_LEVELS:DEEP_LEVELS,
       RECIPES:RECIPES, PAIR_RECIPES:PAIR_RECIPES, MYTHICS:MYTHICS,
       CAVE_FOE_ORDER:CAVE_FOE_ORDER, SKY_FOE_ORDER:SKY_FOE_ORDER,
-      DEEP_FOE_ORDER:DEEP_FOE_ORDER,
+      DEEP_FOE_ORDER:DEEP_FOE_ORDER, DEEP_ITEM:DEEP_ITEM,
       LEVEL_MYTHIC:LEVEL_MYTHIC, SKY_MYTHIC:SKY_MYTHIC,
       LEVEL_ITEM:LEVEL_ITEM, SKY_ITEM:SKY_ITEM, LEVEL_CREATURE:LEVEL_CREATURE,
       FLIES:FLIES, ROWS:ROWS, COLS:COLS, KEEP:KEEP, CW:CW, midX:midX,
       /* live state */
       meta:meta,
-      state:function(){ return {grid:grid, foes:foes, arrows:arrows, bolts:bolts,
+      state:function(){ return {grid:grid, foes:foes, kelps:kelps, arrows:arrows, bolts:bolts,
                                 energy:energy, level:level, world:WORLD,
                                 running:running, paused:paused}; },
       /* drive it */
@@ -6500,6 +6692,7 @@
       skyWorldOpen:skyWorldOpen, deepWorldOpen:deepWorldOpen,
       holdsAlone:holdsAlone, canFly:canFly, noGround:noGround, capOf:capOf,
       spawnFoe:spawnFoe, addUnit:addUnit, refreshLore:refreshLore, hurtFoe:hurtFoe,
+      spawnKelp:spawnKelp, hurtKelp:hurtKelp,
       makeArrow:makeArrow, makeShell:makeShell, tickArrows:tickArrows,
       canPlace:canPlace, setRng:setRng,
       outcome:function(){ return lastOutcome; },

@@ -201,3 +201,53 @@ test("the shield soaks damage before health, then breaks", () => {
   assert.equal(z.shield, 0, "the shield did not break");
   assert.equal(z.hp, hp0 - 10, "the overflow did not carry into health");
 });
+
+/* ---- the kelp army. The Mystic Kelp Phoenix grows green copies of the old
+   enemies that march the other way and fight for the player. ---- */
+
+test("the Mystic Kelp Phoenix grows a soldier every ten seconds, from the pool", () => {
+  const g = boot();
+  g.startLevel("caves", 1, true);        /* sandbox: no wave in the way */
+  g.addUnit(2, 1, "kelpphoenix");
+  const every = g.CREATURES.kelpphoenix.kelp.every;
+  g.step(every - 200);
+  assert.equal(g.state().kelps.length, 0, "a soldier rose early");
+  g.step(400);
+  assert.equal(g.state().kelps.length, 1, "no soldier rose on the clock");
+  const pool = g.CREATURES.kelpphoenix.kelp.pool;
+  assert.ok(pool.includes(g.state().kelps[0].kind),
+    `it grew "${g.state().kelps[0].kind}", which is not in the designer's pool`);
+  g.step(every);
+  assert.equal(g.state().kelps.length, 2, "the clock stopped after one");
+});
+
+test("a kelp soldier marches at the enemy and both sides bleed", () => {
+  const g = boot();
+  g.startLevel("caves", 1, true);
+  const k = g.spawnKelp("skeleton", 1, g.midX(1));
+  const z = g.spawnFoe("skeleton", 1, g.midX(4));
+  const kh = k.hp, zh = z.hp;
+  for (let i = 0; i < 400 && (z.hp === zh || k.hp === kh); i++) g.step(50);
+  assert.ok(z.hp < zh, "the enemy was never bitten");
+  assert.ok(k.hp < kh, "the enemy never bit back");
+});
+
+test("a kelp archer shoots the other way", () => {
+  const g = boot();
+  g.startLevel("caves", 1, true);
+  g.spawnKelp("archer", 0, g.midX(1));
+  const z = g.spawnFoe("armoured", 0, g.midX(3));
+  const zh = z.hp;
+  for (let i = 0; i < 200 && z.hp === zh; i++) g.step(50);
+  assert.ok(z.hp < zh, "the kelp archer never landed a shot");
+});
+
+test("a kelp Brood Glob comes apart on your side", () => {
+  const g = boot();
+  g.startLevel("caves", 1, true);
+  const k = g.spawnKelp("broodglob", 2, g.midX(2));
+  g.hurtKelp(k, 9999);
+  const kinds = g.state().kelps.map(x => x.kind);
+  assert.equal(kinds.filter(x => x === "globling").length, 2,
+    "the brood did not come apart into two kelp Globlings");
+});

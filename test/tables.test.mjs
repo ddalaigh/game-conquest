@@ -125,6 +125,7 @@ test("every level reward names something real", () => {
   };
   check(g.LEVEL_ITEM, "cave item", g.ITEMS);
   check(g.SKY_ITEM, "sky item", g.ITEMS);
+  check(g.DEEP_ITEM, "deep item", g.ITEMS);
   check(g.LEVEL_CREATURE, "cave creature", g.CREATURES);
   check(g.LEVEL_MYTHIC, "cave mythic", g.MYTHICS);
   check(g.SKY_MYTHIC, "sky mythic", g.MYTHICS);
