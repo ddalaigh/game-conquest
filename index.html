@@ -6682,23 +6682,21 @@
     document.getElementById("skyScreen").classList.add("hidden");
     start(1,true);
   });
-  document.getElementById("toSky").addEventListener("click",function(){
+  function openSky(){
     WORLD="sky";
+    /* the Flatbird comes with the Sky \u2014 walking in is enough. The Bone King's
+       victory still tells the bird's story for anyone who plays in order. */
+    if(!meta.unlocked.flatbird){ meta.unlocked.flatbird=1; meta.mythics.flatbird=1; }
     var box=document.getElementById("skyMythic");
-    if(meta.mythics.flatbird){
-      box.className="fuseout hit";
-      box.innerHTML=ART.flatbird.replace(/width='34' height='34'/,"width='30' height='30'")+
-        '<div>The <span class="nm">Flatbird</span> is bound to you. Your Forge, Guardian and Support '+
-        'creatures will be able to fight up here.</div>';
-    } else {
-      box.className="fuseout";
-      box.innerHTML='<div>The <b>Flatbird</b> is still out there. Beat the Bone King and it answers '+
-        'you \u2014 without it only Winged and Dragon creatures can hold a board with no ground '+
-        'under it.</div>';
-    }
+    box.className="fuseout hit";
+    box.innerHTML=ART.flatbird.replace(/width='34' height='34'/,"width='30' height='30'")+
+      '<div>The <span class="nm">Flatbird</span> is bound to you. Your Forge, Guardian and Support '+
+      'creatures will be able to fight up here.</div>';
     document.getElementById("startScreen").classList.add("hidden");
+    document.getElementById("deepScreen").classList.add("hidden");
     document.getElementById("skyScreen").classList.remove("hidden");
-  });
+  }
+  document.getElementById("toSky").addEventListener("click",openSky);
   document.getElementById("skyBack").addEventListener("click",function(){
     WORLD="caves";
     document.getElementById("skyScreen").classList.add("hidden");
@@ -6723,7 +6721,7 @@
   document.getElementById("deepDoor").addEventListener("click",openDeep);
   document.getElementById("deepBack").addEventListener("click",function(){
     document.getElementById("deepScreen").classList.add("hidden");
-    if(meta.cleared["s"+SKY_LAST]){ WORLD="sky"; document.getElementById("skyScreen").classList.remove("hidden"); }
+    if(meta.cleared["s"+SKY_LAST]){ openSky(); }
     else { WORLD="caves"; document.getElementById("startScreen").classList.remove("hidden"); }
   });
   document.getElementById("deepSand").addEventListener("click",function(){
