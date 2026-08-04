@@ -1501,6 +1501,9 @@
       "<path d='M20 8q7 8 4 14 6 3 4 9-3 4-8 4t-8-4q-2-6 4-9-3-6 4-14z' fill='#ff8a3d'/>"+
       "<path d='M20 15q4 5 2 9 4 2 2 6-2 2-4 2t-4-2q-2-4 2-6-2-4 2-9z' fill='#f0c05a'/>"+
       "<path d='M20 21q2 3 1 5t-1 2-1-2 1-5z' fill='#ffe0b0'/>"+
+      "<ellipse cx='17.4' cy='24.5' rx='1.2' ry='1.6' fill='#2b1405'/>"+
+      "<ellipse cx='22.6' cy='24.5' rx='1.2' ry='1.6' fill='#2b1405'/>"+
+      "<circle cx='17.8' cy='24' r='.45' fill='#fff2cf'/><circle cx='23' cy='24' r='.45' fill='#fff2cf'/>"+
       "<g fill='#f0c05a' opacity='.7'><circle cx='11' cy='14' r='1.2'/><circle cx='30' cy='16' r='1'/>"+
       "<circle cx='26' cy='8' r='.9'/></g></g></svg>",
     boxingflames:"<svg viewBox='0 0 40 40' width='34' height='34'><g>"+
@@ -2288,9 +2291,8 @@
     boxingflames:{
       name:"Boxing Flames", fusedOnly:true, family:"dragon", cost:125, rc:10000, hp:200,
       glow:"rgba(226,98,74,.9)",
-      punch:{every:1200, dmg:20, range:3, knockChance:0.35, knockTiles:1},
-      blurb:"The bonfire got up and put gloves on. Anything within three tiles takes 20 a punch, and "+
-            "roughly one punch in three sends it staggering back a square."
+      punch:{every:1200, dmg:20, range:3},
+      blurb:"The bonfire got up and put gloves on. Anything within three tiles takes 20 a punch."
     },
     egyptiancinder:{
       name:"Egyptian Cinder", fusedOnly:true, family:"dragon", cost:70, rc:5000, hp:100,
@@ -2341,10 +2343,9 @@
     skyboxer:{
       name:"Sky Boxer", fusedOnly:true, family:"dragon", cost:200, rc:10000, hp:200,
       glow:"rgba(255,176,77,1)",
-      punch:{every:1100, dmg:25, range:3, knockChance:0.5, knockTiles:1},
-      blurb:"Boxing Flames with a bird folded through it. 25 a punch out to three tiles, and "+
-            "half of them send a glob drifting back a square. It burns, so it is what you bring "+
-            "for a Stormhead."
+      punch:{every:1100, dmg:25, range:3},
+      blurb:"Boxing Flames with a bird folded through it. 25 a punch out to three tiles. It "+
+            "burns, so it is what you bring for a Stormhead."
     },
     stormdrake:{
       name:"Storm Drake", fusedOnly:true, family:"dragon", cost:225, rc:10000, hp:100,
@@ -5116,7 +5117,8 @@
         continue;
       }
 
-      /* the punch: nearest thing within reach, and it may go flying */
+      /* the punch: nearest thing within reach. It used to stagger enemies back a
+         tile too — the designer struck that as too strong, so a punch is a punch. */
       if(s.punchEvery){
         if(foeInRange(u, s.punchRange, 0)){
           u.shootT+=dt;
@@ -5134,12 +5136,6 @@
             if(tgt){
               flare(tgt.x-6, r*CH+CH/2, CW*0.7);
               hurtFoe(tgt, s.punchDmg, true);
-              if(rnd()<s.knockChance && foes.indexOf(tgt)>-1){
-                tgt.x=Math.min(SPAWN_X, tgt.x + CW*s.knockTiles);
-                tgt.biteT=0;
-                placeFoe(tgt);
-                addFloat(tgt.x, r*CH+CH*0.15, "staggered", "#e2624a");
-              }
             }
           }
         }
