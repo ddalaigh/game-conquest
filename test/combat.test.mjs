@@ -368,3 +368,21 @@ test("a lone sand wall is still worth shooting", () => {
   for (let i = 0; i < 200 && !broke; i++) { g.step(100); broke = !g.state().grid[1][3].sandBlock; }
   assert.ok(broke, "with no enemy in range, nobody shot the wall down");
 });
+
+test("the Ruler's cannons bomb the lanes beside it, three by three, for 60", () => {
+  const g = boot();
+  g.startLevel("caves", 1, true);      /* the palace's rules are world-free */
+  g.setEnergy(9999);
+  const above = put(g, "forge", 1, 1);
+  const below = put(g, "forge", 3, 1);
+  assert.ok(above && below, "could not set the court");
+  const s = g.spawnFoe("drownruler", 2);
+  s.laneT = -9e9;                       /* pin its lane so above and below stay put */
+  const spec = g.FOES.drownruler.cannons;
+  const hp0 = above.hp;
+  g.step(spec.every - 300);
+  assert.equal(above.hp, hp0, "the cannons fired early");
+  g.step(600);
+  assert.equal(above.hp, hp0 - spec.dmg, "the lane above was not bombed");
+  assert.equal(below.hp, hp0 - spec.dmg, "the lane below was not bombed");
+});
