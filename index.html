@@ -1602,6 +1602,17 @@
       "<path d='M5 12q5 2 4 6M35 12q-5 2-4 6M7 30q5-2 7 1M33 30q-5-2-7 1' stroke='#dff3ff' "+
         "stroke-width='1.5' fill='none' stroke-linecap='round'/>"+
       "</g></svg>",
+    possessedswimgear:"<svg viewBox='0 0 40 40' width='34' height='34'><g>"+
+      "<rect x='6' y='12' width='6.5' height='14' rx='3' fill='#8fa4b8'/>"+
+      "<ellipse cx='21' cy='16' rx='8' ry='6.5' fill='none' stroke='#2b4a63' stroke-width='2.2'/>"+
+      "<ellipse cx='21' cy='16' rx='6' ry='4.8' fill='#0e2a38'/>"+
+      "<circle cx='18.5' cy='15.5' r='1.6' fill='#8fe3e0'/><circle cx='24' cy='15.5' r='1.6' fill='#8fe3e0'/>"+
+      "<path d='M13 13q-3-1-5 1M29 13q2-1 4 1' stroke='#2b4a63' stroke-width='1.6' fill='none'/>"+
+      "<path d='M12 24q4 4 9 4 5 0 8-3' stroke='#3d5a72' stroke-width='2.4' fill='none' stroke-linecap='round'/>"+
+      "<path d='M14 30q-2 4-5 5 0-4 2-6zM24 31q0 4 3 6 1-4-1-7z' fill='#2b4a63'/>"+
+      "<circle cx='33' cy='10' r='2.4' fill='none' stroke='#8fe3e0' stroke-width='1.2' opacity='.8'/>"+
+      "<circle cx='36.5' cy='6' r='1.4' fill='none' stroke='#8fe3e0' stroke-width='1' opacity='.6'/>"+
+      "</g></svg>",
     corallysprite:"<svg viewBox='0 0 40 40' width='34' height='34'><g>"+
       "<circle cx='20' cy='21' r='14' fill='none' stroke='#ff9d7a' stroke-width='1.2' opacity='.45'/>"+
       "<circle cx='20' cy='21' r='10' fill='none' stroke='#ff9d7a' stroke-width='1' opacity='.3'/>"+
@@ -2448,6 +2459,14 @@
       blurb:"The ghoul bound and sealed, and spread thin across the whole battlefield. Only 3 a shot, "+
             "but it fires down <em>every</em> lane at once and each shot pierces everything in it."
     },
+    possessedswimgear:{
+      name:"Possessed Swim Gear", fusedOnly:true, family:"dragon", cost:75, rc:5000, hp:100,
+      glow:"rgba(143,227,224,.9)",
+      shoot:{every:1500, dmg:30, bolts:1, pierce:true, bub:true, pop:30},
+      boost:{kind:"volley", shots:12},
+      blurb:"The ghoul moved into the scuba gear and never moved out. It blows bubbles that "+
+            "pass through the whole lane for 30 apiece — and the last enemy a bubble touches "+
+            "wears it as it bursts, for 60. The final fusion. The tank never empties."},
     cinderghoul:{
       name:"Cinder Ghoul", fusedOnly:true, family:"dragon", cost:50, rc:5000, hp:100,
       glow:"rgba(255,138,61,.75)",
@@ -2568,7 +2587,7 @@
       blurb:"The burst now triggers from the lanes above and below as well."
     }
   };
-  var ORDER=["flatbird","longbird","bubbledial","forge","leysprite","galesprite","corallysprite","stormforge","tinyember","cinderwisp","cinderghoul","egyptiancinder","bonfire","boxingflames","skyboxer","drakeling","colddrakeling","stormdrake","stonedragon","tortoise","thornback","thornbark","blowertortoise","galetortoise","frostmoth","burnmoth","metalbird","phoenix","phoenixphoenix","slingroc","thunderroc","ashenphoenix","kelpphoenix","bombrider","speedyroller","coldstonedragon","sandstonedragon","stormmoth","thundermoth"];
+  var ORDER=["flatbird","longbird","bubbledial","forge","leysprite","galesprite","corallysprite","stormforge","tinyember","cinderwisp","cinderghoul","possessedswimgear","egyptiancinder","bonfire","boxingflames","skyboxer","drakeling","colddrakeling","stormdrake","stonedragon","tortoise","thornback","thornbark","blowertortoise","galetortoise","frostmoth","burnmoth","metalbird","phoenix","phoenixphoenix","slingroc","thunderroc","ashenphoenix","kelpphoenix","bombrider","speedyroller","coldstonedragon","sandstonedragon","stormmoth","thundermoth"];
   var UPGRADE_ORDER=["twinforge","twindrake","fourdrake","deepshell","brightphoenix","widephoenix"];
 
   /* every upgraded form counts against its base creature's projection cap */
@@ -2604,7 +2623,7 @@
     /* the Sky's own \u2014 a bird was folded into each of them, or the storm made them */
     skyboxer:1, stormdrake:1, thunderroc:1,
     /* dead, and no longer held down by anything */
-    cinderghoul:1, egyptiancinder:1
+    cinderghoul:1, egyptiancinder:1, possessedswimgear:1
   };
   /* Tiny Ember and Cinder Wisp are living flames with no wings — they need carrying.
      Their ghost forms do not, being dead. */
@@ -2614,6 +2633,18 @@
      Fusion items — one is awarded for each level you clear
      ============================================================ */
   var ITEMS={
+    oldscubagear:{name:"Old Scuba Gear",
+      desc:"Left at the bottom by someone in a hurry to be elsewhere. The tank is still half "+
+           "full, which is its own story.",
+      art:"<svg viewBox='0 0 40 40' width='30' height='30'><g>"+
+        "<rect x='22' y='10' width='7' height='16' rx='3.5' fill='#8fa4b8'/>"+
+        "<rect x='23.5' y='7.5' width='4' height='4' rx='1' fill='#6e8496'/>"+
+        "<ellipse cx='13' cy='18' rx='8' ry='6.5' fill='none' stroke='#2b4a63' stroke-width='2.2'/>"+
+        "<ellipse cx='13' cy='18' rx='6' ry='4.6' fill='#bfe6f2' opacity='.85'/>"+
+        "<path d='M5.5 15q-3 1-4 3M20.5 15q3 1 4 3' stroke='#2b4a63' stroke-width='1.8' fill='none'/>"+
+        "<path d='M22 12q-4 4-7 3' stroke='#3d5a72' stroke-width='1.8' fill='none'/>"+
+        "<path d='M9 30q4 3 9 1M12 34q3 2 6 0' stroke='#3f6d4e' stroke-width='1.4' fill='none' stroke-linecap='round' opacity='.8'/>"+
+        "</g></svg>"},
     strangecoral:{name:"Strange Coral",
       desc:"Grown where no light reaches, in colours that have no business down there.",
       art:"<svg viewBox='0 0 40 40' width='30' height='30'><g>"+
@@ -2790,7 +2821,8 @@
   /* the Sky has its own drops */
   var SKY_ITEM={ 1:"galewings", 7:"thunderegg", 10:"cloudkey", 13:"windblower", 15:"birdmask", 17:"stormheart" };
   /* the Deep's first reward — it took twenty levels and a designer to hand one over */
-  var DEEP_ITEM={ 4:"mystickelp", 7:"wetsand", 11:"strangecoral" };
+  /* sixteen carries the last item in the whole game */
+  var DEEP_ITEM={ 4:"mystickelp", 7:"wetsand", 11:"strangecoral", 16:"oldscubagear" };
   /* clearing Sky 2 opens the second table */
   var SKY_UNLOCK={
     2:{key:"pairTable", name:"the creature table",
@@ -2829,6 +2861,8 @@
     {creature:"stonedragon",item:"frostshard", result:"coldstonedragon"},
     {creature:"stonedragon",item:"wetsand",    result:"sandstonedragon"},
     {creature:"leysprite",  item:"strangecoral", result:"corallysprite"},
+    /* the final fusion */
+    {creature:"cinderghoul", item:"oldscubagear", result:"possessedswimgear"},
     {creature:"frostmoth",  item:"stormcore",  result:"stormmoth"},
     {creature:"stormmoth",  item:"rebirthash", result:"thundermoth"},
     {creature:"thornback",  item:"treebark",   result:"thornbark"},
@@ -3361,6 +3395,7 @@
       s.rows=d.shoot.rows||0; s.pierce=!!d.shoot.pierce;
       s.range=d.shoot.range||0; s.heavy=!!d.shoot.heavy; s.chill=!!d.shoot.chill;
       s.allRows=!!d.shoot.allRows;
+      s.pop=d.shoot.pop||0; s.bub=!!d.shoot.bub;
     }
     if(d.burst){
       s.burstDmg=d.burst.dmg; s.burstRange=d.burst.range;
@@ -4458,10 +4493,11 @@
     pea  :{size:12, fill:"radial-gradient(circle,#ffe0b0,#ff8a3d 55%,rgba(255,138,61,0) 78%)"},
     ember:{size:9,  fill:"radial-gradient(circle,#fff2cf,#f0c05a 55%,rgba(240,192,90,0) 75%)"},
     heavy:{size:20, fill:"radial-gradient(circle,#fff6e2,#ffb04d 45%,rgba(255,110,40,.15) 80%)"},
-    ice  :{size:12, fill:"radial-gradient(circle,#e8f6ff,#6fc0e0 55%,rgba(111,192,224,0) 78%)"}
+    ice  :{size:12, fill:"radial-gradient(circle,#e8f6ff,#6fc0e0 55%,rgba(111,192,224,0) 78%)"},
+    bub  :{size:13, fill:"radial-gradient(circle at 36% 30%,rgba(255,255,255,.9),rgba(150,230,245,.5) 45%,rgba(150,230,245,.08) 72%)"}
   };
 
-  function makeBolt(row,x,dmg,pierce,look,chill,fire){
+  function makeBolt(row,x,dmg,pierce,look,chill,fire,pop){
     var L=BOLT_LOOK[look]||BOLT_LOOK.pea;
     var b=document.createElement("div");
     b.className="bolt";
@@ -4469,7 +4505,8 @@
     b.style.background=L.fill;
     b.style.left=pxX(x); b.style.top=pxY(row*CH+CH/2-L.size/2);
     inner.appendChild(b);
-    bolts.push({el:b,row:row,x:x,dmg:dmg,pierce:!!pierce,hit:[],size:L.size,chill:!!chill,fire:!!fire});
+    bolts.push({el:b,row:row,x:x,dmg:dmg,pierce:!!pierce,hit:[],size:L.size,chill:!!chill,fire:!!fire,
+                pop:pop||0,last:null});
   }
 
   function furthestInLane(row){
@@ -4535,11 +4572,11 @@
       for(var dr=-s.rows;dr<=s.rows;dr++){ var rr=u.row+dr; if(rr>=0&&rr<ROWS) rows.push(rr); }
     }
     var dmg = u.volley>0 ? u.volleyDmg : s.dmg;
-    var look = s.heavy ? "heavy" : s.chill ? "ice"
+    var look = s.bub ? "bub" : s.heavy ? "heavy" : s.chill ? "ice"
              : (CREATURES[u.key].family==="winged" ? "ember" : "pea");
     for(var i=0;i<rows.length;i++){
       for(var n=0;n<s.bolts;n++){
-        makeBolt(rows[i], bx + n*10, dmg, s.pierce, look, s.chill, !s.chill && !!FIRE_SOURCE[u.key]);
+        makeBolt(rows[i], bx + n*10, dmg, s.pierce, look, s.chill, !s.chill && !!FIRE_SOURCE[u.key], s.pop);
       }
     }
   }
@@ -5467,7 +5504,16 @@
     for(var i=bolts.length-1;i>=0;i--){
       var b=bolts[i];
       b.x += 0.42*dt;
-      if(b.x>VW+20){ if(b.el.parentNode) b.el.parentNode.removeChild(b.el); bolts.splice(i,1); continue; }
+      if(b.x>VW+20){
+        /* the bubble bursts on the last enemy it touched — another 30 on its way out */
+        if(b.pop && b.last && foes.indexOf(b.last)>-1){
+          flare(b.last.x, b.last.row*CH+CH/2, CW*0.8);
+          addFloat(b.last.x, b.last.row*CH+CH*0.1, "popped", "#8fe3e0");
+          hurtFoe(b.last, b.pop, b.fire);
+        }
+        if(b.el.parentNode) b.el.parentNode.removeChild(b.el);
+        bolts.splice(i,1); continue;
+      }
       b.el.style.left=pxX(b.x);
       /* a sand block stands in the way of anything flying flat */
       var sc=sandAhead(b.row, b.x);
@@ -5486,7 +5532,7 @@
         if(b.pierce && b.hit.indexOf(z)>-1) continue;
         if(b.chill) chillFoe(z);
         hurtFoe(z,b.dmg,b.fire);
-        if(b.pierce){ b.hit.push(z); }
+        if(b.pierce){ b.hit.push(z); b.last=z; }
         else { gone=true; }
         break;
       }

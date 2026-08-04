@@ -445,3 +445,19 @@ test("the Corally Sprite hums through a five-by-five", () => {
   assert.ok(boostedDmg >= plainDmg + 20,
     `two squares out should still quicken — plain ${plainDmg}, boosted ${boostedDmg}`);
 });
+
+test("the Possessed Swim Gear's bubble pierces for 30 and bursts on the last for 60", () => {
+  const g = boot();
+  g.startLevel("caves", 1, true);
+  g.setEnergy(9999);
+  assert.ok(put(g, "possessedswimgear", 2, 0), "could not place the gear");
+  const a = g.spawnFoe("armoured", 2, g.midX(2)); a.frozen = 9e9;
+  const b = g.spawnFoe("armoured", 2, g.midX(3)); b.frozen = 9e9;
+  const c = g.spawnFoe("armoured", 2, g.midX(4)); c.frozen = 9e9;
+  const hp0 = a.hp;
+  let guard = 0;
+  while (hp0 - c.hp < 60 && guard++ < 80) g.step(50);   /* one bubble, through and burst */
+  assert.equal(hp0 - a.hp, 30, "a pierced enemy should take 30");
+  assert.equal(hp0 - b.hp, 30, "a pierced enemy should take 30");
+  assert.equal(hp0 - c.hp, 60, "the last enemy touched should wear the burst for 60");
+});
