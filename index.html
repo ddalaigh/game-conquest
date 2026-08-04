@@ -216,6 +216,7 @@
   .foe[data-kind="skytitan"] .art{filter:drop-shadow(0 0 10px rgba(255,233,168,.5))}
   @keyframes drift{from{transform:translateY(-3px)}to{transform:translateY(3px)}}
   .foe.burrowed{opacity:.22;filter:grayscale(.7)}
+  .foe.lurking{opacity:0}
   .foe.burrowed .tag{display:none}
   .hole{position:absolute;z-index:1;pointer-events:none;border-radius:50%;
     background:radial-gradient(ellipse at 50% 40%,#120e18 55%,#3f3222 78%,rgba(63,50,34,0));
@@ -1291,7 +1292,7 @@
       "<rect x='18.5' y='4' width='3' height='7' rx='1.5' fill='#a89a80'/>"+
       "<path d='M15 27q2 2 4 0M22 31q2 2 4 0' stroke='#b3552f' stroke-width='1.1' fill='none' opacity='.8'/>"+
       "</g></svg>",
-    drownshark:"<svg viewBox='0 0 40 40' width='34' height='30'><g>"+
+    drownshark:"<svg viewBox='0 0 40 40' width='30' height='30'><g transform='translate(40,0) scale(-1,1)'>"+
       "<path d='M4 26q10-9 24-6 6 1 9 5-6 5-16 5T4 26z' fill='#4a6a84'/>"+
       "<path d='M22 15l6-7 2 9z' fill='#3d5a72'/>"+
       "<path d='M4 26l-4-7 6 3z' fill='#3d5a72'/>"+
@@ -2809,7 +2810,7 @@
               "30 health of shield. Its bubbles, not yours. It dances at the water's "+
               "edge, far from your line — reach it there or meet it shielded."},
     drownshark:{name:"Drowned Riding Shark", world:"deep", hp:220, speed:14,
-              art:ART.drownshark, tag:"AMBUSH", size:40, wide:1.3,
+              art:ART.drownshark, tag:"AMBUSH",
               /* it never walks in — it lurks under the seabed, untouchable, and on
                  its own clock it surfaces beside your frontmost creature, devours it
                  whole, and goes back under. The only window is while it is up. */
@@ -4582,10 +4583,10 @@
            surfaceAt:0, surfaceRow:undefined};
     foes.push(z);
     placeFoe(z);
-    /* a lurker arrives already under the seabed — a faint shadow, nothing more */
+    /* a lurker arrives already under the seabed — fully unseen, by his ruling */
     if(d.lurk){
       z.underground=true;
-      z.el.classList.add("burrowed");
+      z.el.classList.add("lurking");
       z.lurkT=d.lurk.first*(0.7+rnd()*0.6);
     }
     return z;
@@ -5447,8 +5448,9 @@
             if(!prey){ z.lurkT=1500; }   /* nothing to hunt — stay under, look again soon */
             else{
               z.underground=false;
-              z.row=prey.r; z.x=midX(prey.c);
-              z.el.classList.remove("burrowed");
+              /* it surfaces one tile in front of its prey and bites backwards */
+              z.row=prey.r; z.x=midX(Math.min(COLS-1, prey.c+1));
+              z.el.classList.remove("lurking");
               placeFoe(z);
               flare(z.x, z.row*CH+CH/2, CW*1.2);
               addFloat(z.x, z.row*CH+CH*0.05, "the water breaks", "#8fd8e8");
@@ -5475,7 +5477,7 @@
         z.lingerT-=dt;
         if(z.lingerT<=0){
           z.underground=true;
-          z.el.classList.add("burrowed");
+          z.el.classList.add("lurking");
           z.lurkT=lk.every[0]+rnd()*(lk.every[1]-lk.every[0]);
         }
         continue;

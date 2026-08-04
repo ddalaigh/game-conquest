@@ -268,7 +268,8 @@ test("the shark surfaces beside the frontmost creature and devours it whole", ()
   while (s.underground && guard++ < 200) g.step(100);
   assert.ok(!s.underground, "the shark never surfaced");
   assert.equal(s.row, 1, "it surfaced in the wrong lane");
-  assert.ok(Math.abs(s.x - g.midX(3)) < 2, "it surfaced away from the frontmost creature");
+  assert.ok(Math.abs(s.x - g.midX(4)) < 2,
+    "it did not surface one tile in front of its prey");
   assert.ok(g.state().grid[1][3].unit, "it ate before the windup");
   g.step(800);                          /* the windup passes, the chomp lands */
   assert.equal(g.state().grid[1][3].unit, null, "the creature was not devoured");
