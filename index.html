@@ -42,6 +42,7 @@
   .btn.hidden{display:none}
   .menurow{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
   .menurow .btn{margin:0}
+  .savenote{margin:-8px 0 12px;font-size:.85em;opacity:.85;min-height:1em}
 
   /* ---------- boost bank ---------- */
   .boosts{display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap;align-items:center}
@@ -559,10 +560,14 @@
       <button class="btn" id="startUpg">Bonds</button>
       <button class="btn" id="startSand">Cave sandbox</button>
       <button class="btn" id="startSandFuse">Sandbox table</button>
+      <button class="btn" id="saveBtn">Save</button>
+      <button class="btn" id="loadBtn">Load</button>
       <!-- DEV: the early way into world three while it is being built -->
       <button class="btn" id="deepDoor">Deep Sea</button>
       <button class="btn" id="startAudio">♪ On</button>
     </div>
+    <input type="file" id="loadFile" accept=".save,.txt" style="display:none">
+    <p class="savenote" id="saveNote"></p>
     <div class="rules">
       <b>Your six.</b> Before each level you choose six creatures from everything you have bound, and
       at most two of them from Support. The sandbox ignores this and gives you the lot.
@@ -3343,6 +3348,52 @@
     cleared:{},
     foesBeaten:{}             /* an enemy writes its own almanac page by dying */
   };
+
+  /* ============================================================
+     Saving. The whole game's memory is the meta object above, so a save is
+     that object written down, and a load is reading it back. The game itself
+     still stores nothing — no cookies, no localStorage — the player keeps
+     the file. Decoding decides and says why not, like canPlace; the buttons
+     near the bottom do the DOM.
+     ============================================================ */
+  var META_FRESH=JSON.parse(JSON.stringify(meta));  /* what a brand-new game remembers */
+  var SAVE_V=1;          /* saves outlive the code that wrote them — bump when the shape changes */
+  var SAVE_TAG="CONQSAVE";
+  function saveSum(s){   /* djb2 — enough to notice a damaged or hand-edited file */
+    var h=5381;
+    for(var i=0;i<s.length;i++) h=((h*33)^s.charCodeAt(i))>>>0;
+    return h.toString(36);
+  }
+  function encodeSave(){
+    var body=JSON.stringify({v:SAVE_V, meta:meta});
+    return SAVE_TAG+"."+btoa(body)+"."+saveSum(body);
+  }
+  function decodeSave(text){
+    var parts=String(text||"").trim().split(".");
+    if(parts.length!==3 || parts[0]!==SAVE_TAG) return {ok:false, why:"not_a_save"};
+    var body, data;
+    try{ body=atob(parts[1]); data=JSON.parse(body); }
+    catch(e){ return {ok:false, why:"garbled"}; }
+    if(!data || typeof data.v!=="number") return {ok:false, why:"garbled"};
+    if(data.v>SAVE_V) return {ok:false, why:"too_new"};  /* version before checksum — newer saves may sum differently */
+    if(saveSum(body)!==parts[2]) return {ok:false, why:"damaged"};
+    if(!data.meta || typeof data.meta!=="object") return {ok:false, why:"garbled"};
+    return {ok:true, data:data.meta};
+  }
+  function applySave(text){
+    var d=decodeSave(text);
+    if(!d.ok) return d;
+    /* only the keys meta was born with cross over — a save brings back
+       progress, not new furniture. A missing key loads as a new game's. */
+    for(var k in meta){
+      var blank=META_FRESH[k];
+      var got=d.data[k];
+      meta[k]=(typeof got===typeof blank && got!==null)
+        ? got
+        : JSON.parse(JSON.stringify(blank));
+    }
+    return d;
+  }
 
   /* Sandbox keeps its own bindings. Anything fused in the sandbox table stays
      in the sandbox — it never reaches the real tray. */
@@ -7158,6 +7209,42 @@
     if(meta.cleared["s"+SKY_LAST]){ openSky(); }
     else { WORLD="caves"; document.getElementById("startScreen").classList.remove("hidden"); }
   });
+
+  /* Save and load. The file is the player's to keep — the game holds nothing. */
+  var SAVE_WORDS={
+    saved:"Saved — keep the file somewhere you will find it again.",
+    loaded:"Loaded. Everything you had earned is yours again.",
+    not_a_save:"That file is not a Conquest save.",
+    garbled:"That save is garbled — it did not survive the trip.",
+    damaged:"That save is damaged — part of it is missing or changed.",
+    too_new:"That save comes from a newer Conquest than this one."
+  };
+  function setSaveNote(msg){ document.getElementById("saveNote").textContent=msg; }
+  document.getElementById("saveBtn").addEventListener("click",function(){
+    var blob=new Blob([encodeSave()],{type:"application/octet-stream"});
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="conquest.save";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    setSaveNote(SAVE_WORDS.saved);
+  });
+  document.getElementById("loadBtn").addEventListener("click",function(){
+    document.getElementById("loadFile").click();
+  });
+  document.getElementById("loadFile").addEventListener("change",function(){
+    var f=this.files && this.files[0];
+    var input=this;
+    if(!f) return;
+    var rd=new FileReader();
+    rd.onload=function(){
+      var d=applySave(rd.result);
+      if(d.ok){ buildLevelGrid(); setSaveNote(SAVE_WORDS.loaded); }
+      else setSaveNote(SAVE_WORDS[d.why]||SAVE_WORDS.garbled);
+      input.value="";   /* so loading the same file twice still counts as a change */
+    };
+    rd.readAsText(f);
+  });
   document.getElementById("deepSand").addEventListener("click",function(){
     WORLD="deep";
     document.getElementById("deepScreen").classList.add("hidden");
@@ -7246,6 +7333,7 @@
       spawnKelp:spawnKelp, hurtKelp:hurtKelp, makeSandBlock:makeSandBlock,
       makeArrow:makeArrow, makeShell:makeShell, tickArrows:tickArrows,
       canPlace:canPlace, setRng:setRng,
+      encodeSave:encodeSave, decodeSave:decodeSave, applySave:applySave,
       outcome:function(){ return lastOutcome; },
       setLoadout:function(list){ loadout=list.slice(); }
     };
