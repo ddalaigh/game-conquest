@@ -787,8 +787,9 @@
       <div class="lore hidden" data-foe="drownshark">
       <b>The Drowned Riding Shark.</b> One of the dead went down holding a saddle, and the sea
       gave it something to put it on. It lives under the seabed, where nothing reaches it, and
-      it comes up only to eat &mdash; always your foremost creature, always whole. The moment
-      after it eats, while the water is still broken, is the only moment it is mortal.
+      it comes up exactly once &mdash; for your foremost creature, taken whole. The moment after
+      it eats, while the water is still broken, is the only moment it is mortal. One meal,
+      won or lost, and the sea keeps it.
       </div>
       <br><br>
       This world is still being dug. Something lives in it now &mdash; twenty levels of it &mdash;
@@ -2811,14 +2812,15 @@
               "edge, far from your line — reach it there or meet it shielded."},
     drownshark:{name:"Drowned Riding Shark", world:"deep", hp:220, speed:14,
               art:ART.drownshark, tag:"AMBUSH",
-              /* it never walks in — it lurks under the seabed, untouchable, and on
-                 its own clock it surfaces beside your frontmost creature, devours it
-                 whole, and goes back under. The only window is while it is up. */
-              lurk:{first:8000, every:[9000,15000], windup:700, linger:1400},
-              note:"220 health, but only sometimes: it lives under the seabed, where "+
-              "nothing reaches it. On its own clock the water breaks beside your "+
-              "foremost creature and that creature is gone — armour, boost and all. "+
-              "It lingers a heartbeat after eating. That heartbeat is the fight."}
+              /* it never walks in — it lurks under the seabed, untouchable, and it
+                 strikes exactly once: it surfaces in front of your frontmost creature,
+                 devours it whole, lingers a heartbeat, and leaves for good. */
+              lurk:{first:8000, windup:700, linger:1400},
+              note:"220 health, but only briefly: it lives under the seabed, where "+
+              "nothing reaches it, and it comes up exactly once — in front of your "+
+              "foremost creature, which it devours whole, armour, boost and all. It "+
+              "lingers a heartbeat over its meal, and that heartbeat is your only "+
+              "shot. Fed or foiled, it leaves."}
   };
 
   /* ============================================================
@@ -2987,9 +2989,10 @@
        note:"More Drowned, more shields, a little faster. Nothing you have not met."},
     7:{count:38, gap:2600, mix:["drowned","shielddrowned","shielddrowned"],
        rare:{kind:"bubbledancer", min:1, max:1}, lurk:"drownshark", gaps:[[1,2],[3,4],[0,5]],
-       note:"Shields outnumber the plain dead, and something new hunts below them: the "+
-            "water breaks beside your frontmost creature, and that creature is gone. It "+
-            "can only be hurt while it is up — bait it with something cheap, then hit it."},
+       note:"Shields outnumber the plain dead, and something new hunts below them: once "+
+            "a level, the water breaks in front of your frontmost creature, and that "+
+            "creature is gone. It can only be hurt while it is up — bait its one strike "+
+            "with something cheap, then hit it or let it leave."},
     8:{count:42, gap:2500, mix:["drowned","shielddrowned","armourdrowned"],
        rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[2,1],[4,3],[0,4],[3,2]],
        note:"All three kinds mixed evenly, and the water keeps getting quicker."},
@@ -4402,6 +4405,16 @@
     return null;
   }
 
+  /* fed or foiled, a lurker leaves rather than dying — the wave counts it dealt with */
+  function lurkLeaves(z){
+    addFloat(z.x, z.row*CH+CH*0.1, "it swims off", "#8fd8e8");
+    if(!z.extra) killed++;
+    var i=foes.indexOf(z);
+    if(i>-1) foes.splice(i,1);
+    if(z.el.parentNode) z.el.parentNode.removeChild(z.el);
+    updateHud();
+  }
+
   /* your creature nearest the enemy's edge — what a shark hunts first */
   function frontmostUnit(){
     for(var c=COLS-1;c>=0;c--)
@@ -5436,16 +5449,21 @@
         continue;
       }
 
-      /* the Drowned Riding Shark. It lives under the seabed, untouchable, and on
-         its own clock it surfaces beside your frontmost creature, devours it
-         whole, and goes back under. The heartbeat after it eats is the fight. */
+      /* the Drowned Riding Shark. It lives under the seabed, untouchable, and it
+         strikes exactly once — surfacing in front of your frontmost creature to
+         devour it whole. The heartbeat after it eats is the only fight it offers;
+         then it leaves, fed or foiled. */
       var lk=FOES[z.kind].lurk;
       if(lk){
         if(z.underground){
           z.lurkT-=dt;
           if(z.lurkT<=0){
             var prey=frontmostUnit();
-            if(!prey){ z.lurkT=1500; }   /* nothing to hunt — stay under, look again soon */
+            if(!prey){
+              z.lurkT=1500;              /* nothing to hunt — look again soon */
+              /* the wave is done and the board is bare: nothing will ever surface it */
+              if(spawnIdx>=wave.length && foes.length===1) lurkLeaves(z);
+            }
             else{
               z.underground=false;
               /* it surfaces one tile in front of its prey and bites backwards */
@@ -5475,11 +5493,7 @@
           continue;
         }
         z.lingerT-=dt;
-        if(z.lingerT<=0){
-          z.underground=true;
-          z.el.classList.add("lurking");
-          z.lurkT=lk.every[0]+rnd()*(lk.every[1]-lk.every[0]);
-        }
+        if(z.lingerT<=0) lurkLeaves(z);  /* one ambush was all it wanted */
         continue;
       }
 

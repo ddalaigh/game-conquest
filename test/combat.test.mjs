@@ -255,7 +255,7 @@ test("a kelp Brood Glob comes apart on your side", () => {
 /* ---- the Drowned Riding Shark. It lurks untouchable under the seabed and
    surfaces to devour the frontmost creature whole. ---- */
 
-test("the shark surfaces beside the frontmost creature and devours it whole", () => {
+test("the shark surfaces in front of the frontmost creature, eats once, and leaves", () => {
   const g = boot();
   g.startLevel("caves", 1, true);      /* sandbox board; the shark's rules are world-free */
   g.setEnergy(9999);                   /* the sandbox tops energy up per tick — no ticks yet */
@@ -274,8 +274,8 @@ test("the shark surfaces beside the frontmost creature and devours it whole", ()
   g.step(800);                          /* the windup passes, the chomp lands */
   assert.equal(g.state().grid[1][3].unit, null, "the creature was not devoured");
   assert.ok(g.state().grid[2][1].unit, "it ate the wrong creature");
-  g.step(1600);                         /* it lingers, then goes back under */
-  assert.equal(s.underground, true, "the shark stayed up after eating");
+  g.step(1600);                         /* it lingers its heartbeat, then leaves for good */
+  assert.equal(g.state().foes.length, 0, "the shark did not leave after its one meal");
 });
 
 test("the shark cannot be hurt under the seabed, only while the water is broken", () => {
