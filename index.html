@@ -559,8 +559,6 @@
       <button class="btn" id="startUpg">Bonds</button>
       <button class="btn" id="startSand">Cave sandbox</button>
       <button class="btn" id="startSandFuse">Sandbox table</button>
-      <!-- DEV: the early way into world three while it is being built -->
-      <button class="btn" id="deepDoor">Deep Sea</button>
       <button class="btn" id="startAudio">♪ On</button>
     </div>
     <div class="rules">
@@ -6933,12 +6931,10 @@
   /* DEV: every level and both world doors are open while the designer plays
      through freely. He turns this on by saying "unlock all levels" and off by
      saying "lock all levels" — to lock, set this to false. */
-  var DEV_ALL_OPEN=true;
+  var DEV_ALL_OPEN=false;
 
   function caveOpen(n){ return DEV_ALL_OPEN || n===1 || !!meta.cleared[n-1]; }
-  /* DEV: the Deep Sea is open from the start while it is being built. Delete the
-     `|| true` here and it goes back to being earned off the Thunderhead. */
-  function deepWorldOpen(){ return !!meta.cleared["s"+SKY_LAST] || true; }
+  function deepWorldOpen(){ return !!meta.cleared["s"+SKY_LAST]; }
   function deepOpen(n){ return DEV_ALL_OPEN || (n===1 ? deepWorldOpen() : !!meta.cleared["d"+(n-1)]); }
   function skyOpen(n){ return DEV_ALL_OPEN || (n===1 ? skyWorldOpen() : !!meta.cleared["s"+(n-1)]); }
   function skyWorldOpen(){ return DEV_ALL_OPEN || !!meta.cleared[CAVE_LAST]; }
@@ -7137,8 +7133,9 @@
   });
   function openDeep(){
     WORLD="deep";
-    /* DEV: while the Deep is open early, the crocodile comes with it — without one
-       there is nowhere to put a single creature. Remove with the gate above. */
+    /* the Bubble Dial comes with the Deep — walking in is enough, the same way
+       the Flatbird comes with the Sky. Without the crocodile there is nowhere
+       to put a single creature down here. */
     if(!meta.unlocked.bubbledial){ meta.unlocked.bubbledial=1; meta.mythics.bubbledial=1; }
     var box=document.getElementById("deepMythic");
     box.className="fuseout hit";
@@ -7151,7 +7148,6 @@
     document.getElementById("deepScreen").classList.remove("hidden");
   }
   document.getElementById("toDeep").addEventListener("click",openDeep);
-  document.getElementById("deepDoor").addEventListener("click",openDeep);
   document.getElementById("deepBack").addEventListener("click",function(){
     document.getElementById("deepScreen").classList.add("hidden");
     if(meta.cleared["s"+SKY_LAST]){ openSky(); }
@@ -7240,6 +7236,7 @@
       /* rules worth asserting on directly */
       caveOpen:caveOpen, skyOpen:skyOpen, deepOpen:deepOpen,
       skyWorldOpen:skyWorldOpen, deepWorldOpen:deepWorldOpen,
+      devAllOpen:function(v){ if(arguments.length) DEV_ALL_OPEN=!!v; return DEV_ALL_OPEN; },
       holdsAlone:holdsAlone, canFly:canFly, noGround:noGround, capOf:capOf,
       spawnFoe:spawnFoe, addUnit:addUnit, refreshLore:refreshLore, hurtFoe:hurtFoe,
       spawnKelp:spawnKelp, hurtKelp:hurtKelp, makeSandBlock:makeSandBlock,
