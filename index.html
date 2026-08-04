@@ -821,9 +821,11 @@
       <b>The Drowned Ruler.</b> The bottom of the Deep is a court. A throne, a palace, a crown
       that kept its shine down here &mdash; and bearers who carry it one lane at a time, so it
       has never once touched the seabed it rules. Two cannons ride the palace rails, and every
-      25 seconds they speak into the lanes beside it, three tiles by three. It does not summon
-      its dead. It grants them an audience, and they arrive dressed for the occasion. Only
-      killing it ends the level.
+      25 seconds they speak into the lanes beside it, three tiles by three; every 35, the
+      bearers bring their burden down and those same lanes are crushed flat. The only safe
+      ground is the palace's own shadow, and the palace moves. It does not summon its dead.
+      It grants them an audience, and they arrive dressed for the occasion. Only killing it
+      ends the level.
       </div>
       <br><br>
       This world is still being dug. Something rules it now &mdash; twenty levels and a throne
@@ -2949,13 +2951,16 @@
                 {above:0,   name:"the palace empties",   pool:["armourdrowned","discodancer","sanddrowned","speedyswimmer"]}
               ],
               cannons:{every:25000, dmg:60},
+              slamEvery:35000, slamWind:1600, slamBeside:true,
               holdCol:2, laneEvery:5000,
               note:"Seven thousand health, and it has never touched the seabed — the palace "+
               "is carried by its own dead, one lane at a time, every 5 seconds. Two cannons "+
               "ride it, left and right: every 25 seconds they throw two bombs, one into the "+
               "lane above and one into the lane below, and everything of yours within a "+
-              "tile of where each lands takes 60. What it grants audience to worsens twice "+
-              "as it weakens. Only killing it ends the level."},
+              "tile of where each lands takes 60. Every 35 seconds the same two lanes are "+
+              "crushed flat outright — the palace's own shadow is the only safe row, and "+
+              "it moves. What it grants audience to worsens twice as it weakens. Only "+
+              "killing it ends the level."},
     drownshark:{name:"Drowned Riding Shark", world:"deep", hp:220, speed:14,
               art:ART.drownshark, tag:"AMBUSH",
               /* it never walks in — it lurks under the seabed, untouchable, and it
@@ -3186,9 +3191,10 @@
        mix:["drowned","shielddrowned","armourdrowned"],
        gaps:[[1,3],[3,4],[0,2],[4,1],[2,3]],
        note:"The bottom, and the throne that sits on it. The Drowned Ruler crosses lanes "+
-            "every 5 seconds, and every 25 its two cannons bomb the lanes beside it — "+
-            "60 to everything of yours, three tiles by three. Its court worsens, twice, "+
-            "as its 7000 health is spent. Only killing it ends the level."}
+            "every 5 seconds; every 25 its cannons bomb the lanes beside it for 60, and "+
+            "every 35 those same lanes are crushed flat. The safe row is the palace's "+
+            "shadow, and the palace moves. Its court worsens, twice, as its 7000 health "+
+            "is spent. Only killing it ends the level."}
   };
 
   /* ============================================================
@@ -4835,6 +4841,8 @@
     var i=foes.indexOf(z);
     if(i>-1) foes.splice(i,1);
     if(z.warnEl && z.warnEl.parentNode) z.warnEl.parentNode.removeChild(z.warnEl);
+    if(z.warnEls) for(var wk=0;wk<z.warnEls.length;wk++)
+      if(z.warnEls[wk].el.parentNode) z.warnEls[wk].el.parentNode.removeChild(z.warnEls[wk].el);
     if(z.el.parentNode) z.el.parentNode.removeChild(z.el);
     if(!z.extra) killed++;
     /* you learn what a thing is by killing one — the sandbox teaches nothing */
@@ -5421,15 +5429,15 @@
     }
   }
 
-  function bossSlam(z){
+  function bossSlamRow(row){
     var n=0;
     for(var c=0;c<COLS;c++){
-      var u=grid[z.row][c].unit;
+      var u=grid[row][c].unit;
       if(u){
         lostOne=true;
         var sk=u.key;
-        removeUnit(z.row,c);
-        tryRevive(sk,z.row,c);
+        removeUnit(row,c);
+        tryRevive(sk,row,c);
         n++;
       }
     }
@@ -5437,11 +5445,12 @@
     var e=document.createElement("div");
     e.className="slamfx";
     e.style.left="0"; e.style.right="0";
-    e.style.top=pxY(z.row*CH); e.style.height=pxY(CH);
+    e.style.top=pxY(row*CH); e.style.height=pxY(CH);
     inner.appendChild(e);
     effects.push({el:e,t:0,life:620});
-    addFloat(midX(2), z.row*CH+CH*0.2, n?"lane crushed":"the ground shakes", "#e2624a");
+    addFloat(midX(2), row*CH+CH*0.2, n?"lane crushed":"the ground shakes", "#e2624a");
   }
+  function bossSlam(z){ bossSlamRow(z.row); }
 
   function bossShiftLane(z){
     var opts=[];
@@ -5517,7 +5526,8 @@
       var row = Math.floor(rnd()*ROWS);
       spawnFoe(kind, row, Math.min(SPAWN_X, z.x+10), true);
     }
-    /* slam — winds up first so the lane can be cleared */
+    /* slam — winds up first so the lane can be cleared. The Ruler's version
+       crushes the lanes beside it instead, and its own shadow stays safe. */
     if(z.winding>0){
       z.winding-=dt;
       if(z.warnEl) z.warnEl.style.top=pxY(z.row*CH);
@@ -5525,25 +5535,47 @@
         z.winding=0;
         if(z.warnEl && z.warnEl.parentNode) z.warnEl.parentNode.removeChild(z.warnEl);
         z.warnEl=null;
+        if(z.warnEls){
+          for(var wc=0;wc<z.warnEls.length;wc++)
+            if(z.warnEls[wc].el.parentNode) z.warnEls[wc].el.parentNode.removeChild(z.warnEls[wc].el);
+          z.warnEls=null;
+        }
         z.el.classList.remove("winding");
-        bossSlam(z);
+        if(d.slamBeside){
+          if(z.row-1>=0)   bossSlamRow(z.row-1);
+          if(z.row+1<ROWS) bossSlamRow(z.row+1);
+        } else bossSlam(z);
         bossShiftLane(z);
         z.laneT=0;
       }
       return true;   /* holds still while winding up */
     }
     z.slamT+=dt;
-    if(z.slamT>=d.slamEvery){
+    if(d.slamEvery && z.slamT>=d.slamEvery){
       z.slamT-=d.slamEvery;
       z.winding=d.slamWind;
       SND.sfx("warn");
       z.el.classList.add("winding");
-      var w=document.createElement("div");
-      w.className="warnfx";
-      w.style.left="0"; w.style.right="0";
-      w.style.top=pxY(z.row*CH); w.style.height=pxY(CH);
-      inner.appendChild(w);
-      z.warnEl=w;
+      if(d.slamBeside){
+        z.warnEls=[];
+        var brs=[z.row-1, z.row+1];
+        for(var bi=0;bi<brs.length;bi++){
+          if(brs[bi]<0 || brs[bi]>=ROWS) continue;
+          var w2=document.createElement("div");
+          w2.className="warnfx";
+          w2.style.left="0"; w2.style.right="0";
+          w2.style.top=pxY(brs[bi]*CH); w2.style.height=pxY(CH);
+          inner.appendChild(w2);
+          z.warnEls.push({el:w2, row:brs[bi]});
+        }
+      } else {
+        var w=document.createElement("div");
+        w.className="warnfx";
+        w.style.left="0"; w.style.right="0";
+        w.style.top=pxY(z.row*CH); w.style.height=pxY(CH);
+        inner.appendChild(w);
+        z.warnEl=w;
+      }
       return true;
     }
     return false;

@@ -386,3 +386,24 @@ test("the Ruler's cannons bomb the lanes beside it, three by three, for 60", () 
   assert.equal(above.hp, hp0 - spec.dmg, "the lane above was not bombed");
   assert.equal(below.hp, hp0 - spec.dmg, "the lane below was not bombed");
 });
+
+test("every 35 seconds the lanes beside the palace are crushed flat", () => {
+  const g = boot();
+  g.startLevel("caves", 1, true);
+  g.setEnergy(9999);
+  const above = put(g, "forge", 1, 4);
+  const below = put(g, "forge", 3, 4);
+  const under = put(g, "forge", 2, 4);
+  assert.ok(above && below && under, "could not set the court");
+  const s = g.spawnFoe("drownruler", 2);
+  s.laneT = -9e9;                        /* pin its lane */
+  s.cannonT = -9e9;                      /* silence the cannons — this test is the crush */
+  s.summonT = -9e9;                      /* and hold the court, so nothing chews the forges */
+  g.step(35000 - 300);
+  assert.ok(g.state().grid[1][4].unit && g.state().grid[3][4].unit, "crushed early");
+  /* small beats — the wind-up must start in one tick and finish across others */
+  for (let i = 0; i < 30; i++) g.step(100);
+  assert.equal(g.state().grid[1][4].unit, null, "the lane above was not crushed");
+  assert.equal(g.state().grid[3][4].unit, null, "the lane below was not crushed");
+  assert.ok(g.state().grid[2][4].unit, "the palace's own shadow should be safe");
+});
