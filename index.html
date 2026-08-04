@@ -220,10 +220,9 @@
   .bubcell.darkbub.disco{
     background:radial-gradient(circle at 34% 28%,rgba(255,120,200,.34),rgba(95,212,255,.22) 55%,rgba(255,210,90,.15) 78%,rgba(10,16,26,.12));
     animation:bobble 3.6s ease-in-out infinite alternate, discoshift 4s linear infinite}
-  .bubcell.darkbub.sandblock{
-    background:radial-gradient(circle at 40% 35%,rgba(232,208,150,.72),rgba(196,168,110,.5) 60%,rgba(138,115,74,.3));
-    box-shadow:inset 0 0 0 2px rgba(94,74,42,.85), 0 0 8px rgba(138,115,74,.45);
-    border-radius:38%;animation:none}
+  .sandcell{position:absolute;z-index:1;pointer-events:none;border-radius:34%;
+    background:radial-gradient(circle at 40% 32%,#e0cb96,#c4a86e 58%,#9a7f52);
+    box-shadow:inset 0 0 0 2px rgba(94,74,42,.9), 0 2px 8px rgba(60,45,25,.5)}
   @keyframes discoshift{from{filter:hue-rotate(0deg)}to{filter:hue-rotate(360deg)}}
   .foe.burrowed .tag{display:none}
   .hole{position:absolute;z-index:1;pointer-events:none;border-radius:50%;
@@ -807,9 +806,10 @@
       </div>
       <div class="lore hidden" data-foe="sanddrowned">
       <b>The Sand Drowned.</b> A Drowned that lay so long in the seabed the seabed kept it.
-      It walks at half a dead man's pace and throws itself ahead of the wave, two lanes at a
-      time &mdash; and the dead wade through and come out wearing it, 80 health of sand apiece.
-      It never runs out. There is always more seabed.
+      It walks at half a dead man's pace and throws blocks of itself ahead of the wave, two
+      lanes at a time &mdash; walls of wet sand your shots thud into, 80 damage a block, while
+      the dead walk through their own sand untroubled. The sling lobs over it. The keg does
+      not slow down. There is always more seabed.
       </div>
       <br><br>
       This world is still being dug. Something lives in it now &mdash; twenty levels of it &mdash;
@@ -2871,15 +2871,15 @@
               "at the same time."},
     sanddrowned:{name:"Sand Drowned", world:"deep", hp:600, speed:6,
               art:ART.sanddrowned, tag:"SAND", size:38,
-              /* every ten seconds on the field it throws sand into two random lanes,
-                 landing on the tile ahead of it — 80 of shield for the first enemy
-                 through each pile. The dancer's trick, thrown by the fistful. */
-              sand:{every:10000, lanes:2, shield:80},
+              /* every twenty seconds on the field it throws blocks of sand into two
+                 random lanes, landing on the tile ahead of it. A block is a wall
+                 against your projectiles — 80 damage breaks it. */
+              sand:{every:20000, lanes:2, hp:80},
               note:"A Drowned that lay so long in the seabed the seabed kept it. 600 "+
-              "health of wet sand at half a dead man's pace, and every ten seconds it "+
-              "throws two fistfuls into the lanes ahead — the first of the dead through "+
-              "each pile takes 80 of shield. Kill it early, or fight everything behind "+
-              "it twice."},
+              "health of wet sand at half a dead man's pace, and every twenty seconds "+
+              "it throws two blocks of itself into the lanes ahead. A block stands "+
+              "there stopping your shots — bolts, arrows, everything that flies flat — "+
+              "until 80 damage breaks it. The sling lobs over. Everything else digs."},
     drownshark:{name:"Drowned Riding Shark", world:"deep", hp:220, speed:14,
               art:ART.drownshark, tag:"AMBUSH",
               /* it never walks in — it lurks under the seabed, untouchable, and it
@@ -3085,9 +3085,10 @@
        note:"A breather of plain dead — but twice as many, twice as fast as they once came."},
     14:{count:72, gap:1950, mix:["drowned","drowned","shielddrowned","armourdrowned","sanddrowned"],
        rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[2,3],[4,2],[0,5],[1,1]],
-       note:"The Sand Drowned arrives — 600 of wet sand at half the usual pace, throwing "+
-            "shields of itself ahead of the wave, two lanes at a time, 80 apiece. Kill it "+
-            "early, or everything behind it comes dressed."},
+       note:"The Sand Drowned arrives — 600 of wet sand at half the usual pace, walling "+
+            "two lanes at a time ahead of itself. Your shots thud into the blocks until "+
+            "80 breaks one; the dead behind them walk in peace. Slings lob over. Kegs "+
+            "do not care."},
     15:{count:78, gap:1900, mix:["shielddrowned","shielddrowned","armourdrowned"],
        rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[0,4],[2,1],[4,4],[3,5]],
        note:"Shield-heavy and relentless. Your crocodile recharge is the clock that matters."},
@@ -3710,7 +3711,7 @@
     if(!d)                return no("unknownCreature");
     if(r<0||r>=ROWS||c<0||c>=COLS) return no("offBoard");
     if(isGap(r,c))        return no("trench", trenchMsg());
-    if(grid[r][c] && grid[r][c].darkBubble) return no("enemyBubble",
+    if(grid[r][c] && (grid[r][c].darkBubble || grid[r][c].sandBlock)) return no("enemyBubble",
       "Something of theirs holds that square — it is not yours to fill.");
 
     var u=unitAt(r,c);
@@ -3965,6 +3966,45 @@
     for(var r=0;r<ROWS;r++) makeDarkBubble(r, dn.bubbleCol, dn.shield, dn.look);
     SND.sfx("place");
     addFloat(z.x, z.row*CH+CH*0.1, "the dance ends", "#9b86d8");
+  }
+
+  /* The Sand Drowned's blocks. A wall on a tile, on their side: your bolts and
+     arrows hit it instead of what walks behind it, and 80 damage breaks it.
+     Enemies pass through their own sand untroubled. */
+  function makeSandBlock(r,c,hp){
+    var g=grid[r][c];
+    if(!g || g.gap || g.bubble || g.darkBubble || g.sandBlock || g.unit) return;
+    g.sandBlock={hp:hp||80, maxHp:hp||80};
+    var b=document.createElement("div");
+    b.className="sandcell";
+    b.style.left=pxX(colX(c)+5); b.style.top=pxY(r*CH+6);
+    b.style.width=pxX(CW-10); b.style.height=pxY(CH-12);
+    inner.appendChild(b);
+    g.sandEl=b;
+  }
+  function removeSandBlock(r,c){
+    var g=grid[r][c];
+    if(!g || !g.sandBlock) return;
+    g.sandBlock=null;
+    if(g.sandEl && g.sandEl.parentNode) g.sandEl.parentNode.removeChild(g.sandEl);
+    g.sandEl=null;
+    flare(midX(c), r*CH+CH/2, CW*0.7);
+    addFloat(midX(c), r*CH+CH*0.15, "the sand breaks", "#d8c08a");
+  }
+  function hurtSandBlock(r,c,amt){
+    var g=grid[r][c];
+    if(!g || !g.sandBlock) return;
+    g.sandBlock.hp-=amt;
+    if(g.sandEl) g.sandEl.style.opacity=Math.max(0.35, g.sandBlock.hp/g.sandBlock.maxHp);
+    if(g.sandBlock.hp<=0) removeSandBlock(r,c);
+  }
+  /* the sand block a rightward projectile is about to hit, if any */
+  function sandAhead(row,x){
+    var c=Math.floor((x-KEEP)/CW);
+    if(c<0 || c>=COLS) return -1;
+    var g=grid[row] && grid[row][c];
+    if(g && g.sandBlock && x >= colX(c)+CW*0.3) return c;
+    return -1;
   }
 
   function upgradeUnit(r,c,k){
@@ -4430,6 +4470,10 @@
       placeRider(rd);
       rd.el.style.transform="rotate("+(rd.x*2.2)+"deg)";
 
+      /* sand is no obstacle to a keg — it smashes through and rolls on */
+      var ksc=sandAhead(rd.row, rd.x);
+      if(ksc>-1) removeSandBlock(rd.row, ksc);
+
       var tn2=tunnelTouching(rd.row);
       if(tn2 && rd.x >= tn2.exitX-CW*0.4 && rd.x <= tn2.entryX+CW*0.4){
         collapseTunnel(tn2);
@@ -4544,6 +4588,13 @@
           continue;
         }
         a.el.style.left=pxX(a.x);
+        var asc=sandAhead(a.row, a.x);
+        if(asc>-1){
+          hurtSandBlock(a.row, asc, a.dmg);
+          if(a.el.parentNode) a.el.parentNode.removeChild(a.el);
+          arrows.splice(i,1);
+          continue;
+        }
         for(var j=foes.length-1;j>=0;j--){
           var z=foes[j];
           if(z.underground) continue;    /* a turned shot flies over what hides below */
@@ -5244,6 +5295,14 @@
       b.x += 0.42*dt;
       if(b.x>VW+20){ if(b.el.parentNode) b.el.parentNode.removeChild(b.el); bolts.splice(i,1); continue; }
       b.el.style.left=pxX(b.x);
+      /* a sand block stands in the way of anything flying flat */
+      var sc=sandAhead(b.row, b.x);
+      if(sc>-1){
+        hurtSandBlock(b.row, sc, b.dmg);
+        if(b.el.parentNode) b.el.parentNode.removeChild(b.el);
+        bolts.splice(i,1);
+        continue;
+      }
       var gone=false;
       for(var j=foes.length-1;j>=0;j--){
         var z=foes[j];
@@ -5541,7 +5600,7 @@
             for(var lr=0;lr<ROWS;lr++) lanes.push(lr);
             for(var th=0;th<sdw.lanes && lanes.length;th++){
               var pick=lanes.splice(Math.floor(rnd()*lanes.length),1)[0];
-              makeDarkBubble(pick, fcol, sdw.shield, "sandblock");
+              makeSandBlock(pick, fcol, sdw.hp);
               flare(midX(fcol), pick*CH+CH/2, CW*0.7);
             }
             addFloat(z.x, z.row*CH+CH*0.08, "sand flies", "#d8c08a");
@@ -5808,8 +5867,8 @@
       placeFoe(z);
 
       /* a dark bubble waits for the first of its own side to walk into it —
-         except the givers: a Dancer or a Sand Drowned never drinks its own work */
-      if(!FOES[z.kind].dance && !FOES[z.kind].sand){
+         except the Dancer, which made it and does not drink its own work */
+      if(!FOES[z.kind].dance){
         var dbc=Math.floor((z.x-KEEP)/CW);
         if(dbc>=0 && dbc<COLS && grid[z.row][dbc] && grid[z.row][dbc].darkBubble){
           z.shield=(z.shield||0)+(grid[z.row][dbc].darkShield||30);
@@ -6905,7 +6964,7 @@
       skyWorldOpen:skyWorldOpen, deepWorldOpen:deepWorldOpen,
       holdsAlone:holdsAlone, canFly:canFly, noGround:noGround, capOf:capOf,
       spawnFoe:spawnFoe, addUnit:addUnit, refreshLore:refreshLore, hurtFoe:hurtFoe,
-      spawnKelp:spawnKelp, hurtKelp:hurtKelp,
+      spawnKelp:spawnKelp, hurtKelp:hurtKelp, makeSandBlock:makeSandBlock,
       makeArrow:makeArrow, makeShell:makeShell, tickArrows:tickArrows,
       canPlace:canPlace, setRng:setRng,
       outcome:function(){ return lastOutcome; },

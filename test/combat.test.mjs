@@ -319,26 +319,41 @@ test("the Disco Bubble Dancer's bubbles hold twice the shield", () => {
   assert.equal(z.shield, 60, "a disco bubble did not grant its 60");
 });
 
-test("the Sand Drowned throws sand ahead — two lanes, 80 of shield apiece", () => {
+test("the Sand Drowned walls two lanes ahead every twenty seconds", () => {
   const g = deepBoard();
   const s = g.FOES.sanddrowned.sand;
   g.spawnFoe("sanddrowned", 2, g.midX(4));
   const scan = () => {
-    const piles = [], grid = g.state().grid;
+    const out = [], grid = g.state().grid;
     for (let r = 0; r < g.ROWS; r++) for (let c = 0; c < g.COLS; c++)
-      if (grid[r][c].darkBubble) piles.push({ r, c, amt: grid[r][c].darkShield });
-    return piles;
+      if (grid[r][c].sandBlock) out.push({ r, c, hp: grid[r][c].sandBlock.hp });
+    return out;
   };
   g.step(s.every - 300);
   assert.equal(scan().length, 0, "sand flew early");
   g.step(600);
-  const piles = scan();
-  assert.equal(piles.length, s.lanes, "the wrong number of lanes got sand");
-  assert.ok(piles.every(p => p.amt === s.shield), "a pile holds the wrong shield");
-  assert.ok(piles.every(p => p.c === piles[0].c), "the sand landed across different columns");
-  const t = piles[0];
-  const z = g.spawnFoe("drowned", t.r, g.midX(t.c) + 40);
-  let guard = 0;
-  while (!z.shield && guard++ < 100) g.step(50);
-  assert.equal(z.shield, s.shield, "the sand shield was not picked up");
+  const blocks = scan();
+  assert.equal(blocks.length, s.lanes, "the wrong number of lanes got walled");
+  assert.ok(blocks.every(b => b.hp === s.hp), "a block has the wrong toughness");
+  assert.ok(blocks.every(b => b.c === blocks[0].c), "the blocks landed across different columns");
+});
+
+test("a sand block stops your shots until 80 damage breaks it", () => {
+  const g = boot();
+  g.startLevel("caves", 1, true);      /* the sand's rules are world-free */
+  g.setEnergy(9999);
+  const shooter = put(g, "drakeling", 2, 0);
+  assert.ok(shooter, "could not place the shooter");
+  g.makeSandBlock(2, 3, 80);
+  const z = g.spawnFoe("skeleton", 2, g.midX(5));
+  z.frozen = 9e9;                       /* hold it still, so only the wall matters */
+  const hp0 = z.hp;
+  for (let i = 0; i < 30; i++) g.step(100);   /* 3s of firing into the wall */
+  assert.equal(z.hp, hp0, "a shot reached the enemy through the sand");
+  let broke = false;
+  for (let i = 0; i < 200 && !broke; i++) { g.step(100); broke = !g.state().grid[2][3].sandBlock; }
+  assert.ok(broke, "the sand never broke");
+  let hurt = false;
+  for (let i = 0; i < 100 && !hurt; i++) { g.step(100); hurt = z.hp < hp0; }
+  assert.ok(hurt, "the broken wall still stopped the shots");
 });
