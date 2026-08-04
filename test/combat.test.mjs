@@ -114,3 +114,75 @@ test("a turned shot leaves the board rather than lingering", () => {
   settle(g, 400);
   assert.equal(liveArrows(g).length, 0, "a returned arrow is still in flight");
 });
+
+/* ---- the Bubble Dancer. It appears mid-board, dances once, and its dark
+   bubbles shield the first enemy through each. The Deep has its rules proved
+   in the sandbox, same as the placement suite. ---- */
+
+function deepBoard() {
+  const g = boot();
+  g.startLevel("deep", 1, true);
+  return g;
+}
+
+test("the Bubble Dancer appears at its tile and its dance ends in dark bubbles", () => {
+  const g = deepBoard();
+  const d = g.FOES.bubbledancer.dance;
+  const z = g.spawnFoe("bubbledancer");
+  assert.equal(z.row, d.row, "it did not appear in the middle lane");
+  const x0 = z.x;
+  g.step(d.windup - 200);
+  assert.equal(z.x, x0, "it walked before the dance was done");
+  assert.equal(g.state().grid[0][d.col].darkBubble || false, false, "bubbles came early");
+  g.step(400);
+  let bubbles = 0;
+  for (let r = 0; r < g.ROWS; r++) if (g.state().grid[r][d.col].darkBubble) bubbles++;
+  assert.equal(bubbles, g.ROWS, "the dance did not leave a bubble in every lane");
+  g.step(600);
+  assert.ok(z.x < x0, "it never started walking after the dance");
+});
+
+test("a Dancer killed mid-dance leaves no bubbles", () => {
+  const g = deepBoard();
+  const d = g.FOES.bubbledancer.dance;
+  const z = g.spawnFoe("bubbledancer");
+  g.step(d.windup / 2);
+  g.hurtFoe(z, 9999);
+  g.step(d.windup);
+  let bubbles = 0;
+  for (let r = 0; r < g.ROWS; r++) if (g.state().grid[r][d.col].darkBubble) bubbles++;
+  assert.equal(bubbles, 0, "a dead Dancer still finished its dance");
+});
+
+test("the first enemy through a dark bubble takes the shield, and the bubble pops", () => {
+  const g = deepBoard();
+  const d = g.FOES.bubbledancer.dance;
+  g.spawnFoe("bubbledancer");
+  g.step(d.windup + 100);
+  const row = 0;
+  const first = g.spawnFoe("drowned", row, g.midX(d.col) + 40);
+  let guard = 0;
+  while (!first.shield && guard++ < 100) g.step(50);
+  assert.equal(first.shield, d.shield, "the shield was not picked up");
+  assert.equal(g.state().grid[row][d.col].darkBubble, false, "the bubble did not pop");
+  const second = g.spawnFoe("drowned", row, g.midX(d.col) + 40);
+  for (let i = 0; i < 80; i++) g.step(50);
+  assert.ok(!second.shield, "a popped bubble shielded a second enemy");
+});
+
+test("the shield soaks damage before health, then breaks", () => {
+  const g = deepBoard();
+  const d = g.FOES.bubbledancer.dance;
+  g.spawnFoe("bubbledancer");
+  g.step(d.windup + 100);
+  const z = g.spawnFoe("drowned", 1, g.midX(d.col) + 40);
+  let guard = 0;
+  while (!z.shield && guard++ < 100) g.step(50);
+  const hp0 = z.hp;
+  g.hurtFoe(z, 20);
+  assert.equal(z.hp, hp0, "damage reached health through the shield");
+  assert.equal(z.shield, d.shield - 20, "the shield did not soak the hit");
+  g.hurtFoe(z, 20);
+  assert.equal(z.shield, 0, "the shield did not break");
+  assert.equal(z.hp, hp0 - 10, "the overflow did not carry into health");
+});

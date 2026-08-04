@@ -140,6 +140,13 @@
     box-shadow:inset 0 0 0 2px rgba(190,245,255,.55), 0 0 12px rgba(150,230,245,.4);
     animation:bobble 3.6s ease-in-out infinite alternate}
   @keyframes bobble{from{transform:translateY(-1.5%) scale(.985)}to{transform:translateY(1.5%) scale(1.015)}}
+  .bubcell.darkbub{
+    background:radial-gradient(circle at 34% 28%,rgba(52,66,86,.44),rgba(10,16,26,.30) 62%,rgba(10,16,26,.12));
+    box-shadow:inset 0 0 0 2px rgba(7,10,16,.92), 0 0 12px rgba(7,10,16,.6)}
+  .foe.dshield{outline:2px solid rgba(9,13,20,.85);outline-offset:-1px;border-radius:50%;
+    box-shadow:0 0 9px rgba(60,80,110,.55)}
+  .foe.dancing .art{animation:seadance .46s ease-in-out infinite alternate}
+  @keyframes seadance{from{transform:rotate(-9deg) translateY(-4%)}to{transform:rotate(9deg) translateY(4%)}}
   .unit.inbubble{filter:drop-shadow(0 0 6px rgba(150,230,245,.75))}
   /* the crocodile puffing before it goes */
   /* the puff is decoration only — removeUnit does the disappearing, so a paused
@@ -738,7 +745,7 @@
     </div>
     <div class="fuseout" id="deepMythic" style="margin-bottom:14px"></div>
     <div class="levels" id="deepGrid"></div>
-    <p>Three levels so far, and nothing at the bottom of them yet. There is no ground down here
+    <p>Five levels so far, and nothing at the bottom of them yet. There is no ground down here
        and nothing floats on its own &mdash; the whole world runs on bubbles.</p>
     <div class="rules">
       <b>The Bubble Dial.</b> A blue crocodile, and it costs nothing. Set one on a bare square and
@@ -767,8 +774,14 @@
       they went down, only a tenth tougher &mdash; shielded at 220, armoured at 440 &mdash; and
       the water has taught them nothing except how to keep walking.
       </div>
+      <div class="lore hidden" data-foe="bubbledancer">
+      <b>The Bubble Dancer.</b> Something down here watched the crocodile work and learned the
+      trick wrong on purpose. It appears where it pleases, dances once, and leaves a column of
+      black-rimmed bubbles the dead drink like armour &mdash; 30 health apiece, first come,
+      first served. Its bubbles answer to it, not to you.
+      </div>
       <br><br>
-      This world is still being dug. Something lives in it now &mdash; three levels of it &mdash;
+      This world is still being dug. Something lives in it now &mdash; five levels of it &mdash;
       but there is no boss at the bottom yet, no items of its own and no fusions.
     </div>
     <div class="bondbar" style="margin-top:14px">
@@ -1268,6 +1281,15 @@
       "<path d='M10 13.5q10-7 20 0v1.5q-10-5-20 0z' fill='#8a7a62'/>"+
       "<rect x='18.5' y='4' width='3' height='7' rx='1.5' fill='#a89a80'/>"+
       "<path d='M15 27q2 2 4 0M22 31q2 2 4 0' stroke='#b3552f' stroke-width='1.1' fill='none' opacity='.8'/>"+
+      "</g></svg>",
+    bubbledancer:"<svg viewBox='0 0 40 40' width='30' height='30'><g>"+
+      "<path d='M20 9q8 0 8 8 0 4-3 5l3 9q-2 3-4 0l-2-6-2 6q-2 3-4 0l3-9q-3-1-3-5 0-8 8-8z' fill='#8a76c8'/>"+
+      "<path d='M12 18q-5 1-8 6 4 2 8-1M28 18q5 1 8 6-4 2-8-1' fill='none' stroke='#b39ddb' stroke-width='1.6' stroke-linecap='round'/>"+
+      "<ellipse cx='20' cy='15' rx='6.2' ry='5.4' fill='#b8a6e0'/>"+
+      "<circle cx='17.6' cy='14' r='1.4' fill='#171227'/><circle cx='22.4' cy='14' r='1.4' fill='#171227'/>"+
+      "<path d='M17.5 18.5q2.5 1.6 5 0' stroke='#171227' stroke-width='1' fill='none' stroke-linecap='round'/>"+
+      "<circle cx='31.5' cy='8.5' r='4' fill='none' stroke='#070a10' stroke-width='1.7'/>"+
+      "<circle cx='30.4' cy='7.4' r='1' fill='#4a5a74'/>"+
       "</g></svg>",
     tortoise:"<svg viewBox='0 0 40 40' width='34' height='34'><g>"+
       "<ellipse cx='20' cy='25' rx='15' ry='11' fill='#6b5a3e'/>"+
@@ -2715,7 +2737,16 @@
     armourdrowned:{name:"Armoured Drowned", world:"deep", hp:440, speed:10,
               art:ART.armourdrowned, tag:"ARMOUR",
               note:"Plate over drowned flesh, and rust has not helped you: 440 health. Chip "+
-              "damage will not shift one — bring something that hits hard in a single place."}
+              "damage will not shift one — bring something that hits hard in a single place."},
+    bubbledancer:{name:"Bubble Dancer", world:"deep", hp:240, speed:10,
+              art:ART.bubbledancer, tag:"DANCER", size:36,
+              /* appears at its tile, dances once, then one dark bubble on its column
+                 in every lane — the first enemy through each drinks 30 of shield */
+              dance:{row:2, col:2, windup:2000, shield:30},
+              note:"It does not walk in — it appears at the middle of the board and dances "+
+              "once. The dance ends in a dark bubble on its column in every lane, and the "+
+              "first of the dead through each drinks 30 health of shield. Its bubbles, not "+
+              "yours. 240 health, so stopping the dance takes damage already standing."}
   };
 
   /* ============================================================
@@ -2864,7 +2895,17 @@
             "lane stops being enough sooner than it did underground."},
     3:{count:22, gap:3200, mix:["drowned","shielddrowned","armourdrowned"], gaps:[[1,1],[2,4],[4,2]],
        note:"Armoured Drowned. 440 health of waterlogged plate — chip damage is a joke it "+
-            "has heard before. Mass something heavy in one place."}
+            "has heard before. Mass something heavy in one place."},
+    4:{count:26, gap:3000, mix:["drowned","drowned","shielddrowned","armourdrowned"],
+       gaps:[[0,4],[2,2],[3,5],[4,3]],
+       note:"Every Drowned at once and four trenches. Nothing new arrives — this level asks "+
+            "whether your answer to the first three was an answer or a fluke."},
+    5:{count:30, gap:2800, mix:["drowned","shielddrowned","armourdrowned","bubbledancer","drowned"],
+       gaps:[[1,4],[3,1],[0,3],[4,5]],
+       note:"The Bubble Dancer appears mid-board, dances once, and leaves dark bubbles in "+
+            "its column — the first of the dead through each drinks 30 health of shield. "+
+            "Its bubbles, not yours. The dance can be stopped, but not with damage you "+
+            "have not built yet."}
   };
 
   /* ============================================================
@@ -3467,6 +3508,8 @@
     if(!d)                return no("unknownCreature");
     if(r<0||r>=ROWS||c<0||c>=COLS) return no("offBoard");
     if(isGap(r,c))        return no("trench", trenchMsg());
+    if(grid[r][c] && grid[r][c].darkBubble) return no("enemyBubble",
+      "A dark bubble holds that square — it is not yours to fill.");
 
     var u=unitAt(r,c);
     if(energy<d.cost)     return no("energy");
@@ -3690,6 +3733,35 @@
     SND.sfx("place");
     flare(midX(c), r*CH+CH/2, CW*0.8);
     addFloat(midX(c), r*CH+CH*0.12, "a bubble", "#8fe3e0");
+  }
+
+  /* The Bubble Dancer's bubbles. Black-rimmed, and not yours: they sit on the board
+     like the crocodile's, but the first enemy through one drinks it as a shield. */
+  function makeDarkBubble(r,c,amt){
+    var g=grid[r][c];
+    /* a trench holds nothing, and a square your own air already holds stays yours */
+    if(!g || g.gap || g.bubble || g.darkBubble) return;
+    g.darkBubble=true;
+    g.darkShield=amt||30;
+    var b=document.createElement("div");
+    b.className="bubcell darkbub";
+    b.style.left=pxX(colX(c)+4); b.style.top=pxY(r*CH+4);
+    b.style.width=pxX(CW-8); b.style.height=pxY(CH-8);
+    inner.appendChild(b);
+    g.darkEl=b;
+  }
+  function popDarkBubble(r,c){
+    var g=grid[r][c];
+    if(!g || !g.darkBubble) return;
+    g.darkBubble=false;
+    if(g.darkEl && g.darkEl.parentNode) g.darkEl.parentNode.removeChild(g.darkEl);
+    g.darkEl=null;
+  }
+  function danceBubbles(z){
+    var dn=FOES[z.kind].dance;
+    for(var r=0;r<ROWS;r++) makeDarkBubble(r, dn.col, dn.shield);
+    SND.sfx("place");
+    addFloat(z.x, z.row*CH+CH*0.1, "the dance ends", "#9b86d8");
   }
 
   function upgradeUnit(r,c,k){
@@ -4342,6 +4414,9 @@
 
   function spawnFoe(kind,row,atX,extra){
     var d=FOES[kind];
+    /* the Bubble Dancer does not walk in — wherever it was sent from, it appears
+       at its own tile, already dancing */
+    if(d.dance){ row=d.dance.row; atX=midX(d.dance.col); }
     var sz=d.size||34;
     var wide=d.wide?CW*d.wide:sz;
     var el=document.createElement("div");
@@ -4362,10 +4437,15 @@
            size:sz, wide:wide, extra:!!extra, boss:!!d.boss, summonT:0, slamT:0, winding:0, warnEl:null, laneT:0,
            through:(d.charge?d.charge.through:0), fireTaken:0, grown:false,
            fireImmune:!!d.fireImmune, fireOnly:!!d.fireOnly, flier:!!d.flier, driftT:0,
+           dancing:(d.dance?d.dance.windup:0), shield:0,
            underground:false, hasDug:false, usedTunnel:false,
            surfaceAt:0, surfaceRow:undefined};
     foes.push(z);
     placeFoe(z);
+    if(z.dancing>0){
+      z.el.classList.add("dancing");
+      flare(z.x, z.row*CH+CH/2, CW*0.9);
+    }
     return z;
   }
 
@@ -4427,6 +4507,13 @@
         addFloat(z.x, z.row*CH+CH*0.1, "the fire feeds it", "#ffe0b0");
       }
       return;
+    }
+    /* whatever a dark bubble gave it soaks the hit first */
+    if(z.shield>0){
+      var soak=Math.min(z.shield,amt);
+      z.shield-=soak; amt-=soak;
+      if(z.shield<=0) z.el.classList.remove("dshield");
+      if(amt<=0){ pulse(z.el,"hitflash",90); return; }
     }
     z.hp-=amt;
     pulse(z.el,"hitflash",90);
@@ -5077,6 +5164,16 @@
         continue;
       }
 
+      /* the Bubble Dancer holds its tile until the dance is done — kill it first
+         and no bubbles come. After the dance it walks like everything else. */
+      if(z.dancing>0){
+        z.dancing-=dt;
+        if(z.dancing>0) continue;
+        z.dancing=0;
+        z.el.classList.remove("dancing");
+        danceBubbles(z);
+      }
+
       /* a Drift Glob will not stay in the lane you answered */
       var dr=FOES[z.kind].drift;
       if(dr){
@@ -5251,6 +5348,18 @@
       z.el.classList.remove("chomp");
       z.x -= z.speed*(z.slow>0?SLOW_MULT:1)*dt/1000;
       placeFoe(z);
+
+      /* a dark bubble waits for the first of its own side to walk into it —
+         except the Dancer, which made it and does not drink its own work */
+      if(!FOES[z.kind].dance){
+        var dbc=Math.floor((z.x-KEEP)/CW);
+        if(dbc>=0 && dbc<COLS && grid[z.row][dbc] && grid[z.row][dbc].darkBubble){
+          z.shield=(z.shield||0)+(grid[z.row][dbc].darkShield||30);
+          popDarkBubble(z.row, dbc);
+          z.el.classList.add("dshield");
+          addFloat(z.x, z.row*CH+CH*0.1, "shielded", "#9b86d8");
+        }
+      }
 
       if(z.x < KEEP-6){
         if(sandbox){
@@ -5659,7 +5768,7 @@
                       "masterarcher","masterdigger","fireballgoblin","bossking"];
   var SKY_FOE_ORDER=["glob","driftglob","shieldglob","broodglob","globling","armourglob",
                      "globairship","stormhead","skytitan"];
-  var DEEP_FOE_ORDER=["drowned","shielddrowned","armourdrowned"];
+  var DEEP_FOE_ORDER=["drowned","shielddrowned","armourdrowned","bubbledancer"];
   var ALM_FAMS=[
     ["mythic","Mythic",
      "Since the Flatbird and the Long Bird are only useful in the Sky, due to their ability to "+
@@ -6330,7 +6439,7 @@
       caveOpen:caveOpen, skyOpen:skyOpen, deepOpen:deepOpen,
       skyWorldOpen:skyWorldOpen, deepWorldOpen:deepWorldOpen,
       holdsAlone:holdsAlone, canFly:canFly, noGround:noGround, capOf:capOf,
-      spawnFoe:spawnFoe, addUnit:addUnit, refreshLore:refreshLore,
+      spawnFoe:spawnFoe, addUnit:addUnit, refreshLore:refreshLore, hurtFoe:hurtFoe,
       makeArrow:makeArrow, makeShell:makeShell, tickArrows:tickArrows,
       canPlace:canPlace, setRng:setRng,
       outcome:function(){ return lastOutcome; },

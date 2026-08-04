@@ -170,3 +170,15 @@ test("a world only offers its own carrier", () => {
   assert.equal(g.CREATURES.flatbird.onlyIn, "sky");
   assert.equal(g.CREATURES.bubbledial.onlyIn, "deep");
 });
+
+test("deep: a dark bubble is not yours to fill", () => {
+  const g = deepBox();
+  const d = g.FOES.bubbledancer.dance;
+  g.spawnFoe("bubbledancer");
+  g.step(d.windup + 100);
+  const v = g.canPlace("bubbledial", d.row, d.col);
+  assert.equal(v.why, "enemyBubble", "the crocodile was allowed at a dark bubble");
+  assert.ok(v.msg && v.msg.length > 10, "the refusal has no message for the player");
+  assert.equal(g.canPlace("forge", 0, d.col).why, "enemyBubble",
+    "a creature was allowed into a dark bubble");
+});
