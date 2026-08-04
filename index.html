@@ -1602,6 +1602,18 @@
       "<path d='M5 12q5 2 4 6M35 12q-5 2-4 6M7 30q5-2 7 1M33 30q-5-2-7 1' stroke='#dff3ff' "+
         "stroke-width='1.5' fill='none' stroke-linecap='round'/>"+
       "</g></svg>",
+    corallysprite:"<svg viewBox='0 0 40 40' width='34' height='34'><g>"+
+      "<circle cx='20' cy='21' r='14' fill='none' stroke='#ff9d7a' stroke-width='1.2' opacity='.45'/>"+
+      "<circle cx='20' cy='21' r='10' fill='none' stroke='#ff9d7a' stroke-width='1' opacity='.3'/>"+
+      "<path d='M13 16q-6-6-2-9 4 2 5 7z' fill='#ffc4a8' opacity='.9'/>"+
+      "<path d='M27 16q6-6 2-9-4 2-5 7z' fill='#ffc4a8' opacity='.9'/>"+
+      "<ellipse cx='20' cy='22' rx='5.5' ry='7' fill='#ff8a70'/>"+
+      "<ellipse cx='20' cy='20' rx='3.6' ry='4.4' fill='#ffe8da'/>"+
+      "<circle cx='18.4' cy='19' r='1.3' fill='#4a201a'/><circle cx='21.6' cy='19' r='1.3' fill='#4a201a'/>"+
+      "<path d='M18.4 24q1.6 1.4 3.2 0' stroke='#4a201a' stroke-width='1.1' fill='none' stroke-linecap='round'/>"+
+      "<path d='M20 5v4M8 21h4M28 21h4M20 33v4' stroke='#ff9d7a' stroke-width='1.6' stroke-linecap='round'/>"+
+      "<path d='M15 30q-1 3 1 4M25 30q1 3-1 4' stroke='#c88ae0' stroke-width='1.4' fill='none' stroke-linecap='round'/>"+
+      "</g></svg>",
     leysprite:"<svg viewBox='0 0 40 40' width='34' height='34'><g>"+
       "<circle cx='20' cy='21' r='14' fill='none' stroke='#63d6e8' stroke-width='1.2' opacity='.45'/>"+
       "<circle cx='20' cy='21' r='10' fill='none' stroke='#63d6e8' stroke-width='1' opacity='.3'/>"+
@@ -2274,6 +2286,13 @@
       blurb:"Lobs a stone over everything in its way at the enemy <em>furthest</em> down its lane, "+
             "splashing the ones beside it. It softens a wave before it ever arrives."
     },
+    corallysprite:{
+      name:"Corally Sprite", fusedOnly:true, family:"forge", cost:200, rc:10000, hp:100,
+      glow:"rgba(255,157,122,1)",
+      aura:{rate:0.75, reach:2},
+      boost:{kind:"energy", amt:150},
+      blurb:"A Ley Sprite grown a reef. Every creature in the five-by-five around it attacks "+
+            "a quarter faster. It has no attack of its own — the coral does the humming."},
     leysprite:{
       name:"Ley Sprite", family:"forge", cost:150, rc:10000, hp:100, glow:"rgba(99,214,232,1)",
       aura:{rate:0.75},
@@ -2549,7 +2568,7 @@
       blurb:"The burst now triggers from the lanes above and below as well."
     }
   };
-  var ORDER=["flatbird","longbird","bubbledial","forge","leysprite","galesprite","stormforge","tinyember","cinderwisp","cinderghoul","egyptiancinder","bonfire","boxingflames","skyboxer","drakeling","colddrakeling","stormdrake","stonedragon","tortoise","thornback","thornbark","blowertortoise","galetortoise","frostmoth","burnmoth","metalbird","phoenix","phoenixphoenix","slingroc","thunderroc","ashenphoenix","kelpphoenix","bombrider","speedyroller","coldstonedragon","sandstonedragon","stormmoth","thundermoth"];
+  var ORDER=["flatbird","longbird","bubbledial","forge","leysprite","galesprite","corallysprite","stormforge","tinyember","cinderwisp","cinderghoul","egyptiancinder","bonfire","boxingflames","skyboxer","drakeling","colddrakeling","stormdrake","stonedragon","tortoise","thornback","thornbark","blowertortoise","galetortoise","frostmoth","burnmoth","metalbird","phoenix","phoenixphoenix","slingroc","thunderroc","ashenphoenix","kelpphoenix","bombrider","speedyroller","coldstonedragon","sandstonedragon","stormmoth","thundermoth"];
   var UPGRADE_ORDER=["twinforge","twindrake","fourdrake","deepshell","brightphoenix","widephoenix"];
 
   /* every upgraded form counts against its base creature's projection cap */
@@ -2581,7 +2600,7 @@
     twindrake:1, fourdrake:1,
     phoenix:1, brightphoenix:1, widephoenix:1, ashenphoenix:1, kelpphoenix:1, phoenixphoenix:1, slingroc:1,
     frostmoth:1, burnmoth:1, stormmoth:1, thundermoth:1, metalbird:1,
-    leysprite:1, galesprite:1, flatbird:1, longbird:1,
+    leysprite:1, galesprite:1, corallysprite:1, flatbird:1, longbird:1,
     /* the Sky's own \u2014 a bird was folded into each of them, or the storm made them */
     skyboxer:1, stormdrake:1, thunderroc:1,
     /* dead, and no longer held down by anything */
@@ -2595,6 +2614,15 @@
      Fusion items — one is awarded for each level you clear
      ============================================================ */
   var ITEMS={
+    strangecoral:{name:"Strange Coral",
+      desc:"Grown where no light reaches, in colours that have no business down there.",
+      art:"<svg viewBox='0 0 40 40' width='30' height='30'><g>"+
+        "<path d='M20 36V20q0-6 -5-8M20 26q0-5 6-7M20 20q0-4-1-8' stroke='#ff8a70' stroke-width='2.4' fill='none' stroke-linecap='round'/>"+
+        "<path d='M15 12q-2-3-1-6M26 19q3-2 3-6M19 12q1-4 4-6' stroke='#ffc4a8' stroke-width='2' fill='none' stroke-linecap='round'/>"+
+        "<circle cx='14' cy='6.5' r='1.6' fill='#c88ae0'/><circle cx='23' cy='6.5' r='1.4' fill='#c88ae0'/>"+
+        "<circle cx='29' cy='13' r='1.5' fill='#c88ae0'/>"+
+        "<path d='M12 36h16' stroke='#8a734a' stroke-width='2.6' stroke-linecap='round'/>"+
+        "</g></svg>"},
     wetsand:{name:"Wet Sand",
       desc:"A fistful of the Deep's seabed, still dripping. It remembers being thrown.",
       art:"<svg viewBox='0 0 40 40' width='30' height='30'><g>"+
@@ -2762,7 +2790,7 @@
   /* the Sky has its own drops */
   var SKY_ITEM={ 1:"galewings", 7:"thunderegg", 10:"cloudkey", 13:"windblower", 15:"birdmask", 17:"stormheart" };
   /* the Deep's first reward — it took twenty levels and a designer to hand one over */
-  var DEEP_ITEM={ 4:"mystickelp", 7:"wetsand" };
+  var DEEP_ITEM={ 4:"mystickelp", 7:"wetsand", 11:"strangecoral" };
   /* clearing Sky 2 opens the second table */
   var SKY_UNLOCK={
     2:{key:"pairTable", name:"the creature table",
@@ -2800,6 +2828,7 @@
     {creature:"ashenphoenix", item:"mystickelp", result:"kelpphoenix"},
     {creature:"stonedragon",item:"frostshard", result:"coldstonedragon"},
     {creature:"stonedragon",item:"wetsand",    result:"sandstonedragon"},
+    {creature:"leysprite",  item:"strangecoral", result:"corallysprite"},
     {creature:"frostmoth",  item:"stormcore",  result:"stormmoth"},
     {creature:"stormmoth",  item:"rebirthash", result:"thundermoth"},
     {creature:"thornback",  item:"treebark",   result:"thornbark"},
@@ -5204,14 +5233,18 @@
     }
   }
 
-  /* a Ley Sprite quickens the four squares around it */
+  /* a Ley Sprite quickens the four squares it touches; the Corally Sprite hums
+     through a full square, five by five */
   function auraAt(r,c){
-    var m=1, n=[[r-1,c],[r+1,c],[r,c-1],[r,c+1]];
-    for(var i=0;i<n.length;i++){
-      var rr=n[i][0], cc=n[i][1];
-      if(rr<0||rr>=ROWS||cc<0||cc>=COLS) continue;
-      var g=grid[rr][cc], p=g && g.unit;
-      if(p && CREATURES[p.key].aura) m=Math.min(m, CREATURES[p.key].aura.rate);
+    var m=1;
+    for(var rr=0;rr<ROWS;rr++)for(var cc=0;cc<COLS;cc++){
+      var p=grid[rr][cc].unit;
+      if(!p || !CREATURES[p.key].aura) continue;
+      if(rr===r && cc===c) continue;
+      var a=CREATURES[p.key].aura, reach=a.reach||1;
+      var dr=Math.abs(rr-r), dc=Math.abs(cc-c);
+      var hit = reach===1 ? (dr+dc===1) : (dr<=reach && dc<=reach);
+      if(hit) m=Math.min(m, a.rate);
     }
     return m;
   }

@@ -426,3 +426,22 @@ test("the Sandstone Dragon breathes sand three lanes wide", () => {
   assert.ok(rows[2].hp < hp0, "the lane below was not breathed on");
   assert.equal(rows[3].hp, hp0, "row zero is two lanes away and should stay dry");
 });
+
+test("the Corally Sprite hums through a five-by-five", () => {
+  const g = boot();
+  g.startLevel("caves", 1, true);
+  g.setEnergy(9999);
+  const plain = put(g, "drakeling", 0, 0);
+  const boosted = put(g, "drakeling", 4, 0);
+  assert.ok(plain && boosted, "could not place the drakelings");
+  assert.ok(put(g, "corallysprite", 4, 2), "could not place the coral");
+  /* two squares from the drakeling — the Ley Sprite's four-square touch would miss */
+  const za = g.spawnFoe("armoured", 0, g.midX(3)); za.frozen = 9e9;
+  const zb = g.spawnFoe("armoured", 4, g.midX(3)); zb.frozen = 9e9;
+  const hp0 = za.hp;
+  for (let i = 0; i < 60; i++) g.step(100);   /* six seconds of fire */
+  const plainDmg = hp0 - za.hp, boostedDmg = hp0 - zb.hp;
+  assert.ok(plainDmg > 0, "the control drakeling never fired");
+  assert.ok(boostedDmg >= plainDmg + 20,
+    `two squares out should still quicken — plain ${plainDmg}, boosted ${boostedDmg}`);
+});
