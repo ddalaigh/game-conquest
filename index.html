@@ -745,7 +745,7 @@
     </div>
     <div class="fuseout" id="deepMythic" style="margin-bottom:14px"></div>
     <div class="levels" id="deepGrid"></div>
-    <p>Five levels so far, and nothing at the bottom of them yet. There is no ground down here
+    <p>Twenty levels now, and nothing at the bottom of them yet. There is no ground down here
        and nothing floats on its own &mdash; the whole world runs on bubbles.</p>
     <div class="rules">
       <b>The Bubble Dial.</b> A blue crocodile, and it costs nothing. Set one on a bare square and
@@ -782,7 +782,7 @@
       first come, first served. Its bubbles answer to it, not to you.
       </div>
       <br><br>
-      This world is still being dug. Something lives in it now &mdash; five levels of it &mdash;
+      This world is still being dug. Something lives in it now &mdash; twenty levels of it &mdash;
       but there is no boss at the bottom yet, no items of its own and no fusions.
     </div>
     <div class="bondbar" style="margin-top:14px">
@@ -2911,7 +2911,55 @@
        note:"One Bubble Dancer comes each wave, late. It takes the middle lane, dances the "+
             "moment it stands on its first tile, and dark bubbles bloom on the third tile "+
             "of every lane — the first of the dead through each drinks 30 health of shield. "+
-            "Reach it at the water's edge, or meet what it blessed."}
+            "Reach it at the water's edge, or meet what it blessed."},
+    /* Six to twenty: the same four enemies, more of them, faster — nothing new
+       by the designer's instruction. Every wave from five on has its one Dancer. */
+    6:{count:34, gap:2700, mix:["drowned","drowned","shielddrowned"],
+       rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[0,1],[2,3],[4,4]],
+       note:"More Drowned, more shields, a little faster. Nothing you have not met."},
+    7:{count:38, gap:2600, mix:["drowned","shielddrowned","shielddrowned"],
+       rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[1,2],[3,4],[0,5]],
+       note:"Shields outnumber the plain dead now. Two shooters a lane is the new floor."},
+    8:{count:42, gap:2500, mix:["drowned","shielddrowned","armourdrowned"],
+       rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[2,1],[4,3],[0,4],[3,2]],
+       note:"All three kinds mixed evenly, and the water keeps getting quicker."},
+    9:{count:46, gap:2400, mix:["shielddrowned","shielddrowned","armourdrowned"],
+       rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[1,1],[3,3],[0,2],[4,5]],
+       note:"Shield-heavy, with plate behind it. Damage in one place beats damage everywhere."},
+    10:{count:52, gap:2300, mix:["drowned","drowned","shielddrowned","armourdrowned","armourdrowned"],
+       rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[0,3],[2,2],[4,1],[1,5]],
+       note:"Half of what comes is armoured. The tenth level of the Deep does not apologise."},
+    11:{count:56, gap:2200, mix:["drowned","shielddrowned","armourdrowned","armourdrowned"],
+       rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[1,3],[3,2],[0,1],[4,4]],
+       note:"Plate outnumbers everything else. Mass your damage or feed the sea."},
+    12:{count:60, gap:2100, mix:["shielddrowned","armourdrowned"],
+       rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[2,4],[0,2],[4,3],[1,1]],
+       note:"Shields and plate only — the plain dead have stopped coming."},
+    13:{count:66, gap:2000, mix:["drowned","drowned","shielddrowned"],
+       rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[3,3],[1,4],[0,1]],
+       note:"A breather of plain dead — but twice as many, twice as fast as they once came."},
+    14:{count:72, gap:1950, mix:["drowned","shielddrowned","armourdrowned"],
+       rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[2,3],[4,2],[0,5],[1,1]],
+       note:"The even mix again, at a pace the third level never dreamt of."},
+    15:{count:78, gap:1900, mix:["shielddrowned","shielddrowned","armourdrowned"],
+       rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[0,4],[2,1],[4,4],[3,5]],
+       note:"Shield-heavy and relentless. Your crocodile recharge is the clock that matters."},
+    16:{count:82, gap:1800, mix:["shielddrowned","armourdrowned"],
+       rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[1,2],[3,4],[0,3],[4,1]],
+       note:"Shields and plate, arriving faster than your bubbles come back."},
+    17:{count:86, gap:1700, mix:["shielddrowned","armourdrowned","armourdrowned"],
+       rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[2,5],[0,1],[4,2],[1,3],[3,1]],
+       note:"Two plates for every shield. The lane you ignore is the lane you lose."},
+    18:{count:90, gap:1600, mix:["drowned","shielddrowned","armourdrowned","armourdrowned"],
+       rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[0,2],[2,3],[4,5],[1,4]],
+       note:"Everything at once, ninety of them. Breadth first, then depth."},
+    19:{count:96, gap:1500, mix:["shielddrowned","armourdrowned","armourdrowned"],
+       rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[3,2],[1,1],[0,4],[4,3],[2,5]],
+       note:"The plain dead are gone for good now. Only shells and shields remain."},
+    20:{count:104, gap:1400, mix:["armourdrowned","shielddrowned","armourdrowned"],
+       rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[1,3],[3,4],[0,2],[4,1],[2,3]],
+       note:"The bottom of what the Deep has, until it has more — one hundred and four "+
+            "of the dead, and the dance, as always, comes late."}
   };
 
   /* ============================================================
