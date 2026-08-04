@@ -120,6 +120,38 @@
   .cloud.fast{animation:sail 30s linear infinite}
   @keyframes sail{from{transform:translateX(12%)}to{transform:translateX(-118%)}}
 
+  /* world three: no ground either, and no air. Light falls off with depth. */
+  .field.deep{background:linear-gradient(180deg,#1b4a63 0%,#123a52 45%,#0b2438 100%)}
+  .field.deep .stripe{background:rgba(255,255,255,.05)}
+  .field.deep .cell:hover{background:rgba(160,240,235,.13)}
+  .field.deep .keep{background:linear-gradient(180deg,#2b6d84,#17455c);
+    border-right-color:rgba(160,240,235,.4)}
+  .field.deep .cell.gapcell:hover{background:transparent}
+  .bubl{position:absolute;pointer-events:none;z-index:0;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.5),rgba(190,240,255,.12) 70%,rgba(190,240,255,0));
+    box-shadow:inset 0 0 0 1px rgba(210,250,255,.35)}
+  .bubl.slow{animation:rise 17s linear infinite}
+  .bubl.fast{animation:rise 11s linear infinite}
+  @keyframes rise{from{transform:translateY(30%);opacity:0}
+    12%{opacity:.85} 88%{opacity:.7} to{transform:translateY(-420%);opacity:0}}
+  /* a bubble the crocodile left behind. Your creatures go inside it. */
+  .bubcell{position:absolute;z-index:1;pointer-events:none;border-radius:50%;
+    background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.42),rgba(150,230,245,.16) 62%,rgba(150,230,245,.05));
+    box-shadow:inset 0 0 0 2px rgba(190,245,255,.55), 0 0 12px rgba(150,230,245,.4);
+    animation:bobble 3.6s ease-in-out infinite alternate}
+  @keyframes bobble{from{transform:translateY(-1.5%) scale(.985)}to{transform:translateY(1.5%) scale(1.015)}}
+  .unit.inbubble{filter:drop-shadow(0 0 6px rgba(150,230,245,.75))}
+  /* the crocodile puffing before it goes */
+  /* the puff is decoration only — removeUnit does the disappearing, so a paused
+     crocodile stays on the board instead of going invisible and waiting */
+  .unit.blowing .art{animation:puff .7s ease-in}
+  @keyframes puff{0%{transform:scale(1)}55%{transform:scale(1.12)}100%{transform:scale(1)}}
+  /* a trench: the deep equivalent of open sky. Nothing holds, everything swims over. */
+  .deepgap{position:absolute;z-index:0;pointer-events:none;border-radius:10px;
+    background:radial-gradient(ellipse at 50% 45%,rgba(4,14,26,.85),rgba(6,20,34,.5) 68%,rgba(8,26,42,0));
+    box-shadow:inset 0 0 0 2px rgba(120,200,220,.22);
+    animation:opensky 5s ease-in-out infinite alternate}
+
   /* open sky: a square with nothing under it. Holds nothing, and everything flies over it. */
   .skygap{position:absolute;z-index:0;pointer-events:none;border-radius:10px;
     background:radial-gradient(ellipse at 50% 45%,rgba(255,255,255,.5),rgba(255,255,255,.12) 68%,rgba(255,255,255,0));
@@ -215,6 +247,11 @@
   .arrow{position:absolute;z-index:5;pointer-events:none;border-radius:2px;
     background:linear-gradient(90deg,#ddd6c2 0 60%,#8a6a4a 60%);
     box-shadow:0 1px 2px rgba(0,0,0,.5)}
+  /* sent back off a Blower Tortoise: the shot reverses and takes your colour */
+  .arrow.back{background:linear-gradient(90deg,#8a6a4a 0 40%,#9fd8ff 40%);
+    box-shadow:0 0 7px rgba(159,216,255,.85)}
+  .shell.back{background:radial-gradient(circle at 35% 30%,#dff1ff,#3f6d90 70%);
+    box-shadow:0 0 10px rgba(159,216,255,.9)}
   .stone{position:absolute;z-index:5;pointer-events:none;border-radius:50%;
     background:radial-gradient(circle at 35% 30%,#b8b2c4,#5c5370 70%);
     box-shadow:0 2px 4px rgba(0,0,0,.45)}
@@ -327,6 +364,9 @@
   .almrow{display:flex;gap:11px;align-items:flex-start;padding:9px 3px;
     border-bottom:1px solid rgba(0,0,0,.25)}
   .almrow.dim{opacity:.4}
+  .almrow.locked .art{opacity:.35}
+  .almrow.locked .nm{color:var(--muted);letter-spacing:3px}
+  .almrow.locked .bl{color:var(--muted);font-style:italic}
   .almrow .art{flex:0 0 36px;display:flex;align-items:center;justify-content:center;padding-top:2px}
   .almrow .txt{flex:1;min-width:0}
   .almrow .nm{font-weight:700;font-size:15px}
@@ -364,6 +404,10 @@
   .levels button{background:var(--panel-2);border:2px solid var(--line);border-radius:10px;
     height:42px;color:var(--text);font-family:'Eczar',serif;font-weight:700;font-size:17px;cursor:pointer}
   .levels button:hover{border-color:var(--gold)}
+  .levels button.locked{background:var(--panel);border-style:dashed;color:var(--muted);
+    cursor:not-allowed;opacity:.5}
+  .levels button.locked:hover{border-color:var(--line)}
+  .levels button svg{vertical-align:-3px}
   .rules{font-size:13px;line-height:1.55;color:var(--muted);border-top:1px solid var(--line);
     padding-top:12px;max-height:38vh;overflow-y:auto;padding-right:6px}
   .rules::-webkit-scrollbar{width:7px}
@@ -376,15 +420,23 @@
     border-radius:11px;background:rgba(159,216,255,.08);border:1px dashed rgba(159,216,255,.4);
     font-size:12px;color:var(--text);line-height:1.4}
   .mythicline.hidden{display:none}
+  .lore.hidden{display:none}
   .mythicline b{color:#9fd8ff}
   .worldline{font-size:13px;color:var(--muted);margin:-2px 0 12px !important;font-style:italic}
   .worldbtn{width:100%;margin-bottom:14px;
     background:linear-gradient(180deg,#3a4a68,#2a3550);border-color:rgba(159,216,255,.35);
     color:#dbeaff;font-weight:700}
   .worldbtn:hover{background:linear-gradient(180deg,#455880,#33415f)}
+  .worldbtn.locked{background:var(--panel);border-color:var(--line);border-style:dashed;
+    color:var(--muted);cursor:not-allowed;font-weight:400;font-size:14px}
+  .worldbtn.locked:hover{background:var(--panel)}
+  .worldbtn.locked svg{vertical-align:-4px;margin-right:7px}
   .card.sky{background:linear-gradient(180deg,#1d2534,#221c2e 70%)}
   .skybox{border-radius:12px;overflow:hidden;margin-bottom:14px;
     background:linear-gradient(180deg,#2c3b56,#4a5f80)}
+  .card.deep{background:linear-gradient(180deg,#12283a,#221c2e 70%)}
+  .deepbox{border-radius:12px;overflow:hidden;margin-bottom:14px;
+    background:linear-gradient(180deg,#1b4a63,#0b2438)}
 
   /* fusion table */
   .tabrow{display:flex;gap:7px;margin-bottom:12px}
@@ -478,7 +530,7 @@
     <p class="worldline">World one of Conquest. Deep under the mountain, where the dead still walk.</p>
     <p>Behind you stands a wellspring of raw energy. It feeds you 25 energy every 10 seconds
        for nothing — and it is the thing the dead are walking towards. Lose it and the level ends.</p>
-    <p>Five creatures are bound to you. You do not place copies of them — you project
+    <p>Six creatures are bound to you. You do not place copies of them — you project
        their energy onto the field, which is why you can hold several at once, and why
        each one takes time to gather strength again.</p>
     <div class="levels" id="levelGrid"></div>
@@ -489,6 +541,8 @@
       <button class="btn" id="startUpg">Bonds</button>
       <button class="btn" id="startSand">Cave sandbox</button>
       <button class="btn" id="startSandFuse">Sandbox table</button>
+      <!-- DEV: the early way into world three while it is being built -->
+      <button class="btn" id="deepDoor">Deep Sea</button>
       <button class="btn" id="startAudio">♪ On</button>
     </div>
     <div class="rules">
@@ -514,6 +568,7 @@
         everything at the back of the wave, and Ashen Phoenix once bound to raise your dead.</li>
         <li><b>Support</b> — Frost Moth, and Burn Moth once bound. Two uses per level between them.</li>
       </ul>
+      <div class="lore hidden" data-foe="bossking">
       <b>The Bone King.</b> Level 15 is a boss with 5,000 health. It never reaches the wellspring —
       it prowls the far side of the field, crossing to a new lane every 5 seconds, and sends its dead
       to do that for it: skeletons at first, then goblins and armoured skeletons once it drops below half.
@@ -526,20 +581,27 @@
       Phoenix is the only thing that answers a slam properly, raising one of the crushed where it fell. It will not walk into your wall and it cannot be blocked — the only way
       to end the level is to kill it.
       <br><br>
+      </div>
+      <div class="lore hidden" data-foe="digger">
       <b>Tunnels.</b> A Digging Goblin burrows partway down its lane and surfaces two tiles closer
       to you. Nothing can touch it while it is under, and the hole stays open afterwards — every
       enemy behind it drops in and skips those two tiles too. A <b>Bomb Rider</b> rolled down that
       lane collapses the tunnel and buries whatever is inside it.
       <br><br>
-      A <b>Master Digger</b> does the same but its tunnel bends: the far end can surface in
+      </div>
+      <div class="lore hidden" data-foe="masterdigger">
+      A <b>Master Digger</b> tunnels the same way, but its tunnel bends: the far end can surface in
       <em>any</em> lane, so the enemies that follow it in come out somewhere else entirely. Rolling a
       Bomb Rider down either end still brings it down.
       <br><br>
+      </div>
+      <div class="lore hidden" data-foe="fireballgoblin">
       <b>Fire feeds fire.</b> The Fireball Goblin cannot be burned at all — flame does it no harm
       whatever. Worse, it feeds: 80 damage of fire and the fireball swells, letting it burn through a
       fourth creature instead of three. Ice, stone, lightning and thorns are the only things that hurt
       it, so a lane defended entirely by dragons and wisps cannot stop one.
       <br><br>
+      </div>
       <b>Sandbox.</b> Everything free, nothing recharging, no projection caps, no way to lose, and
       enemies you drop wherever you like. It has its own fusion table with every item in unlimited supply — but anything
       you bind there stays in the sandbox. To use a creature in a real level you have to bind it at
@@ -599,20 +661,26 @@
       board. They hold nothing &mdash; not a creature, not a Flatbird &mdash; and everything flies
       straight over them. They cut your lanes into shapes, and later levels cut them badly.
       <ul>
-        <li><b>Globs</b> &mdash; the faction up here. They watched your dragons and grew wings, and
+        <li class="lore hidden" data-foe="glob"><b>Globs</b> &mdash; the faction up here. They watched
+        your dragons and grew wings, and
         they drift over anything that cannot meet them in the air. A wall a glob can float past is
         furniture. Shielded at 200, armoured at 400.</li>
-        <li><b>Drift Globs</b> pick a new lane every couple of seconds. A lane you answered is not
+        <li class="lore hidden" data-foe="driftglob"><b>Drift Globs</b> pick a new lane every couple
+        of seconds. A lane you answered is not
         answered for long, so breadth beats depth: Phoenixes, the Egyptian Cinder, the Storm
         Drake.</li>
-        <li><b>Brood Globs</b> take 320 and then come apart into two fast Globlings. Killing one is
+        <li class="lore hidden" data-foe="broodglob"><b>Brood Globs</b> take 320 and then come apart
+        into two fast Globlings. Killing one is
         half the job; keep something in reserve for what falls out.</li>
-        <li><b>Glob Airships</b> shell the creature at the <em>back</em> of your lane &mdash; your
+        <li class="lore hidden" data-foe="globairship"><b>Glob Airships</b> shell the creature at the
+        <em>back</em> of your lane &mdash; your
         forges, not your front line &mdash; and close half a tile with every shell.</li>
-        <li><b>Stormheads</b> are weather. Ice, stone, lightning and thorns pass straight through
+        <li class="lore hidden" data-foe="stormhead"><b>Stormheads</b> are weather. Ice, stone,
+        lightning and thorns pass straight through
         them and do nothing at all. Only flame puts one out, which is the exact inverse of the
-        Fireball Goblin below.</li>
+        Fireball Goblin.</li>
       </ul>
+      <div class="lore hidden" data-foe="skytitan">
       <b>The Thunderhead.</b> Sky 17 is a boss with 6,000 health. It hangs at the far side and never
       closes. Where the Bone King crushes a <em>lane</em>, the Thunderhead rains out a
       <em>column</em> &mdash; and it picks the column you have built up most. When a column darkens
@@ -622,6 +690,7 @@
       dies to the second one. Spread wide, never stack a column, and rebuild in the hole it leaves.
       It calls globs while it waits, and what it calls gets worse twice as it weakens.
       <br><br>
+      </div>
       <b>What the Sky gives you.</b> Sky 1, the Gale Wings. Sky 2 opens the creature-to-creature
       table. Sky 5 widens your bond with the flock to twelve Flatbirds. Sky 7, the Thunder Egg.
       Sky 10, the Cloud Key. Sky 13, the Windblower. Sky 15, the Bird Mask. Sky 17, the Storm
@@ -636,14 +705,76 @@
       its own kind freely; Drakeling and Thunder Egg give the <b>Storm Drake</b>;
       and Sling Roc and Storm Heart the <b>Thunder Roc</b>.
       <br><br>
-      Beating the Caves is not required to come up here, and the Flatbird is still granted from the
-      start rather than earned off the Bone King. That gate goes in whenever you want it to.
+      You are here because the Bone King fell, and you are carried by the bird he was keeping. The
+      Caves open one level at a time and so does the Sky: clear the level you are on to reach the
+      next.
     </div>
+    <button class="btn worldbtn" id="toDeep">Go down to the Deep Sea &rarr;</button>
     <div class="bondbar" style="margin-top:14px">
       <button class="btn" id="skyAlm">Almanac</button>
       <button class="btn" id="skySand">Sky sandbox</button>
       <button class="btn" id="skyAudio">♪ On</button>
       <button class="btn" id="skyBack">Back to the Caves</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen hidden" id="deepScreen">
+  <div class="card deep">
+    <h2>The Deep Sea</h2>
+    <p class="worldline">World three. Below everything, where there is no ground and no air either.</p>
+    <div class="deepbox">
+      <svg viewBox="0 0 300 120" width="100%" height="120" aria-hidden="true">
+        <path d="M0 18q40 8 76 0t76 0 76 0 72 0" stroke="#8fe3e0" stroke-width="2"
+              fill="none" opacity=".35"/>
+        <circle cx="52" cy="74" r="6" fill="none" stroke="#bff2ff" stroke-width="1.4" opacity=".55"/>
+        <circle cx="70" cy="52" r="3.5" fill="none" stroke="#bff2ff" stroke-width="1.2" opacity=".5"/>
+        <circle cx="84" cy="86" r="2.4" fill="none" stroke="#bff2ff" stroke-width="1" opacity=".45"/>
+        <path d="M188 66q22-14 44 0-22 12-44 0z" fill="#2f4d64" opacity=".8"/>
+        <circle cx="200" cy="65" r="2" fill="#bff2ff" opacity=".8"/>
+        <path d="M0 104q30-10 60 0t60 0 60 0 60 0 60 0" stroke="#0b2438" stroke-width="14"
+              fill="none" opacity=".7"/>
+      </svg>
+    </div>
+    <div class="fuseout" id="deepMythic" style="margin-bottom:14px"></div>
+    <div class="levels" id="deepGrid"></div>
+    <p>Five levels so far, and nothing at the bottom of them yet. There is no ground down here
+       and nothing floats on its own &mdash; the whole world runs on bubbles.</p>
+    <div class="rules">
+      <b>The Bubble Dial.</b> A blue crocodile, and it costs nothing. Set one on a bare square and
+      it blows a single bubble out through its nose and swims off &mdash; the crocodile does not
+      stay, does not fight and cannot be attacked, because by the time anything reaches the square
+      it is already gone. What it leaves is the bubble, and the bubble stays for the rest of the
+      level.
+      <br><br>
+      <b>Everything goes inside a bubble.</b> Where the Sky lets anything with wings hold its own
+      square, the Deep lets nothing hold one. Every creature you own &mdash; forges, dragons,
+      tortoises, phoenixes alike &mdash; has to be placed into a bubble that is already there.
+      That is the tax of this world, and it is a heavier one than the Sky's: you pay a crocodile's
+      recharge for every square you want to hold. A bubble is not used up by what sits in it, so
+      when the creature inside dies the bubble is still there and you can fill it again for free.
+      <br><br>
+      Give an <b>energy boost</b> of any tier to a Bubble Dial &mdash; or to an empty bubble it
+      left behind, the crocodile being no creature to wait around for one &mdash; and the whole
+      sea takes a breath: for the rest of that level everything holds its square unaided and you
+      can forget bubbles entirely. It is the same mercy the Flatbird's boost gives the flock, and
+      down here it is worth far more.
+      <br><br>
+      <b>Trenches.</b> Every level cuts squares out of the board that hold nothing at all &mdash;
+      not a creature, not a bubble. They are marked dark, and everything swims straight over them.
+      <br><br>
+      <b>Nothing down here flies.</b> The Deep's own creatures all swim at your level, so every
+      creature you own can reach them and everything they do reaches you. Whatever else this world
+      asks of you, it does not ask you to re-learn how a fight works.
+      <br><br>
+      This world is still being dug. There are five levels, four creatures in it and no boss at
+      the bottom yet, no items of its own and no fusions.
+    </div>
+    <div class="bondbar" style="margin-top:14px">
+      <button class="btn" id="deepAlm">Almanac</button>
+      <button class="btn" id="deepSand">Deep sandbox</button>
+      <button class="btn" id="deepAudio">♪ On</button>
+      <button class="btn" id="deepBack">Back to the Sky</button>
     </div>
   </div>
 </div>
@@ -769,7 +900,7 @@
       var n=Math.floor(ctx.sampleRate*1.2);
       noiseBuf=ctx.createBuffer(1,n,ctx.sampleRate);
       var d=noiseBuf.getChannelData(0);
-      for(var i=0;i<n;i++) d[i]=Math.random()*2-1;
+      for(var i=0;i<n;i++) d[i]=rnd()*2-1;
       return true;
     }
 
@@ -894,7 +1025,7 @@
           if(i===0||i===8)         tone({f:96,to:44,t:t,dur:0.2,gain:0.22,type:"sine"});
           if(i===4||i===12)        noise({f:3400,t:t,dur:0.05,gain:0.045,bus:musicBus});
           var d=this.mel[i];
-          if(d>=0 && Math.random()<0.86){
+          if(d>=0 && rnd()<0.86){
             var n=this.scale[(d+bar)%this.scale.length];
             tone({f:freq(n),t:t,dur:0.55,gain:0.07,type:"triangle",send:0.45});
           }
@@ -914,6 +1045,24 @@
           }
           if(i===0||i===8) tone({f:freq(root-12),t:t,dur:0.6,gain:0.1,type:"triangle"});
           if(i%4===2)      noise({f:7000,t:t,dur:0.04,gain:0.025,bus:musicBus});
+        }},
+
+      /* the same idea taken all the way down: slower, lower, and a sonar ping
+         instead of the sky's hats */
+      deep:{bpm:76, roots:[33,31,34,29], arp:[0,7,12,7],
+        step:function(sp,t){
+          var bar=Math.floor(sp/16)%4, i=sp%16, root=this.roots[bar];
+          if(i===0){
+            [0,3,7,10].forEach(function(o,n){
+              tone({f:freq(root+12+o),t:t+n*0.06,dur:3.6,gain:0.032,type:"sine",atk:1.1,send:0.62});
+            });
+          }
+          if(i%4===0){
+            var n2=root+24+this.arp[(i/4)%this.arp.length];
+            tone({f:freq(n2),t:t,dur:1.1,gain:0.035,type:"sine",send:0.7});
+          }
+          if(i===0) tone({f:freq(root-12),t:t,dur:1.2,gain:0.11,type:"sine"});
+          if(i===8) tone({f:freq(root+31),to:freq(root+19),t:t,dur:0.5,gain:0.045,type:"sine",send:0.8});
         }}
     };
 
@@ -978,7 +1127,7 @@
           break;
         case "shoot":
           if(!spaced("shoot",95)) return;
-          tone({f:640+Math.random()*140,to:280,t:t,dur:0.07,gain:0.045,type:"square",bus:sfxBus});
+          tone({f:640+rnd()*140,to:280,t:t,dur:0.07,gain:0.045,type:"square",bus:sfxBus});
           break;
         case "hit":
           if(!spaced("hit",70)) return;
@@ -1069,6 +1218,56 @@
       "<ellipse cx='31' cy='17.5' rx='2.4' ry='2.8' fill='#8f3d1c'/>"+
       "<path d='M17 9q2-5 5-4-1 3 0 5z' fill='#f0c05a'/>"+
       "<circle cx='23' cy='15' r='1.9' fill='#2b1405'/><circle cx='23.6' cy='14.4' r='.6' fill='#fff'/>"+
+      "</g></svg>",
+    /* world three's carrier: a blue crocodile that blows one bubble and is gone */
+    bubbledial:"<svg viewBox='0 0 40 40' width='34' height='34'><g>"+
+      "<path d='M6 27q-3-2-4-5 3-2 5 0z' fill='#2f7fa8'/>"+
+      "<path d='M8 24q8-3 15-3t13 3q-5 4-13 4t-15-4z' fill='#2b86b4'/>"+
+      "<path d='M9 23q7-3 14-3t12 3q-5 2-12 2T9 23z' fill='#3ea3d4'/>"+
+      "<path d='M24 20q7-1 12 2-1 3-5 3-4 0-7-2z' fill='#2b86b4'/>"+
+      "<path d='M27 21.5q5-1 8 1-2 1.6-5 1.6-2 0-3-1z' fill='#8fe3e0'/>"+
+      "<path d='M12 21l2-3 2 3zM17 20.5l2-3 2 3zM22 21l2-3 2 3z' fill='#1f6a92'/>"+
+      "<circle cx='26' cy='19.5' r='2.2' fill='#0e3d55'/>"+
+      "<circle cx='26.7' cy='18.9' r='.8' fill='#fff'/>"+
+      "<path d='M34 22.6q1.6-.6 3 0-1.4.8-3 .4z' fill='#0e3d55'/>"+
+      "<circle cx='37.4' cy='21.4' r='2.1' fill='none' stroke='#bff2ff' stroke-width='1'/>"+
+      "<circle cx='36.6' cy='20.7' r='.6' fill='#eafcff'/>"+
+      "</g></svg>",
+    /* what lives down there */
+    nipper:"<svg viewBox='0 0 40 40' width='30' height='30'><g>"+
+      "<path d='M9 21q-5-3-7 1 3 4 7 2zM31 21q5-3 7 1-3 4-7 2z' fill='#c4552f'/>"+
+      "<ellipse cx='20' cy='23' rx='11' ry='8' fill='#d9673c'/>"+
+      "<ellipse cx='20' cy='21' rx='8' ry='5' fill='#ef8154'/>"+
+      "<path d='M11 29l-3 5M16 31l-1 5M24 31l1 5M29 29l3 5' stroke='#a8441f' stroke-width='1.6' stroke-linecap='round'/>"+
+      "<circle cx='16' cy='19' r='2' fill='#2b1405'/><circle cx='24' cy='19' r='2' fill='#2b1405'/>"+
+      "<circle cx='16.6' cy='18.4' r='.6' fill='#fff'/><circle cx='24.6' cy='18.4' r='.6' fill='#fff'/>"+
+      "</g></svg>",
+    lanternfish:"<svg viewBox='0 0 40 40' width='30' height='30'><g>"+
+      "<path d='M34 20l6-5v10z' fill='#3b5a72'/>"+
+      "<ellipse cx='21' cy='20' rx='13' ry='8' fill='#2f4d64'/>"+
+      "<ellipse cx='21' cy='19' rx='10' ry='5' fill='#456b86'/>"+
+      "<path d='M14 12q1-6 5-4 0 3-1 5z' fill='#2f4d64'/>"+
+      "<circle cx='11' cy='19' r='2.4' fill='#0d1c28'/><circle cx='11.8' cy='18.3' r='.8' fill='#fff'/>"+
+      "<path d='M11 15q-4-4-6-9' stroke='#7fd4e8' stroke-width='1.3' fill='none'/>"+
+      "<circle cx='5' cy='6' r='3.2' fill='#f0e07a'/>"+
+      "<circle cx='5' cy='6' r='5' fill='none' stroke='#f0e07a' stroke-width='.8' opacity='.5'/>"+
+      "<path d='M14 24q5 3 11 1' stroke='#0d1c28' stroke-width='1.1' fill='none'/>"+
+      "</g></svg>",
+    driftjelly:"<svg viewBox='0 0 40 40' width='30' height='30'><g>"+
+      "<path d='M13 21q0 9-2 14M18 22q0 10 1 15M23 22q0 10-1 15M27 21q1 9 3 13' "+
+        "stroke='#c79be0' stroke-width='1.6' fill='none' stroke-linecap='round' opacity='.85'/>"+
+      "<path d='M20 6q11 0 12 10 0 5-12 5T8 16Q8 6 20 6z' fill='#a678c8'/>"+
+      "<path d='M20 9q8 0 8.5 7 0 3-8.5 3t-8.5-3Q12 9 20 9z' fill='#cda6e4'/>"+
+      "<ellipse cx='20' cy='13' rx='4' ry='2.4' fill='#efe0f8' opacity='.75'/>"+
+      "<circle cx='16.5' cy='16' r='1.5' fill='#3d2452'/><circle cx='23.5' cy='16' r='1.5' fill='#3d2452'/>"+
+      "</g></svg>",
+    armourray:"<svg viewBox='0 0 40 40' width='34' height='30'><g>"+
+      "<path d='M20 10q16 2 19 12-9 5-19 5T1 22Q4 12 20 10z' fill='#3f4a63'/>"+
+      "<path d='M20 13q12 2 14 9-7 3-14 3t-14-3q2-7 14-9z' fill='#5a6884'/>"+
+      "<path d='M20 15q9 1 10 6-5 2-10 2t-10-2q1-5 10-6z' fill='#78879f'/>"+
+      "<path d='M20 27q-1 7-3 11M20 27q1 7 3 11' stroke='#3f4a63' stroke-width='1.8' fill='none' stroke-linecap='round'/>"+
+      "<circle cx='16' cy='17' r='1.7' fill='#131a26'/><circle cx='24' cy='17' r='1.7' fill='#131a26'/>"+
+      "<path d='M8 20l3-2M32 20l-3-2M13 24l2-2M27 24l-2-2' stroke='#99a7bd' stroke-width='1.1'/>"+
       "</g></svg>",
     tortoise:"<svg viewBox='0 0 40 40' width='34' height='34'><g>"+
       "<ellipse cx='20' cy='25' rx='15' ry='11' fill='#6b5a3e'/>"+
@@ -1844,7 +2043,7 @@
     },
 
     flatbird:{
-      name:"Flatbird", family:"mythic", cost:0, rc:3000, hp:100, carrier:true, skyOnly:true, cap:10,
+      name:"Flatbird", family:"mythic", cost:0, rc:3000, hp:100, carrier:true, onlyIn:"sky", cap:10,
       glow:"rgba(159,216,255,1)",
       boost:{kind:"lift"},
       blurb:"A mythical creature, and the only ground the Sky has. Costs nothing, gathers again in "+
@@ -1854,6 +2053,20 @@
             "counts against your ten. Anything with wings needs no help. "+
             "Give it an energy boost of any tier and it calls up the whole flock \u2014 for the rest "+
             "of that level every flightless creature floats on its own, no bird needed."
+    },
+    bubbledial:{
+      name:"Bubble Dial", family:"mythic", cost:0, rc:2600, hp:100, onlyIn:"deep", cap:10,
+      glow:"rgba(140,235,225,1)", blows:{after:700},
+      boost:{kind:"lift"},
+      blurb:"A blue crocodile, and the only air the Deep Sea has. It costs nothing. Set one on a "+
+            "square and it blows a single bubble out through its nose and is gone — the bubble "+
+            "stays, and anything of yours can be placed inside it. The crocodile does not linger "+
+            "and does not fight; it leaves you somewhere to stand and swims off. A bubble is not "+
+            "used up by what sits in it, so if the creature inside dies the bubble is still there "+
+            "for the next one. Give an energy boost of any tier to a Bubble Dial — or to an empty "+
+            "bubble it left, the crocodile itself being long gone — and the whole sea "+
+            "takes a breath: for the rest of that level everything holds its square unaided, no "+
+            "bubble needed."
     },
     tinyember:{
       name:"Tiny Ember", family:"dragon", cost:25, rc:5000, hp:100, glow:"rgba(255,176,77,.7)",
@@ -1925,20 +2138,27 @@
     },
     blowertortoise:{
       name:"Blower Tortoise", fusedOnly:true, family:"guardian", cost:100, rc:10000, hp:400, glow:"rgba(159,216,255,.8)",
-      wall:true, knockAt:0.5, knockTiles:2,
+      wall:true, knockAt:0.5, knockTiles:2, reflect:"arrow",
       boost:{kind:"shield", mult:1.5},
       blurb:"400 health, and the moment it drops below half it vents a gale that throws everything "+
-            "in its lane back two squares."
+            "in its lane back two squares. The horn never stops blowing, either: an arrow that "+
+            "would strike the shell is turned flat in the air and sent back down the lane at the "+
+            "bow that loosed it, carrying the damage it came with. Only arrows — a shell "+
+            "comes down too steeply for the horn to catch."
     },
 
     galetortoise:{
       name:"Gale Tortoise", fusedOnly:true, family:"guardian", cost:150, rc:10000, hp:400,
       glow:"rgba(159,216,255,1)",
-      wall:true, knockAt:0.5, knockTiles:9, knockAll:true,
+      wall:true, knockAt:0.5, knockTiles:9, knockAll:true, reflect:"shell",
       boost:{kind:"shield", mult:1.5},
       blurb:"The Windblower fitted into the shell. 400 health, and the moment it drops below half "+
             "it lets the whole horn go: every enemy in its lane \u2014 in front of it and behind "+
-            "it both \u2014 is thrown all the way back to the far end of the board."
+            "it both \u2014 is thrown all the way back to the far end of the board. The Windblower "+
+            "points upward where the Blower's horn lies flat, so it answers the other half of the "+
+            "sky: a shell crossing its lane is caught and thrown back at the airship that dropped "+
+            "it. Arrows come in too flat for an upturned horn to catch — those it simply takes "+
+            "on the shell."
     },
     phoenixphoenix:{
       name:"Phoenix Phoenix", fusedOnly:true, family:"winged", cost:225, rc:5000, hp:100,
@@ -2068,7 +2288,7 @@
     },
     longbird:{
       name:"Long Bird", fusedOnly:true, family:"mythic", cost:25, rc:5000, hp:100,
-      carrier:true, skyOnly:true, cap:10, spanRows:1,
+      carrier:true, onlyIn:"sky", cap:10, spanRows:1,
       glow:"rgba(203,216,234,1)",
       boost:{kind:"lift"},
       blurb:"Three Flatbirds grown into one long body. Set it down and it lays itself across the "+
@@ -2132,7 +2352,7 @@
       blurb:"The burst now triggers from the lanes above and below as well."
     }
   };
-  var ORDER=["flatbird","longbird","forge","leysprite","galesprite","stormforge","tinyember","cinderwisp","cinderghoul","egyptiancinder","bonfire","boxingflames","skyboxer","drakeling","colddrakeling","stormdrake","stonedragon","tortoise","thornback","thornbark","blowertortoise","galetortoise","frostmoth","burnmoth","metalbird","phoenix","phoenixphoenix","slingroc","thunderroc","ashenphoenix","bombrider","speedyroller","coldstonedragon","stormmoth","thundermoth"];
+  var ORDER=["flatbird","longbird","bubbledial","forge","leysprite","galesprite","stormforge","tinyember","cinderwisp","cinderghoul","egyptiancinder","bonfire","boxingflames","skyboxer","drakeling","colddrakeling","stormdrake","stonedragon","tortoise","thornback","thornbark","blowertortoise","galetortoise","frostmoth","burnmoth","metalbird","phoenix","phoenixphoenix","slingroc","thunderroc","ashenphoenix","bombrider","speedyroller","coldstonedragon","stormmoth","thundermoth"];
   var UPGRADE_ORDER=["twinforge","twindrake","fourdrake","deepshell","brightphoenix","widephoenix"];
 
   /* every upgraded form counts against its base creature's projection cap */
@@ -2310,9 +2530,19 @@
       blurb:"A great pale bird, broad and flat-backed, that lets your Forge, Guardian and Support "+
             "creatures ride into the Sky. Without it only the Winged and the Dragons can hold a "+
             "board with no ground under it."
+    },
+    bubbledial:{
+      name:"Bubble Dial",
+      blurb:"A blue crocodile that swims up out of the dark, blows one bubble through its nose "+
+            "and is gone again. The bubble is what you wanted: it stays where the crocodile left "+
+            "it, and anything of yours can be set down inside it. Without one, the Deep Sea has "+
+            "nowhere for your creatures to be at all."
     }
   };
   var LEVEL_MYTHIC={ 15:"flatbird" };
+  /* the Thunderhead gives up two things: the Storm Heart, and the crocodile that opens
+     the Deep Sea */
+  var SKY_MYTHIC={ 17:"bubbledial" };
   /* the Sky is where every rule about the ground stops applying */
   /* the Sky has its own drops */
   var SKY_ITEM={ 1:"galewings", 7:"thunderegg", 10:"cloudkey", 13:"windblower", 15:"birdmask", 17:"stormheart" };
@@ -2471,7 +2701,25 @@
               "most. When a column darkens you have under two seconds, and everything standing in "+
               "it is already lost \u2014 recalling saves nothing. Spread wide and never stack. "+
               "On its own clock it also throws five bolts at five different creatures anywhere "+
-              "on the board, 60 apiece, with no wind-up and no warning at all."}
+              "on the board, 60 apiece, with no wind-up and no warning at all."},
+
+    /* ---- the Deep Sea. Nothing down here flies; it all swims at your level,
+       so everything you know about fighting in the Caves still holds. ---- */
+    nipper:{name:"Nipper Crab", world:"deep", hp:90, speed:22, art:ART.nipper, tag:"FAST",
+              note:"Quick and slight. It is across the board before a slow wall is worth "+
+              "setting, and there are always more of them than you would like."},
+    driftjelly:{name:"Drift Jelly", world:"deep", hp:160, speed:11, art:ART.driftjelly,
+              tag:"DRIFTS", drift:{every:2600},
+              note:"It has no say in where it goes and neither do you — it takes a new lane "+
+              "every couple of seconds. A lane you answered is not answered for long."},
+    lanternfish:{name:"Lantern Fish", world:"deep", hp:150, speed:10, art:ART.lanternfish,
+              tag:"ARCHER", arrow:{range:3, every:1500, count:1},
+              note:"It stops three tiles short and spits at whatever is lit. A bubble is glass "+
+              "to it: what is inside takes the hit the same as anything else."},
+    armourray:{name:"Armoured Ray", world:"deep", hp:420, speed:8, art:ART.armourray,
+              tag:"ARMOUR", size:38, wide:1.1,
+              note:"420 health of plated hide moving slowly up the lane. Nothing cheap turns "+
+              "one back; you either mass damage on it or you let it eat a bubble."}
   };
 
   /* ============================================================
@@ -2610,24 +2858,76 @@
             "and keep something in reserve to rebuild with."}
   };
 
+  /* ---- The Deep Sea. Five levels so far, and no boss yet at the bottom. ---- */
+  var DEEP_LEVELS={
+    1:{count:14, gap:3800, mix:["nipper"], gaps:[[1,3]],
+       note:"Nipper Crabs, and the first thing you will notice is that you have nowhere to put "+
+            "anything. Set a <b>Bubble Dial</b> down, let the crocodile blow its bubble, and "+
+            "place into the bubble it leaves. One trench here holds nothing at all."},
+    2:{count:18, gap:3500, mix:["nipper","nipper","driftjelly"], gaps:[[0,2],[3,4]],
+       note:"Drift Jellies wander a new lane every couple of seconds. Bubbles do not wander with "+
+            "them, so build breadth rather than one deep lane you are proud of."},
+    3:{count:22, gap:3300, mix:["nipper","driftjelly","lanternfish"], gaps:[[1,1],[2,4],[4,2]],
+       note:"Lantern Fish stop three tiles short and spit. A bubble is no shield — whatever "+
+            "is inside takes the hit — so something has to reach them."},
+    4:{count:26, gap:3100, mix:["nipper","driftjelly","lanternfish","armourray"], gaps:[[0,1],[2,2],[4,4]],
+       note:"Armoured Rays. 420 health apiece and slow with it, which is the one mercy: you have "+
+            "time to mass on one, provided the crabs are not already through."},
+    5:{count:32, gap:2800, mix:["armourray","lanternfish","nipper","driftjelly","armourray"],
+       gaps:[[0,3],[1,1],[3,4],[4,2]],
+       note:"Everything the Deep has so far, four trenches cut through it, and no bottom yet "+
+            "— what waits below this has not come up to meet you."}
+  };
+
+  /* ============================================================
+     The three worlds. The Caves have ground under them. The Sky and the Deep Sea
+     do not, and each hands that job to a mythic of its own — the Flatbird stays
+     under what it carries, the Bubble Dial leaves a bubble behind and swims off.
+     ============================================================ */
+  var WORLDS={
+    caves:{ levels:function(){ return LEVELS; },     word:"Level", key:"",  box:"Cave box",
+            track:"caves", screen:"startScreen", grid:"levelGrid" },
+    sky:  { levels:function(){ return SKY_LEVELS; }, word:"Sky",   key:"s", box:"Sky box",
+            track:"sky",   screen:"skyScreen",   grid:"skyGrid",
+            noGround:true, carrier:"flatbird" },
+    deep: { levels:function(){ return DEEP_LEVELS; },word:"Deep",  key:"d", box:"Deep box",
+            track:"deep",  screen:"deepScreen",  grid:"deepGrid",
+            noGround:true, carrier:"bubbledial" }
+  };
+  /* One place the game draws randomness from, so a test can pin a wave and get
+     the same one every run. Play uses Math.random and never notices. */
+  var rng=Math.random;
+  function rnd(){ return rng(); }
+  function setRng(fn){ rng=fn||Math.random; }
+
   var WORLD="caves";
-  function LV(){ return WORLD==="sky" ? SKY_LEVELS : LEVELS; }
+  function W(){ return WORLDS[WORLD]||WORLDS.caves; }
+  function LV(){ return W().levels(); }
+  function noGround(){ return !!W().noGround; }
+  function carrierKeyFor(){ return W().carrier; }
+  function carrierName(){ var c=W().carrier; return c ? CREATURES[c].name : ""; }
+  /* who can hold a square with nothing under them. In the Sky, anything with wings.
+     In the Deep, nothing at all but the crocodile that makes the bubbles. */
+  function holdsAlone(k){
+    if(WORLD==="deep") return !!CREATURES[k].blows;
+    return canFly(k);
+  }
 
   /* ============================================================
      Persistent meta (session-scoped; no browser storage)
      ============================================================ */
   var meta={
     bank:{1:0,2:0,3:0},
-    /* DEV: flatbird granted from the start while the Sky World is being built.
-       Remove it here to make beating the Bone King the way to earn it. */
-    unlocked:{flatbird:1,forge:1,cinderwisp:1,drakeling:1,tortoise:1,frostmoth:1,phoenix:1},
-    mythics:{flatbird:1},
+    /* the Flatbird is not here: the Bone King on level 15 is how it is earned */
+    unlocked:{forge:1,cinderwisp:1,drakeling:1,tortoise:1,frostmoth:1,phoenix:1},
+    mythics:{},
     pairTable:false,          /* opened by clearing Sky 2 */
     flockUp:false,            /* Sky 5 \u2014 ten birds becomes twelve, Flatbird and Long Bird alike */
     items:{},
     fused:{},
     capUp:{forge:0,dragon:0,guardian:0,support:0,winged:0}, /* 4 -> 5, and support uses 2 -> 3 */
-    cleared:{}
+    cleared:{},
+    foesBeaten:{}             /* an enemy writes its own almanac page by dying */
   };
 
   /* Sandbox keeps its own bindings. Anything fused in the sandbox table stays
@@ -2711,6 +3011,8 @@
      Run state
      ============================================================ */
   var level=1, speed=1, paused=false, running=false, lastT=0;
+  /* how the last level ended, for anything that cannot read the end screen */
+  var lastOutcome=null;
   var energy, grid, foes, bolts, floats, drops, effects, riders, stones, birds, arrows, tunnels;
   var sandFoe=null;
   var skyLift=false;
@@ -2810,8 +3112,20 @@
     c.innerHTML='<b style="left:0;top:34%;width:52%;height:56%"></b>'+
                 '<b style="left:22%;top:6%;width:44%;height:78%"></b>'+
                 '<b style="left:50%;top:28%;width:48%;height:60%"></b>';
-    c.style.animationDelay=(-Math.random()*40)+"s";
+    c.style.animationDelay=(-rnd()*40)+"s";
     return c;
+  }
+
+  /* the Deep has no weather, only what is on its way up */
+  function makeBubbleDrift(leftPct,sizePct,dur){
+    var b=document.createElement("div");
+    b.className="bubl "+dur;
+    b.style.left=leftPct+"%";
+    b.style.top="88%";
+    b.style.width=sizePct+"%";
+    b.style.height=(sizePct*1.6)+"%";
+    b.style.animationDelay=(-rnd()*16)+"s";
+    return b;
   }
 
   /* Open sky: squares with nothing under them at all. A level lists them and they hold nothing —
@@ -2825,15 +3139,26 @@
     var g=grid[r] && grid[r][c];
     return !!(g && g.gap);
   }
+  /* the same hole wears a different name in each world */
+  function trenchMsg(){
+    return WORLD==="deep"
+      ? "A trench. Nothing holds there — not a creature, not a bubble."
+      : "Open sky. Nothing holds there — not a creature, not a <b>Flatbird</b>.";
+  }
 
   function buildField(){
     inner.innerHTML="";
     var fieldEl=inner.parentNode;
     fieldEl.classList.toggle("sky", WORLD==="sky");
+    fieldEl.classList.toggle("deep", WORLD==="deep");
     var gapList=gapsForLevel();
     if(WORLD==="sky"){
       [[6,26,"slow"],[34,20,"fast"],[58,30,"slow"],[76,18,"fast"],[20,16,"fast"]]
         .forEach(function(c){ inner.appendChild(makeCloud(c[0],c[1],c[2])); });
+    }
+    if(WORLD==="deep"){
+      [[9,7,"slow"],[23,4,"fast"],[41,9,"slow"],[57,5,"fast"],[70,7,"slow"],[86,4,"fast"]]
+        .forEach(function(b){ inner.appendChild(makeBubbleDrift(b[0],b[1],b[2])); });
     }
     for(var r=0;r<ROWS;r++){
       if(r%2===1){
@@ -2866,13 +3191,13 @@
         if(gap){
           cell.classList.add("gapcell");
           var gd=document.createElement("div");
-          gd.className="skygap";
+          gd.className=(WORLD==="deep") ? "deepgap" : "skygap";
           gd.style.left=pxX(colX(c)+2); gd.style.top=pxY(r*CH+3);
           gd.style.width=pxX(CW-4); gd.style.height=pxY(CH-6);
           inner.appendChild(gd);
         }
         inner.appendChild(cell);
-        grid[r][c]={cell:cell, unit:null, gap:gap};
+        grid[r][c]={cell:cell, unit:null, gap:gap, bubble:false, bublEl:null};
       })(rr,cc);
     }
     /* grid holds {cell,unit} — normalise the null init above */
@@ -2894,8 +3219,18 @@
       return;
     }
     var t2=unitAt(r,c);
-    if(WORLD==="sky" && sd && !canFly(selected) && !sd.carrier){
+    if(noGround() && sd && !holdsAlone(selected) && !sd.carrier && !skyLift){
+      if(WORLD==="deep"){
+        /* into the bubble the crocodile left, and only there */
+        if(grid[r][c].bubble && !t2) cell.classList.add("ok"); else cell.classList.add("no");
+        return;
+      }
       if(t2 && CREATURES[t2.key].carrier) cell.classList.add("ok"); else cell.classList.add("no");
+      return;
+    }
+    /* a crocodile wants a bare square, not one that already holds a bubble */
+    if(WORLD==="deep" && sd && sd.blows){
+      if(!t2 && !grid[r][c].bubble) cell.classList.add("ok"); else cell.classList.add("no");
       return;
     }
     if(t2) cell.classList.add("no"); else cell.classList.add("ok");
@@ -2907,7 +3242,7 @@
   function buildTray(){
     trayEl.innerHTML="";
     ORDER.filter(function(k){
-      if(sandbox) return liveUnlocked()[k] && (WORLD==="sky" || !CREATURES[k].skyOnly);
+      if(sandbox) return liveUnlocked()[k] && (!CREATURES[k].onlyIn || CREATURES[k].onlyIn===WORLD);
       return loadout.indexOf(k)>-1;
     }).forEach(function(k){
       var d=CREATURES[k];
@@ -2981,9 +3316,13 @@
     var lbl=document.createElement("span");
     lbl.className="lbl"; lbl.textContent="Spawn";
     bar.appendChild(lbl);
-    Object.keys(FOES).filter(function(f){
-      return (FOES[f].world||"caves")===WORLD;
-    }).forEach(function(f){
+    /* The sandbox is a box, not a level. Everything that walks or flies in either world
+       is on the shelf, whichever world you opened it from — a glob will happily drift
+       down a cave lane and a skeleton will walk a sky one. */
+    var shelf=CAVE_FOE_ORDER.concat(SKY_FOE_ORDER).concat(DEEP_FOE_ORDER);
+    Object.keys(FOES).forEach(function(f){ if(shelf.indexOf(f)<0) shelf.push(f); });
+    shelf.forEach(function(f){
+      if(!FOES[f]) return;
       var b=document.createElement("button");
       b.className="seed";
       b.setAttribute("data-foe",f);
@@ -3119,6 +3458,106 @@
   /* ============================================================
      Placing / recalling
      ============================================================ */
+  /* ------------------------------------------------------------
+     Whether a square will take what you are holding, and if not, why not.
+     Pure: it reads state and decides, and touches no DOM and no sound. Every
+     refusal carries a code, so a test can tell "the level is over" apart from
+     "that is the wrong square" instead of inferring both from an empty grid.
+     ------------------------------------------------------------ */
+  function canPlace(k,r,c){
+    function no(why,msg){ return {ok:false, why:why, msg:msg||""}; }
+    function yes(mode,extra){
+      var o={ok:true, why:"ok", mode:mode};
+      if(extra) for(var p in extra) o[p]=extra[p];
+      return o;
+    }
+
+    if(paused||!running)  return no("notRunning");
+    if(!k)                return no("nothingSelected");
+    var d=CREATURES[k];
+    if(!d)                return no("unknownCreature");
+    if(r<0||r>=ROWS||c<0||c>=COLS) return no("offBoard");
+    if(isGap(r,c))        return no("trench", trenchMsg());
+
+    var u=unitAt(r,c);
+    if(energy<d.cost)     return no("energy");
+    if((cd[k]||0)>0)      return no("cooldown");
+
+    if(d.roller){
+      if(u) return no("occupied", "It needs a clear square to set off from.");
+      /* A keg has nothing to roll along up here. It takes the whole flock being up,
+         which means an energy boost spent on a carrier first. */
+      if(noGround() && !holdsAlone(k) && !skyLift) return no("noFooting",
+        WORLD==="deep"
+          ? "Nothing to roll along down here. Give an empty bubble an energy boost first "+
+            "\u2014 the sea has to breathe before a keg can go anywhere."
+          : "Nothing to roll along. Give a <b>Flatbird</b> or a <b>Long Bird</b> an energy boost "+
+            "first \u2014 the flock has to be up before a keg can go anywhere.");
+      return yes("roller");
+    }
+
+    if(d.instant){
+      if(supportLeft<=0) return no("noSupportLeft", "No support uses left this level.");
+      return yes("instant");
+    }
+
+    if(d.from){
+      if(CREATURES[d.from].fusedOnly)
+        return no("notUpgradable", CREATURES[d.from].name+" cannot be upgraded.");
+      if(!u || u.key!==d.from)
+        return no("wrongBase", "Place that on a "+CREATURES[d.from].name+" you already have out.");
+      return yes("upgrade");
+    }
+
+    /* A Long Bird lies across three squares at once. Any of the three that is taken
+       or open sky is simply skipped, which is what lets two of them overlap. */
+    if(d.spanRows){
+      var span=[];
+      for(var sr=r-d.spanRows; sr<=r+d.spanRows; sr++){
+        if(sr<0 || sr>=ROWS) continue;
+        if(grid[sr][c].gap) continue;
+        if(grid[sr][c].unit) continue;
+        span.push(sr);
+      }
+      if(!span.length) return no("occupied", "All three squares there are taken or open sky.");
+      if(countOf(k)+span.length>capOf(k)) return no("cap",
+        "That would put you over "+capOf(k)+" tiles of <b>"+d.name+"</b>. You have "+
+        countOf(k)+" out.");
+      return yes("span",{span:span});
+    }
+
+    var overCap = "You can only hold "+capOf(k)+" "+d.name+" projections at once.";
+
+    /* In the Deep, the crocodile is placed on a bare square, blows its bubble and goes. */
+    if(WORLD==="deep" && d.blows && !skyLift){
+      if(u) return no("occupied", "That square is taken. Recall it first.");
+      if(grid[r][c].bubble) return no("alreadyBubble", "There is already a bubble here.");
+      if(countOf(k)>=capOf(k)) return no("cap", overCap);
+      return yes("croc");
+    }
+
+    /* In the Deep nothing of yours can be in open water — it goes inside a bubble. */
+    if(WORLD==="deep" && !holdsAlone(k) && !skyLift){
+      if(!grid[r][c].bubble) return no("noBubble",
+        "Nothing to hold it. Set a <b>Bubble Dial</b> down first and let it blow you a bubble.");
+      if(u) return no("occupied", "That square is taken. Recall it first.");
+      if(countOf(k)>=capOf(k)) return no("cap", overCap);
+      return yes("bubble");
+    }
+
+    /* In the Sky a flightless creature has nowhere to stand unless a Flatbird is under it. */
+    if(WORLD==="sky" && !canFly(k) && !d.carrier && !skyLift){
+      if(!u || !CREATURES[u.key].carrier) return no("noCarrier",
+        "Nothing to stand on. Set a <b>Flatbird</b> down first and place it on top.");
+      if(countOf(k)>=capOf(k)) return no("cap", overCap);
+      return yes("onbird");
+    }
+
+    if(u) return no("occupied", "That square is taken. Recall it first.");
+    if(countOf(k)>=capOf(k)) return no("cap", overCap);
+    return yes("plain");
+  }
+
   function clickCell(r,c){
     if(paused||!running) return;
     if(sandbox && sandFoe){
@@ -3126,13 +3565,25 @@
       return;
     }
     if(isGap(r,c)){
-      hint("Open sky. Nothing holds there \u2014 not a creature, not a <b>Flatbird</b>.");
+      hint(trenchMsg());
       return;
     }
     var u=unitAt(r,c);
 
     if(boostSel){
-      if(!u){ hint("Boosts go on your own creatures."); return; }
+      if(!u){
+        /* The crocodile rarely waits around to be handed one, so an empty bubble
+           it left takes the boost in its place. */
+        if(WORLD==="deep" && grid[r][c].bubble){
+          hint("");
+          liftAll(c,r);
+          liveBank()[boostSel]--;
+          boostSel=null;
+          refreshBoostBar(); syncTray();
+          return;
+        }
+        hint("Boosts go on your own creatures."); return;
+      }
       hint("");
       applyBoost(u, boostSel);          /* may set its own hint, so clear first */
       liveBank()[boostSel]--;
@@ -3149,88 +3600,37 @@
     if(!selected) return;
 
     var k=selected, d=CREATURES[k];
-    if(energy<d.cost) return;
-    if((cd[k]||0)>0) return;
+    var v=canPlace(k,r,c);
+    if(!v.ok){ if(v.msg) hint(v.msg); return; }
 
-    if(d.roller){
-      if(u){ hint("It needs a clear square to set off from."); return; }
-      /* A keg has nothing to roll along up here. It takes the whole flock being up, which means
-         an energy boost spent on a Flatbird or a Long Bird first. */
-      if(WORLD==="sky" && !canFly(k) && !skyLift){
-        hint("Nothing to roll along. Give a <b>Flatbird</b> or a <b>Long Bird</b> an energy boost "+
-             "first \u2014 the flock has to be up before a keg can go anywhere.");
-        return;
-      }
-      energy-=d.cost;
-      cd[k]=d.rc;
-      launchRider(r,c,k);
-      selected=null; syncTray(); updateHud(); hint("");
-      return;
-    }
-    if(d.instant){
-      if(supportLeft<=0){ hint("No support uses left this level."); return; }
-      energy-=d.cost; supportLeft--;
-      cd[k]=d.rc;
+    energy-=d.cost;
+    cd[k]=d.rc;
+
+    if(v.mode==="roller"){ launchRider(r,c,k); }
+    else if(v.mode==="instant"){
+      supportLeft--;
       if(d.instant==="laneburn") laneBurn(r,c,d.burnDmg);
       else if(d.instant==="fieldzap") fieldZap(d.zapDmg);
       else if(d.instant==="metalbird") launchBird(d.bombs, d.bombDmg);
       else laneFreeze(r,c,d.freeze);
-      selected=null; syncTray(); updateHud(); hint("");
-      return;
     }
-    if(d.from){
-      if(CREATURES[d.from].fusedOnly){ hint(CREATURES[d.from].name+" cannot be upgraded."); return; }
-      if(!u || u.key!==d.from){
-        hint("Place that on a "+CREATURES[d.from].name+" you already have out.");
-        return;
-      }
-      energy-=d.cost;
-      cd[k]=d.rc;
-      upgradeUnit(r,c,k);
-      selected=null; syncTray(); updateHud(); hint("");
-      return;
+    else if(v.mode==="upgrade"){ upgradeUnit(r,c,k); }
+    else if(v.mode==="span"){
+      v.span.forEach(function(sr){ addUnit(sr,c,k); });
+      addFloat(midX(c), r*CH+CH*0.15, v.span.length+" tiles", "#cbd8ea");
     }
-    /* A Long Bird lies across three squares at once. Any of the three that is taken or open sky
-       is simply skipped, which is what lets two of them overlap. */
-    if(d.spanRows){
-      var span=[];
-      for(var sr=r-d.spanRows; sr<=r+d.spanRows; sr++){
-        if(sr<0 || sr>=ROWS) continue;
-        if(grid[sr][c].gap) continue;
-        if(grid[sr][c].unit) continue;
-        span.push(sr);
-      }
-      if(!span.length){
-        hint("All three squares there are taken or open sky.");
-        return;
-      }
-      if(countOf(k)+span.length>capOf(k)){
-        hint("That would put you over "+capOf(k)+" tiles of <b>"+d.name+"</b>. You have "+
-             countOf(k)+" out.");
-        return;
-      }
-      energy-=d.cost;
-      cd[k]=d.rc;
-      span.forEach(function(sr){ addUnit(sr,c,k); });
-      addFloat(midX(c), r*CH+CH*0.15, span.length+" tiles", "#cbd8ea");
-      selected=null; syncTray(); updateHud(); hint("");
-      return;
+    else if(v.mode==="croc"){
+      addUnit(r,c,k).el.classList.add("blowing");
     }
-
-    /* In the Sky a flightless creature has nowhere to stand unless a Flatbird is under it. */
-    if(WORLD==="sky" && !canFly(k) && !d.carrier && !skyLift){
-      if(!u || !CREATURES[u.key].carrier){
-        hint("Nothing to stand on. Set a <b>Flatbird</b> down first and place it on top.");
-        return;
-      }
-      if(countOf(k)>=capOf(k)){
-        hint("You can only hold "+capOf(k)+" "+d.name+" projections at once.");
-        return;
-      }
-      energy-=d.cost;
-      cd[k]=d.rc;
+    else if(v.mode==="bubble"){
+      var du=addUnit(r,c,k);
+      du.carried=true;                 /* it is held up, so fliers can still reach it */
+      du.el.classList.add("inbubble");
+      addFloat(midX(c), r*CH+CH*0.15, "in the bubble", "#8fe3e0");
+    }
+    else if(v.mode==="onbird"){
+      var carrierKey=unitAt(r,c).key;
       removeUnit(r,c,"swap");
-      var carrierKey=u.key;
       var cu=addUnit(r,c,k);
       cu.carried=true;
       cu.onBird=true;              /* the bird is under it, not gone */
@@ -3239,18 +3639,11 @@
       cu.el.classList.add("onbird");
       cu.el.insertAdjacentHTML("afterbegin", WINGS_SVG);
       addFloat(midX(c), r*CH+CH*0.15, "carried", "#9fd8ff");
-      selected=null; syncTray(); updateHud(); hint("");
-      return;
     }
-    if(u){ hint("That square is taken. Recall it first."); return; }
-    if(countOf(k)>=capOf(k)){
-      hint("You can only hold "+capOf(k)+" "+d.name+" projections at once.");
-      return;
+    else {
+      var nu2=addUnit(r,c,k);
+      if(skyLift && !canFly(k) && !d.carrier){ nu2.carried=true; nu2.el.classList.add("carried"); }
     }
-    energy-=d.cost;
-    cd[k]=d.rc;
-    var nu2=addUnit(r,c,k);
-    if(skyLift && !canFly(k) && !d.carrier){ nu2.carried=true; nu2.el.classList.add("carried"); }
     selected=null; syncTray(); updateHud(); hint("");
   }
 
@@ -3288,9 +3681,26 @@
            hp:s.hp, maxHp:s.hp, shield:0, maxShield:0,
            genT:0, shootT:0, burstT:0, volley:0, volleyT:0, volleyDmg:0,
            restT:0, burning:false, flameEl:null, forceFlame:0, knocked:false, reviveT:0,
-           carried:false, onBird:false};
+           carried:false, onBird:false, blowT:0};
     grid[r][c].unit=u;
     return u;
+  }
+
+  /* The bubble the crocodile leaves. It is board state, not a creature: it holds no
+     health, nothing eats it, and what sits inside it does not use it up. */
+  function makeBubble(r,c){
+    var g=grid[r][c];
+    if(g.bubble) return;
+    g.bubble=true;
+    var b=document.createElement("div");
+    b.className="bubcell";
+    b.style.left=pxX(colX(c)+4); b.style.top=pxY(r*CH+4);
+    b.style.width=pxX(CW-8); b.style.height=pxY(CH-8);
+    inner.appendChild(b);
+    g.bublEl=b;
+    SND.sfx("place");
+    flare(midX(c), r*CH+CH/2, CW*0.8);
+    addFloat(midX(c), r*CH+CH*0.12, "a bubble", "#8fe3e0");
   }
 
   function upgradeUnit(r,c,k){
@@ -3381,21 +3791,31 @@
      ============================================================ */
   function boostMult(t){ return t===1 ? 1/3 : t===2 ? 1 : 2; }
 
+  /* The lift, wherever it lands. Every tier does the same thing — in the Sky the
+     flock rises, in the Deep the sea takes a breath, and either way nothing of
+     yours needs holding up for the rest of the level. */
+  function liftAll(col,row){
+    skyLift=true;
+    var deep=WORLD==="deep";
+    addFloat(midX(col), row*CH+CH*0.1, deep?"the sea breathes":"the flock rises",
+             deep?"#8fe3e0":"#9fd8ff");
+    for(var lr=0;lr<ROWS;lr++)for(var lc=0;lc<COLS;lc++){
+      var lu=grid[lr][lc].unit;
+      if(lu && !canFly(lu.key) && !CREATURES[lu.key].carrier){
+        lu.carried=true; lu.el.classList.add("carried");
+      }
+    }
+    hint(deep
+      ? "<b>The sea takes a breath.</b> Your creatures hold their squares unaided this level — no bubble needed."
+      : "<b>The flock rises.</b> Flightless creatures no longer need a Flatbird under them this level.");
+    flare(midX(col), row*CH+CH/2, CW*2.2);
+  }
+
   function applyBoost(u,t){
     var d=CREATURES[u.key], m=boostMult(t), s=statsFor(u.key);
     if(!d.boost){ hint("The Frost Moth cannot hold a boost."); return; }
     if(d.boost.kind==="lift"){
-      /* every tier does the same thing — the flock comes either way */
-      skyLift=true;
-      addFloat(midX(u.col), u.row*CH+CH*0.1, "the flock rises", "#9fd8ff");
-      for(var lr=0;lr<ROWS;lr++)for(var lc=0;lc<COLS;lc++){
-        var lu=grid[lr][lc].unit;
-        if(lu && !canFly(lu.key) && !CREATURES[lu.key].carrier){
-          lu.carried=true; lu.el.classList.add("carried");
-        }
-      }
-      hint("<b>The flock rises.</b> Flightless creatures no longer need a Flatbird under them this level.");
-      flare(midX(u.col), u.row*CH+CH/2, CW*2.2);
+      liftAll(u.col,u.row);
       return;
     }
     if(d.boost.kind==="energy"){
@@ -3725,7 +4145,7 @@
   function riderFlatten(rd){
     var live=foes.filter(function(z){ return z && !z.hypno && !z.fireOnly; });
     if(!live.length) return;
-    var z=live[Math.floor(Math.random()*live.length)];
+    var z=live[Math.floor(rnd()*live.length)];
     flare(z.x, z.row*CH+CH/2, CW*1.2);
     addFloat(z.x, z.row*CH+CH*0.15, "flattened", "#e2624a");
     crushFoe(z, rd.bossFlat);
@@ -3808,9 +4228,40 @@
     arrows.push({el:a,row:row,x:x,dmg:dmg});
   }
 
+  /* A Blower Tortoise does not eat a shot, it returns it: the projectile reverses,
+     keeps the damage it was carrying, and belongs to you for the rest of its flight. */
+  function reflectShot(a){
+    a.back=true;
+    a.shell=false;                 /* a turned shell no longer arcs — it flies straight back */
+    a.el.classList.add("back");
+    SND.sfx("shoot");
+    flare(a.x, a.row*CH+CH/2, CW*0.7);
+    addFloat(a.x, a.row*CH+CH*0.08, "turned back", "#9fd8ff");
+  }
+
   function tickArrows(dt){
     for(var i=arrows.length-1;i>=0;i--){
       var a=arrows[i];
+      /* a returned shot runs the other way, at the speed of your own bolts */
+      if(a.back){
+        a.x += 0.42*dt;
+        if(a.x>VW+20){
+          if(a.el.parentNode) a.el.parentNode.removeChild(a.el);
+          arrows.splice(i,1);
+          continue;
+        }
+        a.el.style.left=pxX(a.x);
+        for(var j=foes.length-1;j>=0;j--){
+          var z=foes[j];
+          if(z.row!==a.row) continue;
+          if(Math.abs(z.x-a.x) > 15) continue;
+          hurtFoe(z, a.dmg);
+          if(a.el.parentNode) a.el.parentNode.removeChild(a.el);
+          arrows.splice(i,1);
+          break;
+        }
+        continue;
+      }
       a.x -= 0.30*dt;
       if(a.x<KEEP-10){
         if(a.el.parentNode) a.el.parentNode.removeChild(a.el);
@@ -3821,9 +4272,17 @@
       var col=Math.floor((a.x-KEEP)/CW);
       /* a shell arcs over the front line and only bursts where it was aimed */
       if(a.shell){
+        var tgt2=(col>=0&&col<COLS) ? grid[a.row][col].unit : null;
+        /* the Windblower points up, and catches a shell as it passes overhead rather than
+           only where it was aimed — otherwise a tortoise walling the front, which is where
+           a wall belongs, would never come near one */
+        if(tgt2 && !CREATURES[tgt2.key].ground && CREATURES[tgt2.key].reflect==="shell"){
+          pulse(tgt2.el,"firing",240);
+          reflectShot(a);
+          continue;
+        }
         if(a.x>a.toX) continue;
         flare(a.x, a.row*CH+CH/2, CW*0.9);
-        var tgt2=(col>=0&&col<COLS) ? grid[a.row][col].unit : null;
         if(tgt2 && !CREATURES[tgt2.key].ground) hurtUnit(tgt2, a.dmg);
         if(a.el.parentNode) a.el.parentNode.removeChild(a.el);
         arrows.splice(i,1);
@@ -3831,6 +4290,12 @@
       }
       var hit=(col>=0&&col<COLS) ? grid[a.row][col].unit : null;
       if(hit && !CREATURES[hit.key].ground){
+        /* the Blower's horn lies flat, so it turns arrows and nothing else */
+        if(CREATURES[hit.key].reflect==="arrow"){
+          pulse(hit.el,"firing",240);
+          reflectShot(a);
+          continue;
+        }
         hurtUnit(hit, a.dmg);
         if(a.el.parentNode) a.el.parentNode.removeChild(a.el);
         arrows.splice(i,1);
@@ -3902,7 +4367,7 @@
                  '<div class="art">'+d.art+'</div>'+
                  '<div class="hpbar"><i style="width:100%"></i></div>';
     inner.appendChild(el);
-    var z={kind:kind, row:(row===undefined?Math.floor(Math.random()*ROWS):row),
+    var z={kind:kind, row:(row===undefined?Math.floor(rnd()*ROWS):row),
            x:(atX===undefined?SPAWN_X:atX), hp:d.hp, maxHp:d.hp, speed:d.speed,
            el:el, fill:el.querySelector(".hpbar i"), biteT:0, frozen:0, slow:0, eating:null,
            size:sz, wide:wide, extra:!!extra, boss:!!d.boss, summonT:0, slamT:0, winding:0, warnEl:null, laneT:0,
@@ -3936,6 +4401,8 @@
     if(z.warnEl && z.warnEl.parentNode) z.warnEl.parentNode.removeChild(z.warnEl);
     if(z.el.parentNode) z.el.parentNode.removeChild(z.el);
     if(!z.extra) killed++;
+    /* you learn what a thing is by killing one — the sandbox teaches nothing */
+    if(!sandbox) meta.foesBeaten[z.kind]=1;
     /* a Brood Glob does not simply die \u2014 it comes apart */
     var sp=FOES[z.kind] && FOES[z.kind].splits;
     if(sp && !z.split){
@@ -3986,29 +4453,29 @@
     if(L.boss){
       /* a little breathing room, then the king walks on */
       for(var b=0;b<L.count;b++){
-        out.push({kind:L.mix[Math.floor(Math.random()*L.mix.length)],
-                  at:8000+b*L.gap, row:Math.floor(Math.random()*ROWS)});
+        out.push({kind:L.mix[Math.floor(rnd()*L.mix.length)],
+                  at:8000+b*L.gap, row:Math.floor(rnd()*ROWS)});
       }
       out.push({kind:(L.bossKind||"bossking"), at:26000, row:2});
       out.sort(function(a,b2){ return a.at-b2.at; });
       return out;
     }
     for(var i=0;i<L.count;i++){
-      var kind=L.mix[Math.floor(Math.random()*L.mix.length)];
-      out.push({kind:kind, at:t, row:Math.floor(Math.random()*ROWS)});
+      var kind=L.mix[Math.floor(rnd()*L.mix.length)];
+      out.push({kind:kind, at:t, row:Math.floor(rnd()*ROWS)});
       var gap=L.gap*(1-Math.min(0.45, i/L.count*0.5));
       /* goblins arrive in little mobs */
-      if(kind==="goblin" && Math.random()<0.5) gap*=0.25;
+      if(kind==="goblin" && rnd()<0.5) gap*=0.25;
       t+=gap;
     }
     /* a couple of rare arrivals, saved for the closing stretch */
     if(L.rare){
       var span=t;
-      var n=L.rare.min + Math.floor(Math.random()*(L.rare.max-L.rare.min+1));
+      var n=L.rare.min + Math.floor(rnd()*(L.rare.max-L.rare.min+1));
       for(var q=0;q<n;q++){
         out.push({kind:L.rare.kind,
-                  at: span*(0.62 + Math.random()*0.32),
-                  row: Math.floor(Math.random()*ROWS)});
+                  at: span*(0.62 + rnd()*0.32),
+                  row: Math.floor(rnd()*ROWS)});
       }
       out.sort(function(a,b){ return a.at-b.at; });
     }
@@ -4017,20 +4484,20 @@
 
   function planDrops(){
     var span = wave.length ? wave[wave.length-1].at : 40000;
-    var a = span*0.25 + Math.random()*span*0.15;
-    var b = span*0.6  + Math.random()*span*0.2;
+    var a = span*0.25 + rnd()*span*0.15;
+    var b = span*0.6  + rnd()*span*0.2;
     return [{at:a,done:false},{at:b,done:false}];
   }
 
   function rollTier(){
-    var r=Math.random();
+    var r=rnd();
     return r<0.50 ? 1 : r<0.85 ? 2 : 3;
   }
 
   function dropBoost(){
     var tier=rollTier();
-    var r=Math.floor(Math.random()*ROWS);
-    var c=1+Math.floor(Math.random()*(COLS-1));
+    var r=Math.floor(rnd()*ROWS);
+    var c=1+Math.floor(rnd()*(COLS-1));
     var el=document.createElement("div");
     el.className="drop";
     el.style.left=pxX(midX(c)-16); el.style.top=pxY(r*CH+CH/2-16);
@@ -4064,8 +4531,8 @@
   function updateHud(){
     energyEl.textContent=Math.floor(energy);
     foesLeftEl.textContent = sandbox ? foes.length : Math.max(0, wave.length-killed);
-    lvlNumEl.textContent=sandbox ? (WORLD==="sky"?"Sky box":"Cave box")
-                                 : (WORLD==="sky"?"S":"")+level;
+    lvlNumEl.textContent=sandbox ? W().box
+                                 : (WORLD==="sky"?"S":WORLD==="deep"?"D":"")+level;
   }
 
   /* ============================================================
@@ -4169,6 +4636,16 @@
       var u=grid[r][c].unit;
       if(!u) continue;
       var d=CREATURES[u.key], s=statsFor(u.key);
+
+      /* the crocodile does one thing and then it is gone */
+      if(d.blows){
+        u.blowT+=dt;
+        if(u.blowT>=d.blows.after){
+          makeBubble(r,c);
+          removeUnit(r,c,"swap");
+          continue;
+        }
+      }
 
       if(d.revive){
         if(u.reviveT>0){
@@ -4288,7 +4765,7 @@
             if(tgt){
               flare(tgt.x-6, r*CH+CH/2, CW*0.7);
               hurtFoe(tgt, s.punchDmg, true);
-              if(Math.random()<s.knockChance && foes.indexOf(tgt)>-1){
+              if(rnd()<s.knockChance && foes.indexOf(tgt)>-1){
                 tgt.x=Math.min(SPAWN_X, tgt.x + CW*s.knockTiles);
                 tgt.biteT=0;
                 placeFoe(tgt);
@@ -4375,7 +4852,7 @@
     if(z.row>0) opts.push(z.row-1);
     if(z.row<ROWS-1) opts.push(z.row+1);
     if(!opts.length) return;
-    z.row=opts[Math.floor(Math.random()*opts.length)];
+    z.row=opts[Math.floor(rnd()*opts.length)];
     placeFoe(z);
     addFloat(z.x-10, z.row*CH+CH*0.15, "\u2195", "#e2624a");
   }
@@ -4411,8 +4888,8 @@
     z.summonT+=dt;
     if(z.summonT>=d.summonEvery && live<(d.maxMinions||4)){
       z.summonT-=d.summonEvery;
-      var kind = ph.pool[Math.floor(Math.random()*ph.pool.length)];
-      var row = Math.floor(Math.random()*ROWS);
+      var kind = ph.pool[Math.floor(rnd()*ph.pool.length)];
+      var row = Math.floor(rnd()*ROWS);
       spawnFoe(kind, row, Math.min(SPAWN_X, z.x+10), true);
     }
     /* slam — winds up first so the lane can be cleared */
@@ -4456,7 +4933,7 @@
       for(var r=0;r<ROWS;r++) if(grid[r][c].unit) m++;
       if(m>bestN){ bestN=m; best=c; }
     }
-    if(bestN<=0) return Math.floor(Math.random()*COLS);
+    if(bestN<=0) return Math.floor(rnd()*COLS);
     return best;
   }
 
@@ -4496,7 +4973,7 @@
     }
     /* shuffled, so it spreads across the board rather than hammering one corner */
     for(var i=targets.length-1;i>0;i--){
-      var j=Math.floor(Math.random()*(i+1)), t=targets[i]; targets[i]=targets[j]; targets[j]=t;
+      var j=Math.floor(rnd()*(i+1)), t=targets[i]; targets[i]=targets[j]; targets[j]=t;
     }
     var hit=Math.min(count, targets.length);
     if(hit) SND.sfx("thunder");
@@ -4552,8 +5029,8 @@
     z.summonT+=dt;
     if(z.summonT>=d.summonEvery && live<(d.maxMinions||5)){
       z.summonT-=d.summonEvery;
-      var kind=ph.pool[Math.floor(Math.random()*ph.pool.length)];
-      spawnFoe(kind, Math.floor(Math.random()*ROWS), Math.min(SPAWN_X, z.x+10), true);
+      var kind=ph.pool[Math.floor(rnd()*ph.pool.length)];
+      spawnFoe(kind, Math.floor(rnd()*ROWS), Math.min(SPAWN_X, z.x+10), true);
     }
 
     if(z.winding>0){
@@ -4621,7 +5098,7 @@
           if(z.row>0) dopts.push(z.row-1);
           if(z.row<ROWS-1) dopts.push(z.row+1);
           if(dopts.length){
-            z.row=dopts[Math.floor(Math.random()*dopts.length)];
+            z.row=dopts[Math.floor(rnd()*dopts.length)];
             z.biteT=0;
             placeFoe(z);
           }
@@ -4652,7 +5129,7 @@
           /* a Master Digger can bring the tunnel up in any lane at all */
           var opts=[];
           for(var rr=0;rr<ROWS;rr++) if(rr!==z.row) opts.push(rr);
-          exitRow=opts[Math.floor(Math.random()*opts.length)];
+          exitRow=opts[Math.floor(rnd()*opts.length)];
         }
         var tt=makeTunnel(z.row, dg.atCol, exitCol, exitRow);
         z.underground=true;
@@ -4845,6 +5322,7 @@
      ============================================================ */
   function reset(){
     energy=50; killed=0; spawnIdx=0; spawnTimer=0; elapsed=0; lostOne=false; wellT=0; skyLift=false;
+    lastOutcome=null;
     selected=null; boostSel=null;
     supportLeft=supportUses();
     cd={}; foes=[]; bolts=[]; floats=[]; drops=[]; effects=[]; riders=[]; stones=[]; birds=[]; arrows=[]; tunnels=[];
@@ -4858,7 +5336,7 @@
     document.getElementById("tableBtn").classList.toggle("hidden", !sandbox);
     refreshBoostBar(); syncTray(); updateHud();
     hint(sandbox
-      ? (WORLD==="sky"?"Sky sandbox":"Cave sandbox")+
+      ? (WORLD==="sky"?"Sky sandbox":WORLD==="deep"?"Deep sandbox":"Cave sandbox")+
         ". Everything is free, nothing recharges, nothing is capped, and you cannot lose. "+
         "Spawn from the red row."
       : LV()[level].note);
@@ -4871,7 +5349,7 @@
     document.getElementById("endScreen").classList.add("hidden");
     reset();
     var bossLv = !sandbox && LV()[lv] && LV()[lv].boss;
-    SND.play(bossLv ? "boss" : (WORLD==="sky" ? "sky" : "caves"));
+    SND.play(bossLv ? "boss" : W().track);
     SND.duck(false);
     paused=false; running=true; lastT=0;
     document.getElementById("pauseBtn").textContent="Pause";
@@ -4884,9 +5362,21 @@
     stopAll();
     SND.play("menu");
     SND.sfx("win");
-    var key=(WORLD==="sky"?"s":"")+level;
+    var key=W().key+level;
     var first=!meta.cleared[key];
+    lastOutcome={result:"win", world:WORLD, level:level, first:first};
     meta.cleared[key]=true;
+    buildLevelGrid();          /* the next level, and maybe the Sky, just opened */
+    if(WORLD==="deep"){
+      document.getElementById("endTitle").textContent="Deep "+level+" cleared";
+      document.getElementById("endBody").innerHTML=
+        "Held. The Deep Sea gives up nothing yet \u2014 its items and its bottom are still to come.";
+      var nxd=document.getElementById("endNext");
+      if(DEEP_LEVELS[level+1]){ nxd.textContent="Deep "+(level+1); nxd.style.display=""; }
+      else nxd.style.display="none";
+      document.getElementById("endScreen").classList.remove("hidden");
+      return;
+    }
     if(WORLD==="sky"){
       var stxt="";
       if(first && SKY_ITEM[level]){
@@ -4899,6 +5389,13 @@
         var su=SKY_UNLOCK[level];
         meta[su.key]=true;
         stxt+='<span class="upg">You have opened '+su.name+'.</span> '+su.text+'<br><br>';
+      }
+      if(first && SKY_MYTHIC[level]){
+        var sm=SKY_MYTHIC[level];
+        meta.mythics[sm]=1;
+        meta.unlocked[sm]=1;
+        stxt+='<span class="upg">The '+MYTHICS[sm].name+' answers you.</span> '+
+              MYTHICS[sm].blurb+' The Deep Sea is open to you.<br><br>';
       }
       if(first && LV()[level].boss){
         stxt = '<span class="upg">The Thunderhead breaks apart.</span> It rains itself out across '+
@@ -4952,11 +5449,13 @@
     stopAll();
     SND.play("menu");
     SND.sfx("lose");
+    lastOutcome={result:"lose", world:WORLD, level:level};
     document.getElementById("endTitle").textContent="The wellspring fell";
     document.getElementById("endBody").innerHTML =
-      "Something reached the wellspring on level "+level+". Your upgrades and banked boosts are kept.";
+      "Something reached the wellspring on "+W().word.toLowerCase()+" "+level+
+      ". Your upgrades and banked boosts are kept.";
     var nx=document.getElementById("endNext");
-    nx.textContent="Try level "+level+" again"; nx.style.display="";
+    nx.textContent="Try "+W().word.toLowerCase()+" "+level+" again"; nx.style.display="";
     document.getElementById("endScreen").classList.remove("hidden");
   }
 
@@ -5171,6 +5670,7 @@
                       "masterarcher","masterdigger","fireballgoblin","bossking"];
   var SKY_FOE_ORDER=["glob","driftglob","shieldglob","broodglob","globling","armourglob",
                      "globairship","stormhead","skytitan"];
+  var DEEP_FOE_ORDER=["nipper","driftjelly","lanternfish","armourray"];
   var ALM_FAMS=[
     ["mythic","Mythic",
      "Since the Flatbird and the Long Bird are only useful in the Sky, due to their ability to "+
@@ -5180,13 +5680,32 @@
 
   function almArt(k){ return ART[k].replace(/width='34' height='34'/,"width='30' height='30'"); }
 
+  /* Nothing gives itself up for free. A creature has to be bound and an enemy has
+     to be put down before the almanac will write its page. */
+  function unknownArt(w,h){
+    return "<svg viewBox='0 0 40 40' width='"+w+"' height='"+h+"' aria-hidden='true'>"+
+      "<text x='20' y='30' text-anchor='middle' font-family='Eczar,serif' font-size='27' "+
+      "font-weight='700' fill='currentColor'>?</text></svg>";
+  }
+  function almUnknown(b,foe){
+    b.appendChild(almRow(unknownArt(foe?34:30, foe?24:30), "???",
+      foe ? "not yet met" : "not yet bound",
+      foe ? "Put one down and this page writes itself."
+          : "Bind it and this page writes itself.",
+      "", false, "locked"+(foe?" foerow":"")));
+  }
+
   function creatureStats(k){
     var d=CREATURES[k], bits=[FAMILY_LABEL[d.family]];
     bits.push(d.cost===0 ? "free" : d.cost+" energy");
     if(d.instant) bits.push("one support use");
     else if(d.roller) bits.push("rolls down the lane");
     else bits.push(d.hp+" health");
-    if(!d.instant && !d.roller) bits.push(canFly(k) ? "flies" : "needs a Flatbird in the Sky");
+    /* naming the bird before you have met it gives the Bone King's reward away.
+       The Deep's own never leave it, so the Sky is no concern of theirs — they swim. */
+    if(!d.instant && !d.roller) bits.push(d.onlyIn==="deep" ? "swims"
+      : canFly(k) ? "flies"
+      : (meta.unlocked.flatbird ? "needs a Flatbird in the Sky" : "needs carrying in the Sky"));
     var cap=capOf(k);
     if(cap) bits.push(sandbox ? "no limit in the sandbox" : cap+" at once");
     return bits.join(" \u00B7 ");
@@ -5204,6 +5723,7 @@
         return "Fusion table: "+CREATURES[RECIPES[i].creature].name+" and the "+
                ITEMS[RECIPES[i].item].name+".";
     for(i in LEVEL_MYTHIC) if(LEVEL_MYTHIC[i]===k) return "It answers you when you beat Level "+i+".";
+    for(i in SKY_MYTHIC) if(SKY_MYTHIC[i]===k) return "It answers you when you beat Sky "+i+".";
     for(i in LEVEL_CREATURE) if(LEVEL_CREATURE[i]===k) return "Bound for clearing Level "+i+".";
     return "Bound to you from the start.";
   }
@@ -5217,9 +5737,11 @@
 
   function foeSource(kind){
     var found=null, byBoss=[], splitFrom=null;
-    /* some enemies are never spawned by a wave at all \u2014 they fall out of something else */
+    /* some enemies are never spawned by a wave at all \u2014 they fall out of something else.
+       A source line never names a foe you have not met: that is the reveal, given away. */
     Object.keys(FOES).forEach(function(sk){
-      if(FOES[sk].splits && FOES[sk].splits.kind===kind) splitFrom=FOES[sk].name;
+      if(FOES[sk].splits && FOES[sk].splits.kind===kind)
+        splitFrom=meta.foesBeaten[sk] ? FOES[sk].name : null;
     });
     if(splitFrom) return "Only ever summoned when a "+splitFrom+" is killed.";
     function scan(tbl,pre){
@@ -5232,9 +5754,10 @@
     }
     scan(LEVELS,"Level");
     if(!found) scan(SKY_LEVELS,"Sky");
+    if(!found) scan(DEEP_LEVELS,"Deep");
     Object.keys(FOES).forEach(function(bk){
       var B=FOES[bk];
-      if(!B.phases) return;
+      if(!B.phases || !meta.foesBeaten[bk]) return;
       for(var i=0;i<B.phases.length;i++)
         if(B.phases[i].pool.indexOf(kind)>-1 && byBoss.indexOf(B.name)<0) byBoss.push(B.name);
     });
@@ -5267,21 +5790,30 @@
       var list=ORDER.filter(function(k){ return CREATURES[k].family===fam; })
              .concat(UPGRADE_ORDER.filter(function(k){ return CREATURES[k].family===fam; }));
       if(!list.length) return;
-      almHead(b, sec[1], sec[2]);
+      var note=sec[2];
+      /* the standing mythic note names both birds, which gives them away until at
+         least one of them is yours — owning some other mythic reveals nothing */
+      if(fam==="mythic" && !meta.unlocked.flatbird && !meta.unlocked.longbird)
+        note="Mythical creatures do not fight for you — they change what the rules "+
+             "allow. What each one allows is its own reveal.";
+      almHead(b, sec[1], note);
       list.forEach(function(k){
         var d=CREATURES[k];
         var have = d.from ? !!meta.unlocked[ROOT[k]] : !!meta.unlocked[k];
-        b.appendChild(almRow(almArt(k), d.name, creatureStats(k), d.blurb, creatureSource(k), !have));
+        if(!have){ almUnknown(b,false); return; }
+        b.appendChild(almRow(almArt(k), d.name, creatureStats(k), d.blurb, creatureSource(k), false));
       });
     });
   }
 
   function almEnemies(b){
-    [["The Caves",CAVE_FOE_ORDER],["The Sky",SKY_FOE_ORDER]].forEach(function(sec){
+    [["The Caves",CAVE_FOE_ORDER],["The Sky",SKY_FOE_ORDER],
+     ["The Deep Sea",DEEP_FOE_ORDER]].forEach(function(sec){
       almHead(b, sec[0]);
       sec[1].forEach(function(f){
         var d=FOES[f];
         if(!d) return;
+        if(!meta.foesBeaten[f]){ almUnknown(b,true); return; }
         var stats=d.hp+" health \u00B7 speed "+d.speed+(d.tag?" \u00B7 "+d.tag:"");
         b.appendChild(almRow(foeIcon(f), d.name, stats, d.note||"", foeSource(f), false, "foerow"));
       });
@@ -5369,26 +5901,36 @@
   }
 
   function hasCarrier(){
-    for(var i=0;i<loadout.length;i++) if(CREATURES[loadout[i]].carrier) return true;
+    for(var i=0;i<loadout.length;i++){
+      var cd2=CREATURES[loadout[i]];
+      if(cd2.carrier || cd2.blows) return true;
+    }
     return false;
   }
   /* in the Sky, ground families may only come if something is carrying them */
   function needsCarrier(k){
-    if(WORLD!=="sky") return false;
-    if(CREATURES[k].carrier || canFly(k)) return false;
+    if(!noGround()) return false;
+    if(CREATURES[k].carrier || CREATURES[k].blows || holdsAlone(k)) return false;
     return !hasCarrier();
   }
 
   function refreshCarrierLine(){
     var ml=document.getElementById("pickMythic");
-    if(WORLD!=="sky"){ ml.classList.add("hidden"); return; }
+    if(!noGround()){ ml.classList.add("hidden"); return; }
     ml.classList.remove("hidden");
-    ml.innerHTML=ART.flatbird.replace(/width='34' height='34'/,"width='30' height='30'")+
-      (hasCarrier()
+    var ck=carrierKeyFor(), have=hasCarrier();
+    var txt = WORLD==="deep"
+      ? (have
+        ? '<div><b>Bubble Dial</b> is in your six. Set the crocodile on a bare square, let it blow '+
+          'its bubble, and place whatever you like inside the bubble it leaves behind.</div>'
+        : '<div>Nothing holds a square down here on its own. Without the <b>Bubble Dial</b> you '+
+          'will have nowhere to put a single creature.</div>')
+      : (have
         ? '<div><b>Flatbird</b> is in your six. Set one down, then place a flightless creature on top '+
           'of it \u2014 forges, tortoises, the Bonfire, the Bomb Rider.</div>'
         : '<div>Anything with wings needs no help up here. Bring the <b>Flatbird</b> if you want the '+
           'flightless ones too \u2014 they have nothing to stand on without it.</div>');
+    ml.innerHTML=ART[ck].replace(/width='34' height='34'/,"width='30' height='30'")+txt;
   }
 
   function buildPicker(){
@@ -5396,7 +5938,7 @@
     g.innerHTML="";
     ORDER.filter(function(k){
       if(!meta.unlocked[k]) return false;
-      if(CREATURES[k].skyOnly && WORLD!=="sky") return false;   /* no use underground */
+      if(CREATURES[k].onlyIn && CREATURES[k].onlyIn!==WORLD) return false;  /* wrong world for it */
       return true;
     }).forEach(function(k){
       var d=CREATURES[k], on=loadout.indexOf(k)>-1;
@@ -5413,7 +5955,7 @@
         if(i>-1){
           loadout.splice(i,1);
           /* dropping the carrier strands anything it was carrying */
-          if(d.carrier && WORLD==="sky"){
+          if((d.carrier||d.blows) && noGround()){
             loadout=loadout.filter(function(x){ return canFly(x) || CREATURES[x].carrier; });
           }
         } else {
@@ -5444,11 +5986,11 @@
     /* keep whatever is still valid from last time */
     loadout=loadout.filter(function(k){ return meta.unlocked[k]; }).slice(0,LOADOUT_MAX);
     document.getElementById("pickTitle").textContent=
-      (WORLD==="sky"?"Sky ":"Level ")+lv+" \u2014 choose your six";
+      W().word+" "+lv+" \u2014 choose your six";
 
     /* mythics do not take a slot — they change what the six may contain */
     var ml=document.getElementById("pickMythic");
-    ml.classList.toggle("hidden", WORLD!=="sky");
+    ml.classList.toggle("hidden", !noGround());
     buildPicker();
     document.getElementById("startScreen").classList.add("hidden");
     document.getElementById("skyScreen").classList.add("hidden");
@@ -5474,14 +6016,54 @@
     document.getElementById("upgScreen").classList.remove("hidden");
   }
 
+  /* One level at a time. Clearing a level opens the next; clearing the Bone King
+     on the last cave level opens the Sky, and the Sky then opens the same way. */
+  var CAVE_LAST=Math.max.apply(null,Object.keys(LEVELS).map(Number));
+  var LOCK='<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">'+
+    '<path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5" fill="none" stroke="currentColor" '+
+    'stroke-width="2.2" stroke-linecap="round"/>'+
+    '<rect x="4.5" y="10.5" width="15" height="10.5" rx="2.5" fill="currentColor"/></svg>';
+
+  var SKY_LAST=Math.max.apply(null,Object.keys(SKY_LEVELS).map(Number));
+
+  function caveOpen(n){ return n===1 || !!meta.cleared[n-1]; }
+  /* DEV: the Deep Sea is open from the start while it is being built. Delete the
+     `|| true` here and it goes back to being earned off the Thunderhead. */
+  function deepWorldOpen(){ return !!meta.cleared["s"+SKY_LAST] || true; }
+  function deepOpen(n){ return n===1 ? deepWorldOpen() : !!meta.cleared["d"+(n-1)]; }
+  function skyOpen(n){ return n===1 ? skyWorldOpen() : !!meta.cleared["s"+(n-1)]; }
+  function skyWorldOpen(){ return !!meta.cleared[CAVE_LAST]; }
+
+  function lockBtn(b,why,label){
+    b.className="locked";
+    b.innerHTML=LOCK;
+    b.disabled=true;
+    b.title=why;
+    b.setAttribute("aria-label",label);
+  }
+
+  /* The rules panels describe enemies by name. A block stays shut until you have
+     put one of that kind down, the same way its almanac page does. */
+  function refreshLore(){
+    var n=document.querySelectorAll(".lore[data-foe]");
+    for(var i=0;i<n.length;i++)
+      if(meta.foesBeaten[n[i].getAttribute("data-foe")]) n[i].classList.remove("hidden");
+      else n[i].classList.add("hidden");
+  }
+
   function buildLevelGrid(){
+    refreshLore();
     var g=document.getElementById("levelGrid");
     g.innerHTML="";
     Object.keys(LEVELS).forEach(function(n){
       var b=document.createElement("button");
-      b.textContent=n;
-      b.title="Level "+n+" — "+LEVELS[n].note;
-      b.addEventListener("click",function(){ WORLD="caves"; openPicker(+n); });
+      if(caveOpen(+n)){
+        b.textContent=n;
+        b.title="Level "+n+" — "+LEVELS[n].note;
+        b.addEventListener("click",function(){ WORLD="caves"; openPicker(+n); });
+      } else {
+        lockBtn(b,"Shut. Clear level "+(n-1)+" first.","Level "+n+", locked");
+      }
       g.appendChild(b);
     });
 
@@ -5489,26 +6071,82 @@
     sg.innerHTML="";
     Object.keys(SKY_LEVELS).forEach(function(n){
       var b=document.createElement("button");
-      b.textContent=n;
-      b.title="Sky "+n+" — "+SKY_LEVELS[n].note;
-      b.addEventListener("click",function(){
-        WORLD="sky";
-        document.getElementById("skyScreen").classList.add("hidden");
-        openPicker(+n);
-      });
+      if(skyOpen(+n)){
+        b.textContent=n;
+        b.title="Sky "+n+" — "+SKY_LEVELS[n].note;
+        b.addEventListener("click",function(){
+          WORLD="sky";
+          document.getElementById("skyScreen").classList.add("hidden");
+          openPicker(+n);
+        });
+      } else {
+        lockBtn(b, +n===1
+          ? "Shut. Beat the Bone King on level "+CAVE_LAST+" first."
+          : "Shut. Clear Sky "+(n-1)+" first.", "Sky "+n+", locked");
+      }
       sg.appendChild(b);
     });
+
+    var dg=document.getElementById("deepGrid");
+    dg.innerHTML="";
+    Object.keys(DEEP_LEVELS).forEach(function(n){
+      var b=document.createElement("button");
+      if(deepOpen(+n)){
+        b.textContent=n;
+        b.title="Deep "+n+" — "+DEEP_LEVELS[n].note;
+        b.addEventListener("click",function(){
+          WORLD="deep";
+          document.getElementById("deepScreen").classList.add("hidden");
+          openPicker(+n);
+        });
+      } else {
+        lockBtn(b,"Shut. Clear Deep "+(n-1)+" first.","Deep "+n+", locked");
+      }
+      dg.appendChild(b);
+    });
+
+    var deep=document.getElementById("toDeep");
+    if(deepWorldOpen()){
+      deep.classList.remove("locked");
+      deep.disabled=false;
+      deep.innerHTML="Go down to the Deep Sea →";
+      deep.title="";
+    } else {
+      deep.classList.add("locked");
+      deep.disabled=true;
+      deep.innerHTML=LOCK+"The Deep Sea is shut — clear all "+SKY_LAST+" levels of the Sky";
+      deep.title="Clear Sky "+SKY_LAST+" to open the Deep Sea.";
+    }
+
+    var sky=document.getElementById("toSky");
+    if(skyWorldOpen()){
+      sky.classList.remove("locked");
+      sky.disabled=false;
+      sky.innerHTML="Go forward to the Sky World →";
+      sky.title="";
+    } else {
+      sky.classList.add("locked");
+      sky.disabled=true;
+      /* naming the king here would give away what waits on the last level */
+      sky.innerHTML=LOCK+"The Sky World is shut — clear all "+CAVE_LAST+" levels of the Caves";
+      sky.title="Clear level "+CAVE_LAST+" to open the Sky World.";
+    }
+
+    /* the door out of the Deep names where it actually goes — the Sky once the
+       Thunderhead has fallen, the Caves before that */
+    document.getElementById("deepBack").textContent =
+      meta.cleared["s"+SKY_LAST] ? "Back to the Sky" : "Back to the Caves";
   }
 
   function toMenu(){
     stopAll();
+    buildLevelGrid();
     SND.play("menu");
     SND.duck(false);
     sandbox=false;
     document.getElementById("pickScreen").classList.add("hidden");
     document.getElementById("endScreen").classList.add("hidden");
-    if(WORLD==="sky") document.getElementById("skyScreen").classList.remove("hidden");
-    else document.getElementById("startScreen").classList.remove("hidden");
+    document.getElementById(W().screen).classList.remove("hidden");
   }
 
   document.getElementById("pauseBtn").addEventListener("click",function(){
@@ -5522,7 +6160,7 @@
     this.textContent="▸ "+speed+"×";
   });
   document.getElementById("menuBtn").addEventListener("click",toMenu);
-  ["almBtn","startAlm","skyAlm","endAlm"].forEach(function(id){
+  ["almBtn","startAlm","skyAlm","deepAlm","endAlm"].forEach(function(id){
     document.getElementById(id).addEventListener("click",openAlmanac);
   });
   document.getElementById("almClose").addEventListener("click",function(){
@@ -5590,6 +6228,33 @@
     document.getElementById("skyScreen").classList.add("hidden");
     document.getElementById("startScreen").classList.remove("hidden");
   });
+  function openDeep(){
+    WORLD="deep";
+    /* DEV: while the Deep is open early, the crocodile comes with it — without one
+       there is nowhere to put a single creature. Remove with the gate above. */
+    if(!meta.unlocked.bubbledial){ meta.unlocked.bubbledial=1; meta.mythics.bubbledial=1; }
+    var box=document.getElementById("deepMythic");
+    box.className="fuseout hit";
+    box.innerHTML=ART.bubbledial.replace(/width='34' height='34'/,"width='30' height='30'")+
+      '<div>The <span class="nm">Bubble Dial</span> is bound to you. Set the crocodile down, take '+
+      'the bubble it leaves, and put anything you like inside it.</div>';
+    buildLevelGrid();
+    document.getElementById("skyScreen").classList.add("hidden");
+    document.getElementById("startScreen").classList.add("hidden");
+    document.getElementById("deepScreen").classList.remove("hidden");
+  }
+  document.getElementById("toDeep").addEventListener("click",openDeep);
+  document.getElementById("deepDoor").addEventListener("click",openDeep);
+  document.getElementById("deepBack").addEventListener("click",function(){
+    document.getElementById("deepScreen").classList.add("hidden");
+    if(meta.cleared["s"+SKY_LAST]){ WORLD="sky"; document.getElementById("skyScreen").classList.remove("hidden"); }
+    else { WORLD="caves"; document.getElementById("startScreen").classList.remove("hidden"); }
+  });
+  document.getElementById("deepSand").addEventListener("click",function(){
+    WORLD="deep";
+    document.getElementById("deepScreen").classList.add("hidden");
+    start(1,true);
+  });
   document.getElementById("pickGo").addEventListener("click",function(){
     document.getElementById("pickScreen").classList.add("hidden");
     start(pickFor);
@@ -5597,8 +6262,7 @@
   document.getElementById("pickClear").addEventListener("click",function(){ loadout=[]; buildPicker(); });
   document.getElementById("pickBack").addEventListener("click",function(){
     document.getElementById("pickScreen").classList.add("hidden");
-    if(WORLD==="sky") document.getElementById("skyScreen").classList.remove("hidden");
-    else document.getElementById("startScreen").classList.remove("hidden");
+    document.getElementById(W().screen).classList.remove("hidden");
   });
   document.getElementById("startUpg").addEventListener("click",openUpgrades);
   document.getElementById("endUpg").addEventListener("click",openUpgrades);
@@ -5610,7 +6274,7 @@
   });
 
   /* ---------- sound controls ---------- */
-  var AUDIO_BTNS=["audioBtn","startAudio","skyAudio"];
+  var AUDIO_BTNS=["audioBtn","startAudio","skyAudio","deepAudio"];
   function syncAudioBtns(){
     var lbl = SND.isOn() ? "\u266a On" : "\u266a Off";
     AUDIO_BTNS.forEach(function(id){
@@ -5634,6 +6298,49 @@
   syncAudioBtns();
 
   buildLevelGrid();
+
+  /* ------------------------------------------------------------
+     A seam for the test harness, and nothing else. Inert unless the harness
+     sets the flag first, so the shipped file is still one file you can open
+     by double-clicking.
+     ------------------------------------------------------------ */
+  if(typeof window!=="undefined" && window.__CONQUEST_TEST__){
+    window.__game={
+      /* tables */
+      CREATURES:CREATURES, FOES:FOES, ITEMS:ITEMS, ART:ART,
+      ORDER:ORDER, UPGRADE_ORDER:UPGRADE_ORDER,
+      LEVELS:LEVELS, SKY_LEVELS:SKY_LEVELS, DEEP_LEVELS:DEEP_LEVELS,
+      RECIPES:RECIPES, PAIR_RECIPES:PAIR_RECIPES, MYTHICS:MYTHICS,
+      CAVE_FOE_ORDER:CAVE_FOE_ORDER, SKY_FOE_ORDER:SKY_FOE_ORDER,
+      DEEP_FOE_ORDER:DEEP_FOE_ORDER,
+      LEVEL_MYTHIC:LEVEL_MYTHIC, SKY_MYTHIC:SKY_MYTHIC,
+      LEVEL_ITEM:LEVEL_ITEM, SKY_ITEM:SKY_ITEM, LEVEL_CREATURE:LEVEL_CREATURE,
+      FLIES:FLIES, ROWS:ROWS, COLS:COLS, KEEP:KEEP, CW:CW, midX:midX,
+      /* live state */
+      meta:meta,
+      state:function(){ return {grid:grid, foes:foes, arrows:arrows, bolts:bolts,
+                                energy:energy, level:level, world:WORLD,
+                                running:running, paused:paused}; },
+      /* drive it */
+      startLevel:function(w,lv,sand){ WORLD=w; start(lv,!!sand); },
+      setWorld:function(w){ WORLD=w; },
+      setEnergy:function(v){ energy=v; },
+      clearCooldowns:function(){ cd={}; },
+      select:function(k){ selected=k; },
+      selectBoost:function(t){ boostSel=t; },
+      click:function(r,c){ clickCell(r,c); },
+      step:function(ms){ tick(ms); },          /* the injectable clock */
+      /* rules worth asserting on directly */
+      caveOpen:caveOpen, skyOpen:skyOpen, deepOpen:deepOpen,
+      skyWorldOpen:skyWorldOpen, deepWorldOpen:deepWorldOpen,
+      holdsAlone:holdsAlone, canFly:canFly, noGround:noGround, capOf:capOf,
+      spawnFoe:spawnFoe, addUnit:addUnit, refreshLore:refreshLore,
+      makeArrow:makeArrow, makeShell:makeShell, tickArrows:tickArrows,
+      canPlace:canPlace, setRng:setRng,
+      outcome:function(){ return lastOutcome; },
+      setLoadout:function(list){ loadout=list.slice(); }
+    };
+  }
 })();
 </script>
 </body>
