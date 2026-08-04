@@ -811,6 +811,12 @@
       the dead walk through their own sand untroubled. The sling lobs over it. The keg does
       not slow down. There is always more seabed.
       </div>
+      <div class="lore hidden" data-foe="speedyswimmer">
+      <b>The Super Speedy Swimmer Drowned.</b> It was in a hurry before it died and death has
+      not slowed it down &mdash; fifty health at twice a Goblin's pace, the fastest thing in
+      any world. The snorkel serves no purpose. It has been dead for years. It keeps it the
+      way the fast keep their habits: without thinking, and at full speed.
+      </div>
       <br><br>
       This world is still being dug. Something lives in it now &mdash; twenty levels of it &mdash;
       but there is no boss at the bottom yet, no items of its own and no fusions.
@@ -1312,6 +1318,18 @@
       "<path d='M10 13.5q10-7 20 0v1.5q-10-5-20 0z' fill='#8a7a62'/>"+
       "<rect x='18.5' y='4' width='3' height='7' rx='1.5' fill='#a89a80'/>"+
       "<path d='M15 27q2 2 4 0M22 31q2 2 4 0' stroke='#b3552f' stroke-width='1.1' fill='none' opacity='.8'/>"+
+      "</g></svg>",
+    speedyswimmer:"<svg viewBox='0 0 40 40' width='32' height='28'><g>"+
+      "<path d='M4 22q6-4 13-4t13 4q-6 4-13 4t-13-4z' fill='#45706c'/>"+
+      "<ellipse cx='30' cy='20' rx='5' ry='4.6' fill='#72a49c'/>"+
+      "<rect x='26.5' y='17.5' width='7' height='3.4' rx='1.6' fill='none' stroke='#0f2126' stroke-width='1'/>"+
+      "<circle cx='29' cy='19.2' r='1' fill='#0f2126'/><circle cx='32' cy='19.2' r='1' fill='#0f2126'/>"+
+      "<circle cx='29.4' cy='18.8' r='.4' fill='#bff2ff'/><circle cx='32.4' cy='18.8' r='.4' fill='#bff2ff'/>"+
+      "<path d='M34 18q3-1 3-5' stroke='#ff8a3d' stroke-width='2' fill='none' stroke-linecap='round'/>"+
+      "<rect x='35.6' y='11.2' width='3' height='2.2' rx='1' fill='#ff8a3d'/>"+
+      "<path d='M8 20q-4-2-6-1M8 24q-4 2-6 1' stroke='#45706c' stroke-width='1.8' fill='none' stroke-linecap='round'/>"+
+      "<path d='M14 17q2-3 5-3M20 26q3 1 5-1' stroke='#72a49c' stroke-width='1.6' fill='none' stroke-linecap='round'/>"+
+      "<path d='M2 16q2 1 3 0M1 27q2-1 3 0M6 13q1 1 2 0' stroke='#bff2ff' stroke-width='1' fill='none' opacity='.6'/>"+
       "</g></svg>",
     sanddrowned:"<svg viewBox='0 0 40 40' width='32' height='32'><g>"+
       "<path d='M20 7q11 0 12 11 4 2 4 8 0 6-6 8-2 4-10 4T10 34q-6-2-6-8 0-6 4-8Q9 7 20 7z' fill='#d8c08a'/>"+
@@ -2880,6 +2898,12 @@
               "it throws two blocks of itself into the lanes ahead. A block stands "+
               "there stopping your shots — bolts, arrows, everything that flies flat — "+
               "until 80 damage breaks it. The sling lobs over. Everything else digs."},
+    speedyswimmer:{name:"Super Speedy Swimmer Drowned", world:"deep", hp:50, speed:48,
+              art:ART.speedyswimmer, tag:"FAST",
+              note:"Fifty health and twice a Goblin's pace — the fastest thing in the "+
+              "game, alive or dead. It is across the board before a crocodile finishes "+
+              "blowing, and there is never just one. The snorkel does nothing. It has "+
+              "been dead for years."},
     drownshark:{name:"Drowned Riding Shark", world:"deep", hp:220, speed:14,
               art:ART.drownshark, tag:"AMBUSH",
               /* it never walks in — it lurks under the seabed, untouchable, and it
@@ -3098,9 +3122,11 @@
     17:{count:86, gap:1700, mix:["shielddrowned","armourdrowned","armourdrowned"],
        rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[2,5],[0,1],[4,2],[1,3],[3,1]],
        note:"Two plates for every shield. The lane you ignore is the lane you lose."},
-    18:{count:90, gap:1600, mix:["drowned","shielddrowned","armourdrowned","armourdrowned"],
+    18:{count:90, gap:1600, mix:["drowned","shielddrowned","armourdrowned","armourdrowned","speedyswimmer"],
        rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[0,2],[2,3],[4,5],[1,4]],
-       note:"Everything at once, ninety of them. Breadth first, then depth."},
+       note:"Ninety of everything, and something new in the water: the Super Speedy "+
+            "Swimmer Drowned, fifty health at twice a Goblin's pace. It is at your "+
+            "wellspring before you finish reading this. Breadth first, then depth."},
     19:{count:96, gap:1500, mix:["shielddrowned","armourdrowned","armourdrowned"],
        rare:{kind:"bubbledancer", min:1, max:1}, gaps:[[3,2],[1,1],[0,4],[4,3],[2,5]],
        note:"The plain dead are gone for good now. Only shells and shields remain."},
@@ -6310,7 +6336,7 @@
                       "masterarcher","masterdigger","fireballgoblin","bossking"];
   var SKY_FOE_ORDER=["glob","driftglob","shieldglob","broodglob","globling","armourglob",
                      "globairship","stormhead","skytitan"];
-  var DEEP_FOE_ORDER=["drowned","shielddrowned","armourdrowned","bubbledancer","discodancer","drownshark","sanddrowned"];
+  var DEEP_FOE_ORDER=["drowned","shielddrowned","armourdrowned","bubbledancer","discodancer","drownshark","sanddrowned","speedyswimmer"];
   var ALM_FAMS=[
     ["mythic","Mythic",
      "Since the Flatbird and the Long Bird are only useful in the Sky, due to their ability to "+
