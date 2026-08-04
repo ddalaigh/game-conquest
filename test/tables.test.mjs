@@ -19,6 +19,7 @@ test("every level's wave names a real enemy", () => {
         assert.ok(g.FOES[kind], `${world} ${n}: mix names unknown foe "${kind}"`);
       }
       if (L.rare) assert.ok(g.FOES[L.rare.kind], `${world} ${n}: unknown rare "${L.rare.kind}"`);
+      if (L.lurk) assert.ok(g.FOES[L.lurk], `${world} ${n}: unknown lurker "${L.lurk}"`);
       if (L.boss) {
         const bk = L.bossKind || "bossking";
         assert.ok(g.FOES[bk], `${world} ${n}: unknown boss "${bk}"`);
@@ -35,6 +36,8 @@ test("a level only ever fields enemies from its own world", () => {
         const fw = g.FOES[kind].world || "caves";
         assert.equal(fw, world, `${world} ${n}: "${kind}" belongs to ${fw}`);
       }
+      if (L.lurk) assert.equal(g.FOES[L.lurk].world || "caves", world,
+        `${world} ${n}: lurker "${L.lurk}" belongs to ${g.FOES[L.lurk].world || "caves"}`);
     }
   }
 });

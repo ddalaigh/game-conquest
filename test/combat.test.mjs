@@ -251,3 +251,43 @@ test("a kelp Brood Glob comes apart on your side", () => {
   assert.equal(kinds.filter(x => x === "globling").length, 2,
     "the brood did not come apart into two kelp Globlings");
 });
+
+/* ---- the Drowned Riding Shark. It lurks untouchable under the seabed and
+   surfaces to devour the frontmost creature whole. ---- */
+
+test("the shark surfaces beside the frontmost creature and devours it whole", () => {
+  const g = boot();
+  g.startLevel("caves", 1, true);      /* sandbox board; the shark's rules are world-free */
+  g.setEnergy(9999);                   /* the sandbox tops energy up per tick — no ticks yet */
+  const back = put(g, "forge", 2, 1);
+  const front = put(g, "tortoise", 1, 3);
+  assert.ok(back && front, "could not set the table");
+  const s = g.spawnFoe("drownshark");
+  assert.equal(s.underground, true, "the shark did not start under the seabed");
+  let guard = 0;
+  while (s.underground && guard++ < 200) g.step(100);
+  assert.ok(!s.underground, "the shark never surfaced");
+  assert.equal(s.row, 1, "it surfaced in the wrong lane");
+  assert.ok(Math.abs(s.x - g.midX(3)) < 2, "it surfaced away from the frontmost creature");
+  assert.ok(g.state().grid[1][3].unit, "it ate before the windup");
+  g.step(800);                          /* the windup passes, the chomp lands */
+  assert.equal(g.state().grid[1][3].unit, null, "the creature was not devoured");
+  assert.ok(g.state().grid[2][1].unit, "it ate the wrong creature");
+  g.step(1600);                         /* it lingers, then goes back under */
+  assert.equal(s.underground, true, "the shark stayed up after eating");
+});
+
+test("the shark cannot be hurt under the seabed, only while the water is broken", () => {
+  const g = boot();
+  g.startLevel("caves", 1, true);
+  g.setEnergy(9999);
+  put(g, "forge", 2, 2);
+  const s = g.spawnFoe("drownshark");
+  const hp0 = s.hp;
+  g.hurtFoe(s, 50);
+  assert.equal(s.hp, hp0, "it was wounded through the seabed");
+  let guard = 0;
+  while (s.underground && guard++ < 200) g.step(100);
+  g.hurtFoe(s, 50);
+  assert.equal(s.hp, hp0 - 50, "it could not be hurt while surfaced");
+});
