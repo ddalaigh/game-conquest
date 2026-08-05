@@ -3408,7 +3408,13 @@
     burning:{name:"Burning", when:{pureFire:true},
              how:"Win a level where only fire creatures deal the damage"},
     unproductive:{name:"Unproductive", when:{noForge:true},
-             how:"Win a level without a single Forge creature"}
+             how:"Win a level without a single Forge creature"},
+    something:{name:"Well, that's something new",
+             when:{met:{of:["archer","goblin","digger","masterarcher","masterdigger",
+                            "fireballgoblin","bossking","driftglob","broodglob","globling",
+                            "globairship","stormhead","skytitan","bubbledancer","discodancer",
+                            "drownshark","sanddrowned","speedyswimmer","drownruler"]}},
+             how:"Meet your first enemy with a trick to it"}
   };
   /* his fire list — everything that burns. Cold, storm and sand cousins are
      not fire, whatever family they were born to. */
@@ -3485,6 +3491,8 @@
         hit = (!w.kill.of || w.kill.of.indexOf(ev.kill.kind)>-1)
            && (!w.kill.undanced || !!ev.kill.undanced)
            && (!w.kill.by || w.kill.by===ev.kill.by);
+      else if(w.met && ev.met)
+        hit = w.met.of.indexOf(ev.met.kind)>-1;
       else if(w.family && ev.unlocked)
         hit = familyDone(w.family);
       else if(w.pureFire && ev.pureFire)
@@ -5068,6 +5076,7 @@
            surfaceAt:0, surfaceRow:undefined};
     foes.push(z);
     placeFoe(z);
+    earnOn({met:{kind:kind}, sand:sandbox}).forEach(toastAch);
     /* a lurker arrives already under the seabed — fully unseen, by his ruling */
     if(d.lurk){
       z.underground=true;

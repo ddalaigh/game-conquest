@@ -103,6 +103,20 @@ test("the starting six finish no family", () => {
   assert.deepEqual(g.earnOn({ unlocked: true }), []);
 });
 
+test("Well, that's something new — met at the spawn, once, tricks only", () => {
+  const g = boot();
+  g.startLevel("caves", 3, false);
+  g.spawnFoe("skeleton", 1, 400);
+  assert.equal("something" in g.meta.achievements, false, "a plain walker is nothing new");
+  g.spawnFoe("archer", 2, 400);
+  assert.equal(g.meta.achievements.something, 1, "the first archer is the moment");
+  assert.deepEqual(g.earnOn({ met: { kind: "goblin" } }), [], "the surprise only happens once");
+  const g2 = boot();
+  g2.startLevel("caves", 3, true);
+  g2.spawnFoe("archer", 2, 400);
+  assert.equal("something" in g2.meta.achievements, false, "the sandbox surprises nobody");
+});
+
 test("the toast card carries the medal's name into the corner stack", () => {
   /* no browser playtest — toastAch hands its card back so the suite can read
      it: right words, right class, parented in the fixed top-right stack */
@@ -240,6 +254,10 @@ test("every achievement row is whole, and points at something real", () => {
     } else if (a.when.family) {
       assert.ok(Object.values(g.CREATURES).some(c => c.family === a.when.family),
         k + " points at family \"" + a.when.family + "\", which no creature has");
+    } else if (a.when.met) {
+      assert.ok(Array.isArray(a.when.met.of) && a.when.met.of.length, k + " meets nobody");
+      for (const f of a.when.met.of)
+        assert.ok(g.FOES[f], k + " points at foe \"" + f + "\", which does not exist");
     } else if (a.when.pureFire || a.when.noForge) {
       assert.equal(a.when.pureFire || a.when.noForge, true,
         k + " has a challenge flag that is not simply true");
