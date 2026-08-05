@@ -114,6 +114,23 @@ test("the toast card carries the medal's name into the corner stack", () => {
   assert.equal(card.parentNode && card.parentNode.id, "achToasts");
 });
 
+test("the achievements screen lists every medal, veiled until earned", () => {
+  const g = boot();
+  const rows = g.achRows();
+  assert.equal(rows.length, Object.keys(g.ACHIEVEMENTS).length, "a medal is missing from the shelf");
+  for (const r of rows) {
+    assert.equal(r.earned, false);
+    assert.equal(r.how, "Still to be earned.", r.key + " gives away its how too early");
+  }
+  g.earnOn({ win: { world: "caves", level: 1 } });
+  const after = g.achRows();
+  const v = after.find(r => r.key === "victory");
+  assert.equal(v.earned, true);
+  assert.equal(v.how, "Clear the first level of the Caves", "an earned medal tells its story");
+  assert.equal(after.filter(r => r.earned).length, 1, "only the earned medal unveils");
+  g.buildAchScreen();   /* and the painter runs on the fake DOM without complaint */
+});
+
 test("every achievement row is whole, and points at something real", () => {
   const g = boot();
   for (const k in g.ACHIEVEMENTS) {

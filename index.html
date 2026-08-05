@@ -50,6 +50,10 @@
   .ach span{font-family:'Eczar',serif;font-size:17px}
   @keyframes achin{from{transform:translateX(130%);opacity:0}to{transform:none;opacity:1}}
   @keyframes achout{to{transform:translateX(130%);opacity:0}}
+  .achrow{padding:9px 4px;border-bottom:1px solid var(--line)}
+  .achrow:last-child{border-bottom:none}
+  .achrow .how{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+  .achrow.dim{opacity:.45}
 
   /* ---------- boost bank ---------- */
   .boosts{display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap;align-items:center}
@@ -563,6 +567,7 @@
     <button class="btn worldbtn" id="toSky">Go forward to the Sky World &rarr;</button>
     <div class="menurow">
       <button class="btn" id="startAlm">Almanac</button>
+      <button class="btn" id="startAch">Achievements</button>
       <button class="btn" id="startFuse">Fusion table</button>
       <button class="btn" id="startUpg">Bonds</button>
       <button class="btn" id="startSand">Cave sandbox</button>
@@ -736,6 +741,7 @@
     <button class="btn worldbtn" id="toDeep">Go down to the Deep Sea &rarr;</button>
     <div class="bondbar" style="margin-top:14px">
       <button class="btn" id="skyAlm">Almanac</button>
+      <button class="btn" id="skyAch">Achievements</button>
       <button class="btn" id="skySand">Sky sandbox</button>
       <button class="btn" id="skyAudio">♪ On</button>
       <button class="btn" id="skyBack">Back to the Caves</button>
@@ -841,6 +847,7 @@
     </div>
     <div class="bondbar" style="margin-top:14px">
       <button class="btn" id="deepAlm">Almanac</button>
+      <button class="btn" id="deepAch">Achievements</button>
       <button class="btn" id="deepSand">Deep sandbox</button>
       <button class="btn" id="deepAudio">♪ On</button>
       <button class="btn" id="deepBack">Back to the Sky</button>
@@ -901,6 +908,18 @@
       <button class="btn" id="upgClose">Done</button>
     </div>
     <div id="upgList"></div>
+  </div>
+</div>
+
+<div class="screen hidden" id="achScreen">
+  <div class="card">
+    <h2>Achievements</h2>
+    <p>What the run has earned, and what it still might &mdash; <span id="achCount"></span>.
+       Greyed medals are not yet yours.</p>
+    <div class="almscroll" id="achBody"></div>
+    <div class="bondbar" style="margin-top:14px">
+      <button class="btn" id="achClose">Close</button>
+    </div>
   </div>
 </div>
 
@@ -6894,6 +6913,44 @@
     document.getElementById("almScreen").classList.remove("hidden");
   }
 
+  /* ---------- achievements screen ---------- */
+  /* what to show is a decision; achRows makes it and the builder only paints.
+     An unearned medal keeps its name but not its how — the hows name kings
+     and dancers the player may not have met. */
+  function achRows(){
+    var rows=[];
+    for(var k in ACHIEVEMENTS){
+      var got=!!meta.achievements[k];
+      rows.push({key:k, name:ACHIEVEMENTS[k].name, earned:got,
+                 how:got ? ACHIEVEMENTS[k].how : "Still to be earned."});
+    }
+    return rows;
+  }
+  function buildAchScreen(){
+    var rows=achRows(), earned=0, b=document.getElementById("achBody");
+    b.innerHTML="";
+    for(var i=0;i<rows.length;i++){
+      if(rows[i].earned) earned++;
+      var d=document.createElement("div");
+      d.className="achrow"+(rows[i].earned?"":" dim");
+      d.innerHTML='<span class="nm">'+rows[i].name+'</span>'+
+                  '<span class="how">'+rows[i].how+'</span>';
+      b.appendChild(d);
+    }
+    document.getElementById("achCount").textContent =
+      earned+" of "+rows.length+" earned";
+    b.scrollTop=0;
+  }
+  function openAch(){
+    /* opened mid-level it pauses, the way the almanac does */
+    if(running && !paused){
+      paused=true;
+      document.getElementById("pauseBtn").textContent="Resume";
+    }
+    buildAchScreen();
+    document.getElementById("achScreen").classList.remove("hidden");
+  }
+
   /* ---------- loadout ---------- */
   var LOADOUT_MAX=6, SUPPORT_MAX=2;
   var loadout=[], pickFor=1;
@@ -7173,6 +7230,12 @@
   document.getElementById("almClose").addEventListener("click",function(){
     document.getElementById("almScreen").classList.add("hidden");
   });
+  ["startAch","skyAch","deepAch"].forEach(function(id){
+    document.getElementById(id).addEventListener("click",openAch);
+  });
+  document.getElementById("achClose").addEventListener("click",function(){
+    document.getElementById("achScreen").classList.add("hidden");
+  });
   document.getElementById("almTabC").addEventListener("click",function(){ almTab="creatures"; buildAlmanac(); });
   document.getElementById("almTabE").addEventListener("click",function(){ almTab="enemies";   buildAlmanac(); });
   document.getElementById("almTabF").addEventListener("click",function(){ almTab="fusions";   buildAlmanac(); });
@@ -7345,7 +7408,7 @@
       spawnKelp:spawnKelp, hurtKelp:hurtKelp, makeSandBlock:makeSandBlock,
       makeArrow:makeArrow, makeShell:makeShell, tickArrows:tickArrows,
       canPlace:canPlace, setRng:setRng, earnOn:earnOn, toastAch:toastAch,
-      fusibleTotal:fusibleTotal,
+      fusibleTotal:fusibleTotal, achRows:achRows, buildAchScreen:buildAchScreen,
       outcome:function(){ return lastOutcome; },
       setLoadout:function(list){ loadout=list.slice(); }
     };
