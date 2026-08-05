@@ -3357,7 +3357,13 @@
      ============================================================ */
   var ACHIEVEMENTS={
     victory:{name:"Victory at last", when:{world:"caves", level:1},
-             how:"Clear the first level of the Caves"}
+             how:"Clear the first level of the Caves"},
+    king:   {name:"Long live the king", when:{world:"caves", level:15},
+             how:"Beat the Bone King at the bottom of the Caves"},
+    storm:  {name:"Stormed off", when:{world:"sky", level:17},
+             how:"Beat the Thunderhead at the top of the Sky"},
+    majesty:{name:"Goodbye, your majesty", when:{world:"deep", level:20},
+             how:"Beat the Drowned Ruler at the bottom of the Deep"}
   };
   function earnFor(world, level, sand){
     if(sand) return [];             /* the sandbox is practice — no medals */

@@ -16,12 +16,20 @@ test("clearing Caves 1 earns Victory at last, exactly once", () => {
   assert.deepEqual(g.earnFor("caves", 1, false), [], "a medal is not earned twice");
 });
 
-test("other wins and sandbox wins earn nothing (yet)", () => {
+test("other wins and sandbox wins earn nothing", () => {
   const g = boot();
   assert.deepEqual(g.earnFor("caves", 2, false), []);
-  assert.deepEqual(g.earnFor("deep", 20, false), []);
+  assert.deepEqual(g.earnFor("deep", 19, false), []);
   assert.deepEqual(g.earnFor("caves", 1, true), [], "the sandbox is practice — no medals");
   assert.equal("victory" in g.meta.achievements, false);
+});
+
+test("each crown has its medal — one per boss, once each", () => {
+  const g = boot();
+  assert.deepEqual(g.earnFor("caves", 15, false), ["king"],    "the Bone King");
+  assert.deepEqual(g.earnFor("sky", 17, false),   ["storm"],   "the Thunderhead");
+  assert.deepEqual(g.earnFor("deep", 20, false),  ["majesty"], "the Drowned Ruler");
+  assert.deepEqual(g.earnFor("caves", 15, false), [], "a king only dies once");
 });
 
 test("the toast card carries the medal's name into the corner stack", () => {
@@ -42,5 +50,8 @@ test("every achievement row is whole — a name, a how, and a when", () => {
     assert.ok(a.name, k + " has no name");
     assert.ok(a.how, k + " does not say how it is earned");
     assert.ok(a.when && a.when.world && a.when.level, k + " has no earning win");
+    const table = { caves: g.LEVELS, sky: g.SKY_LEVELS, deep: g.DEEP_LEVELS }[a.when.world];
+    assert.ok(table && table[a.when.level],
+      k + " points at " + a.when.world + " " + a.when.level + ", which does not exist");
   }
 });
