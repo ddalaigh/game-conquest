@@ -3356,24 +3356,38 @@
      is only the messenger.
      ============================================================ */
   var ACHIEVEMENTS={
-    victory:{name:"Victory at last", when:{world:"caves", level:1},
+    victory:{name:"Victory at last", when:{win:{world:"caves", level:1}},
              how:"Clear the first level of the Caves"},
-    king:   {name:"Long live the king", when:{world:"caves", level:15},
+    king:   {name:"Long live the king", when:{win:{world:"caves", level:15}},
              how:"Beat the Bone King at the bottom of the Caves"},
-    storm:  {name:"Stormed off", when:{world:"sky", level:17},
+    storm:  {name:"Stormed off", when:{win:{world:"sky", level:17}},
              how:"Beat the Thunderhead at the top of the Sky"},
-    majesty:{name:"Goodbye, your majesty", when:{world:"deep", level:20},
-             how:"Beat the Drowned Ruler at the bottom of the Deep"}
+    majesty:{name:"Goodbye, your majesty", when:{win:{world:"deep", level:20}},
+             how:"Beat the Drowned Ruler at the bottom of the Deep"},
+    binding:{name:"Binding", when:{fused:1},
+             how:"Bind your first fusion at the table"},
+    federal:{name:"Federal of Fusion Award", when:{fused:"all"},
+             how:"Bind every fusion in the game"}
   };
-  function earnFor(world, level, sand){
-    if(sand) return [];             /* the sandbox is practice — no medals */
+  /* counted off the recipe tables so a new recipe can never leave it stale */
+  function fusibleTotal(){
+    var seen={}, n=0, all=RECIPES.concat(PAIR_RECIPES);
+    for(var i=0;i<all.length;i++) if(!seen[all[i].result]){ seen[all[i].result]=1; n++; }
+    return n;
+  }
+  /* one dispatcher for every kind of triumph — ev is {win:{world,level}} or
+     {fused:count}, plus sand. Decides only; the toast presents. */
+  function earnOn(ev){
+    if(ev.sand) return [];          /* the sandbox is practice — no medals */
     var got=[];
     for(var k in ACHIEVEMENTS){
-      var w=ACHIEVEMENTS[k].when;
-      if(w.world===world && w.level===level && !meta.achievements[k]){
-        meta.achievements[k]=1;
-        got.push(k);
-      }
+      if(meta.achievements[k]) continue;
+      var w=ACHIEVEMENTS[k].when, hit=false;
+      if(w.win && ev.win)
+        hit = w.win.world===ev.win.world && w.win.level===ev.win.level;
+      else if(w.fused && ev.fused)
+        hit = w.fused==="all" ? ev.fused>=fusibleTotal() : ev.fused>=w.fused;
+      if(hit){ meta.achievements[k]=1; got.push(k); }
     }
     return got;
   }
@@ -6308,7 +6322,7 @@
     var first=!meta.cleared[key];
     lastOutcome={result:"win", world:WORLD, level:level, first:first};
     meta.cleared[key]=true;
-    earnFor(WORLD, level, sandbox).forEach(toastAch);
+    earnOn({win:{world:WORLD, level:level}, sand:sandbox}).forEach(toastAch);
     buildLevelGrid();          /* the next level, and maybe the Sky, just opened */
     if(WORLD==="deep"){
       document.getElementById("endTitle").textContent="Deep "+level+" cleared";
@@ -6607,6 +6621,7 @@
     } else {
       meta.unlocked[r.result]=1;
       meta.fused[r.result]=1;
+      earnOn({fused:Object.keys(meta.fused).length}).forEach(toastAch);
       fuseItem=null;
     }
     buildFuseScreen();
@@ -7299,7 +7314,8 @@
       spawnFoe:spawnFoe, addUnit:addUnit, refreshLore:refreshLore, hurtFoe:hurtFoe,
       spawnKelp:spawnKelp, hurtKelp:hurtKelp, makeSandBlock:makeSandBlock,
       makeArrow:makeArrow, makeShell:makeShell, tickArrows:tickArrows,
-      canPlace:canPlace, setRng:setRng, earnFor:earnFor, toastAch:toastAch,
+      canPlace:canPlace, setRng:setRng, earnOn:earnOn, toastAch:toastAch,
+      fusibleTotal:fusibleTotal,
       outcome:function(){ return lastOutcome; },
       setLoadout:function(list){ loadout=list.slice(); }
     };
