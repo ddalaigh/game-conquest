@@ -461,3 +461,18 @@ test("the Possessed Swim Gear's bubble pierces for 30 and bursts on the last for
   assert.equal(hp0 - b.hp, 30, "a pierced enemy should take 30");
   assert.equal(hp0 - c.hp, 60, "the last enemy touched should wear the burst for 60");
 });
+
+/* Enemies chew on a shared clock unless their row says otherwise. The Super
+ * Speedy Swimmer Drowned is the first with its own — it eats at double speed. */
+test("the Super Speedy Swimmer eats twice as fast as its cousins", () => {
+  const g = board();
+  const fast = put(g, "tortoise", 0, 4);
+  const slow = put(g, "tortoise", 2, 4);
+  assert.ok(fast && slow, "could not place the two walls");
+  g.spawnFoe("speedyswimmer", 0, g.midX(4));
+  g.spawnFoe("drowned", 2, g.midX(4));
+  const hp0 = fast.hp;
+  for (let i = 0; i < 20; i++) g.step(50);   /* one second, in even bites */
+  assert.equal(hp0 - fast.hp, 40, "the swimmer should land two bites in a second");
+  assert.equal(hp0 - slow.hp, 20, "an ordinary Drowned lands one");
+});

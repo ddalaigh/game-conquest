@@ -812,7 +812,7 @@
       </div>
       <div class="lore hidden" data-foe="speedyswimmer">
       <b>The Super Speedy Swimmer Drowned.</b> It was in a hurry before it died and death has
-      not slowed it down &mdash; fifty health at four times a Goblin's pace, the fastest thing
+      not slowed it down &mdash; fifty health at five times a Goblin's pace, the fastest thing
       in any world by a distance nobody else is even swimming in. The snorkel serves no
       purpose. It has been dead for years. It keeps it the way the fast keep their habits:
       without thinking, and at full speed.
@@ -3028,12 +3028,12 @@
               "it throws two blocks of itself into the lanes ahead. A block stands "+
               "there stopping your shots — bolts, arrows, everything that flies flat — "+
               "until 80 damage breaks it. The sling lobs over. Everything else digs."},
-    speedyswimmer:{name:"Super Speedy Swimmer Drowned", world:"deep", hp:50, speed:96,
-              art:ART.speedyswimmer, tag:"FAST",
-              note:"Fifty health at four times a Goblin's pace — the fastest thing in the "+
+    speedyswimmer:{name:"Super Speedy Swimmer Drowned", world:"deep", hp:50, speed:120,
+              art:ART.speedyswimmer, tag:"FAST", biteEvery:500,
+              note:"Fifty health at five times a Goblin's pace — the fastest thing in the "+
               "game, alive or dead, by a distance nobody else is even swimming in. It "+
-              "crosses the whole board in five seconds. The snorkel does nothing. It has "+
-              "been dead for years."},
+              "crosses the whole board in four seconds and eats twice as fast as anything "+
+              "else. The snorkel does nothing. It has been dead for years."},
     drownruler:{name:"Drowned Ruler", world:"deep", hp:7000, speed:5,
               art:ART.drownruler, tag:"DROWNED RULER", size:58, boss:true,
               summonEvery:9000, maxMinions:5,
@@ -4900,7 +4900,8 @@
     inner.appendChild(el);
     var z={kind:kind, row:(row===undefined?Math.floor(rnd()*ROWS):row),
            x:(atX===undefined?SPAWN_X:atX), hp:d.hp, maxHp:d.hp, speed:d.speed,
-           el:el, fill:el.querySelector(".hpbar i"), biteT:0, frozen:0, slow:0, eating:null,
+           el:el, fill:el.querySelector(".hpbar i"), biteT:0, biteEvery:d.biteEvery||BITE_EVERY,
+           frozen:0, slow:0, eating:null,
            size:sz, wide:wide, extra:!!extra, boss:!!d.boss, summonT:0, slamT:0, winding:0, warnEl:null, laneT:0,
            through:(d.charge?d.charge.through:0), fireTaken:0, grown:false,
            fireImmune:!!d.fireImmune, fireOnly:!!d.fireOnly, flier:!!d.flier, driftT:0,
@@ -6100,7 +6101,7 @@
       if(kb){
         z.el.classList.add("chomp");
         z.biteT+=dt;
-        if(z.biteT>=BITE_EVERY){ z.biteT-=BITE_EVERY; hurtKelp(kb, BITE_DMG); }
+        if(z.biteT>=z.biteEvery){ z.biteT-=z.biteEvery; hurtKelp(kb, BITE_DMG); }
         continue;
       }
 
@@ -6119,8 +6120,8 @@
       if(target){
         z.el.classList.add("chomp");
         z.biteT+=dt;
-        if(z.biteT>=BITE_EVERY){
-          z.biteT-=BITE_EVERY;
+        if(z.biteT>=z.biteEvery){
+          z.biteT-=z.biteEvery;
           var th=CREATURES[target.key].thorns;
           hurtUnit(target,BITE_DMG);
           if(th) hurtFoe(z,th);
