@@ -114,6 +114,29 @@ test("the toast card carries the medal's name into the corner stack", () => {
   assert.equal(card.parentNode && card.parentNode.id, "achToasts");
 });
 
+test("Blowing up — only a blast kill earns it, and not in the sandbox", () => {
+  const g = boot();
+  assert.deepEqual(g.earnOn({ kill: { by: "blast" } }), ["blow"]);
+  assert.deepEqual(g.earnOn({ kill: { by: "blast" } }), [], "one boom is enough");
+  const g2 = boot();
+  assert.deepEqual(g2.earnOn({ kill: { kind: "skeleton", undanced: true } }), [],
+    "an ordinary kill is not a blast");
+  assert.deepEqual(g2.earnOn({ kill: { by: "blast" }, sand: true }), []);
+});
+
+test("a real Bomb Rider blast on a real skeleton earns Blowing up", () => {
+  const g = boot();
+  g.meta.unlocked.bombrider = 1;
+  g.startLevel("caves", 1, false);
+  g.setEnergy(9999);
+  g.clearCooldowns();
+  g.select("bombrider");
+  g.click(2, 1);                       /* the rider launches from the square */
+  g.spawnFoe("skeleton", 2, g.midX(5));
+  for (let i = 0; i < 600 && !g.meta.achievements.blow; i++) g.step(16);
+  assert.equal(g.meta.achievements.blow, 1, "the rider rolled and nothing boomed");
+});
+
 test("the achievements screen lists every medal, veiled until earned", () => {
   const g = boot();
   const rows = g.achRows();
@@ -146,9 +169,9 @@ test("every achievement row is whole, and points at something real", () => {
       assert.ok(a.when.fused === "all" || Number.isInteger(a.when.fused),
         k + " has a fused threshold that is neither a count nor \"all\"");
     } else if (a.when.kill) {
-      assert.ok(Array.isArray(a.when.kill.of) && a.when.kill.of.length,
+      assert.ok((Array.isArray(a.when.kill.of) && a.when.kill.of.length) || a.when.kill.by,
         k + " kills nothing in particular");
-      for (const f of a.when.kill.of)
+      if (a.when.kill.of) for (const f of a.when.kill.of)
         assert.ok(g.FOES[f], k + " points at foe \"" + f + "\", which does not exist");
     } else if (a.when.family) {
       assert.ok(Object.values(g.CREATURES).some(c => c.family === a.when.family),

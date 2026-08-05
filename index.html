@@ -3400,7 +3400,9 @@
     cheer:  {name:"Cheerleader", when:{family:"support"},
              how:"Bind every Support creature"},
     hunter: {name:"Mythic Hunter", when:{family:"mythic"},
-             how:"Bind every Mythic creature"}
+             how:"Bind every Mythic creature"},
+    blow:   {name:"Blowing up", when:{kill:{by:"blast"}},
+             how:"Blow an enemy up with a Bomb Rider or Speedy Bomb Roller"}
   };
   /* counted off the recipe tables so a new recipe can never leave it stale */
   function fusibleTotal(){
@@ -3432,7 +3434,9 @@
       else if(w.fused && ev.fused)
         hit = w.fused==="all" ? ev.fused>=fusibleTotal() : ev.fused>=w.fused;
       else if(w.kill && ev.kill)
-        hit = w.kill.of.indexOf(ev.kill.kind)>-1 && (!w.kill.undanced || !!ev.kill.undanced);
+        hit = (!w.kill.of || w.kill.of.indexOf(ev.kill.kind)>-1)
+           && (!w.kill.undanced || !!ev.kill.undanced)
+           && (!w.kill.by || w.kill.by===ev.kill.by);
       else if(w.family && ev.unlocked)
         hit = familyDone(w.family);
       if(hit){ meta.achievements[k]=1; got.push(k); }
@@ -4710,11 +4714,12 @@
 
   /* Anything caught is destroyed. The Bone King is too big for that,
      so it takes a flat amount instead. */
-  function crushFoe(z,bossAmt){
-    if(z.fireOnly) return;                /* nothing to crush \u2014 only flame works on weather */
-    if(z.underground) return;             /* nothing to crush that is not up here */
-    if(z.boss) hurtFoe(z,bossAmt);
-    else killFoe(z);
+  function crushFoe(z,bossAmt){          /* says whether anything actually died */
+    if(z.fireOnly) return false;          /* nothing to crush \u2014 only flame works on weather */
+    if(z.underground) return false;       /* nothing to crush that is not up here */
+    if(z.boss){ hurtFoe(z,bossAmt); return z.hp<=0; }
+    killFoe(z);
+    return true;
   }
 
   /* three rows by three columns, centred on where it went off */
@@ -4729,7 +4734,7 @@
       if(!z || Math.abs(z.row-rd.row)>(rd.blastRows||1)) continue;
       var zc=Math.floor((z.x-KEEP)/CW);
       if(zc<c0 || zc>c1) continue;
-      crushFoe(z, rd.bossBlast);
+      if(crushFoe(z, rd.bossBlast)) earnOn({kill:{by:"blast"}, sand:sandbox}).forEach(toastAch);
       n++;
     }
     addFloat(midX(col), rd.row*CH+CH*0.15, n?"destroyed \u00D7"+n:"blast", "#ff8a3d");
