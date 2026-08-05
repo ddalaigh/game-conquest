@@ -3369,7 +3369,19 @@
     federal:{name:"Federal of Fusion Award", when:{fused:"all"},
              how:"Bind every fusion in the game"},
     pooper: {name:"Party pooper", when:{kill:{of:["bubbledancer","discodancer"], undanced:true}},
-             how:"Stop a dancer before its bubbles arrive"}
+             how:"Stop a dancer before its bubbles arrive"},
+    top:    {name:"Making my way to the top", when:{family:"forge"},
+             how:"Bind every Forge creature"},
+    tamer:  {name:"Dragon Tamer", when:{family:"dragon"},
+             how:"Bind every Dragon creature"},
+    wall:   {name:"The great wall of tortoise", when:{family:"guardian"},
+             how:"Bind every Guardian creature"},
+    kfc:    {name:"I love KFC", when:{family:"winged"},
+             how:"Bind every Winged creature"},
+    cheer:  {name:"Cheerleader", when:{family:"support"},
+             how:"Bind every Support creature"},
+    hunter: {name:"Mythic Hunter", when:{family:"mythic"},
+             how:"Bind every Mythic creature"}
   };
   /* counted off the recipe tables so a new recipe can never leave it stale */
   function fusibleTotal(){
@@ -3377,8 +3389,19 @@
     for(var i=0;i<all.length;i++) if(!seen[all[i].result]){ seen[all[i].result]=1; n++; }
     return n;
   }
-  /* one dispatcher for every kind of triumph — ev is {win:{world,level}} or
-     {fused:count}, plus sand. Decides only; the toast presents. */
+  function familyDone(fam){
+    for(var k in CREATURES) if(CREATURES[k].family===fam && !meta.unlocked[k]) return false;
+    return true;
+  }
+  /* every real unlock passes this one door, so a finished family is
+     noticed the moment its last member arrives */
+  function bindCreature(k){
+    meta.unlocked[k]=1;
+    earnOn({unlocked:true}).forEach(toastAch);
+  }
+  /* one dispatcher for every kind of triumph — ev is {win:{world,level}},
+     {fused:count}, {kill:{...}} or {unlocked:true}, plus sand. Decides only;
+     the toast presents. */
   function earnOn(ev){
     if(ev.sand) return [];          /* the sandbox is practice — no medals */
     var got=[];
@@ -3391,6 +3414,8 @@
         hit = w.fused==="all" ? ev.fused>=fusibleTotal() : ev.fused>=w.fused;
       else if(w.kill && ev.kill)
         hit = w.kill.of.indexOf(ev.kill.kind)>-1 && (!w.kill.undanced || !!ev.kill.undanced);
+      else if(w.family && ev.unlocked)
+        hit = familyDone(w.family);
       if(hit){ meta.achievements[k]=1; got.push(k); }
     }
     return got;
@@ -6368,7 +6393,7 @@
       if(first && SKY_MYTHIC[level]){
         var sm=SKY_MYTHIC[level];
         meta.mythics[sm]=1;
-        meta.unlocked[sm]=1;
+        bindCreature(sm);
         stxt+='<span class="upg">The '+MYTHICS[sm].name+' answers you.</span> '+
               MYTHICS[sm].blurb+' The Deep Sea is open to you.<br><br>';
       }
@@ -6394,13 +6419,13 @@
     if(first && LEVEL_MYTHIC[level]){
       var my=LEVEL_MYTHIC[level];
       meta.mythics[my]=1;
-      meta.unlocked[my]=1;
+      bindCreature(my);
       txt += '<span class="upg">The '+MYTHICS[my].name+' answers you.</span> '+
              MYTHICS[my].blurb+'<br><br>';
     }
     if(first && LEVEL_CREATURE[level]){
       var nc=LEVEL_CREATURE[level];
-      meta.unlocked[nc]=1;
+      bindCreature(nc);
       txt += '<span class="upg">The '+CREATURES[nc].name+' is bound to you.</span> '+
              'It can go in your six from the next level.<br><br>';
     }
@@ -6624,7 +6649,7 @@
       sandMeta.unlocked[r.result]=1;
       if(sandbox && running){ buildTray(); syncTray(); }
     } else {
-      meta.unlocked[r.result]=1;
+      bindCreature(r.result);
       meta.fused[r.result]=1;
       earnOn({fused:Object.keys(meta.fused).length}).forEach(toastAch);
       fuseItem=null;
@@ -7192,7 +7217,7 @@
     WORLD="sky";
     /* the Flatbird comes with the Sky \u2014 walking in is enough. The Bone King's
        victory still tells the bird's story for anyone who plays in order. */
-    if(!meta.unlocked.flatbird){ meta.unlocked.flatbird=1; meta.mythics.flatbird=1; }
+    if(!meta.unlocked.flatbird){ bindCreature("flatbird"); meta.mythics.flatbird=1; }
     var box=document.getElementById("skyMythic");
     box.className="fuseout hit";
     box.innerHTML=ART.flatbird.replace(/width='34' height='34'/,"width='30' height='30'")+
@@ -7213,7 +7238,7 @@
     /* the Bubble Dial comes with the Deep — walking in is enough, the same way
        the Flatbird comes with the Sky. Without the crocodile there is nowhere
        to put a single creature down here. */
-    if(!meta.unlocked.bubbledial){ meta.unlocked.bubbledial=1; meta.mythics.bubbledial=1; }
+    if(!meta.unlocked.bubbledial){ bindCreature("bubbledial"); meta.mythics.bubbledial=1; }
     var box=document.getElementById("deepMythic");
     box.className="fuseout hit";
     box.innerHTML=ART.bubbledial.replace(/width='34' height='34'/,"width='30' height='30'")+

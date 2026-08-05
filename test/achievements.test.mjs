@@ -75,6 +75,34 @@ test("a dancer killed mid-dance through the real death path earns it", () => {
   assert.equal(g.meta.achievements.pooper, 1, "the kill did not earn the medal");
 });
 
+test("finishing a family earns its medal — all six, one each", () => {
+  const probe = boot();
+  const families = [...new Set(Object.values(probe.CREATURES).map(c => c.family))];
+  for (const fam of families) {
+    const g = boot();
+    const medal = Object.keys(g.ACHIEVEMENTS)
+      .find(k => g.ACHIEVEMENTS[k].when.family === fam);
+    assert.ok(medal, "the " + fam + " family has no medal");
+    for (const k in g.CREATURES) if (g.CREATURES[k].family === fam) g.meta.unlocked[k] = 1;
+    assert.deepEqual(g.earnOn({ unlocked: true }), [medal], fam);
+    assert.deepEqual(g.earnOn({ unlocked: true }), [], fam + " is earned once");
+  }
+});
+
+test("a family one creature short earns nothing", () => {
+  const g = boot();
+  const dragons = Object.keys(g.CREATURES).filter(k => g.CREATURES[k].family === "dragon");
+  /* withhold one the starting six does not already own */
+  const withheld = dragons.find(k => !g.meta.unlocked[k]);
+  for (const k of dragons) if (k !== withheld) g.meta.unlocked[k] = 1;
+  assert.deepEqual(g.earnOn({ unlocked: true }), []);
+});
+
+test("the starting six finish no family", () => {
+  const g = boot();
+  assert.deepEqual(g.earnOn({ unlocked: true }), []);
+});
+
 test("the toast card carries the medal's name into the corner stack", () => {
   /* no browser playtest — toastAch hands its card back so the suite can read
      it: right words, right class, parented in the fixed top-right stack */
@@ -105,6 +133,9 @@ test("every achievement row is whole, and points at something real", () => {
         k + " kills nothing in particular");
       for (const f of a.when.kill.of)
         assert.ok(g.FOES[f], k + " points at foe \"" + f + "\", which does not exist");
+    } else if (a.when.family) {
+      assert.ok(Object.values(g.CREATURES).some(c => c.family === a.when.family),
+        k + " points at family \"" + a.when.family + "\", which no creature has");
     } else {
       assert.fail(k + " has a when shape earnOn does not understand");
     }
