@@ -537,6 +537,7 @@
     <div class="stat energy">◈ <span id="energy">50</span> <small>energy</small></div>
     <div class="stat">☠ <span id="foesLeft">0</span> <small>left</small></div>
     <div class="stat">Level <span id="lvlNum">1</span></div>
+    <div class="stat" id="kingClockWrap" style="display:none">⏱ <span id="kingClock">0:00.0</span></div>
     <button class="btn" id="speedBtn">▸ 1×</button>
     <button class="btn" id="pauseBtn">Pause</button>
     <button class="btn hidden" id="tableBtn">Fusion table</button>
@@ -3366,7 +3367,8 @@
     capUp:{forge:0,dragon:0,guardian:0,support:0,winged:0}, /* 4 -> 5, and support uses 2 -> 3 */
     cleared:{},
     foesBeaten:{},            /* an enemy writes its own almanac page by dying */
-    achievements:{}           /* medals of the run — session-only, like the rest */
+    achievements:{},          /* medals of the run — session-only, like the rest */
+    bestKing:0                /* fastest Bone King kill this session, in game-time ms */
   };
 
   /* ============================================================
@@ -3431,6 +3433,24 @@
     for(var k in placedKinds)
       if(CREATURES[k].family==="forge") return false;
     return true;
+  }
+
+  /* the king's clock. Injected time only — levelMs adds up inside tick(dt),
+     so the run is fair at any playback speed and exact under the tests. */
+  var levelMs=0, kingClockOn=false;
+  function fmtTime(ms){
+    var tenths=Math.floor(ms/100)%10, secs=Math.floor(ms/1000)%60, mins=Math.floor(ms/60000);
+    return mins+":"+(secs<10?"0":"")+secs+"."+tenths;
+  }
+  function kingResult(ms){   /* the end-screen line, and the session best */
+    var line="The Bone King fell in "+fmtTime(ms)+".";
+    if(!meta.bestKing || ms<meta.bestKing){
+      meta.bestKing=ms;
+      line+=" Your fastest yet.";
+    } else {
+      line+=" Your fastest stands at "+fmtTime(meta.bestKing)+".";
+    }
+    return line;
   }
   /* counted off the recipe tables so a new recipe can never leave it stale */
   function fusibleTotal(){
@@ -6317,6 +6337,8 @@
   }
 
   function tick(dt){
+    levelMs+=dt;
+    if(kingClockOn) document.getElementById("kingClock").textContent=fmtTime(levelMs);
     if(sandbox){ energy=9999; supportLeft=99; sandMeta.bank={1:9,2:9,3:9}; }
     else { tickWell(dt); tickSpawn(dt); }
     tickUnits(dt);
@@ -6372,6 +6394,9 @@
     sandbox=!!isSand;
     level=lv;
     placedKinds={};
+    levelMs=0;
+    kingClockOn = !sandbox && WORLD==="caves" && !!(LV()[lv] && LV()[lv].boss);
+    document.getElementById("kingClockWrap").style.display = kingClockOn ? "" : "none";
     document.getElementById("startScreen").classList.add("hidden");
     document.getElementById("endScreen").classList.add("hidden");
     reset();
@@ -6471,6 +6496,9 @@
       return;
     }
     var txt="";
+    if(LV()[level].boss){
+      txt+='<span class="upg">'+kingResult(levelMs)+'</span><br><br>';
+    }
     if(first && UNLOCKS[level]){
       var u=UNLOCKS[level];
       meta.capUp[u.fam]=1;
@@ -7452,6 +7480,8 @@
       fusibleTotal:fusibleTotal, achRows:achRows, buildAchScreen:buildAchScreen,
       FIRE_CREATURES:FIRE_CREATURES, dealsDamage:dealsDamage,
       pureFireNow:pureFireNow, noForgeNow:noForgeNow,
+      fmtTime:fmtTime, kingResult:kingResult,
+      levelMsNow:function(){ return levelMs; },
       outcome:function(){ return lastOutcome; },
       setLoadout:function(list){ loadout=list.slice(); }
     };
