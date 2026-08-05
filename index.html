@@ -3402,8 +3402,22 @@
     hunter: {name:"Mythic Hunter", when:{family:"mythic"},
              how:"Bind every Mythic creature"},
     blow:   {name:"Blowing up", when:{kill:{by:"blast"}},
-             how:"Blow an enemy up with a Bomb Rider or Speedy Bomb Roller"}
+             how:"Blow an enemy up with a Bomb Rider or Speedy Bomb Roller"},
+    burning:{name:"Burning", when:{pureFire:true},
+             how:"Win a level where only fire creatures deal the damage"}
   };
+  /* his fire list — everything that burns. Cold, storm and sand cousins are
+     not fire, whatever family they were born to. */
+  var FIRE_CREATURES={tinyember:1, cinderwisp:1, cinderghoul:1, egyptiancinder:1,
+    bonfire:1, boxingflames:1, skyboxer:1, drakeling:1, twindrake:1, fourdrake:1,
+    stonedragon:1, phoenix:1, phoenixphoenix:1, ashenphoenix:1, kelpphoenix:1,
+    brightphoenix:1, widephoenix:1, burnmoth:1, possessedswimgear:1};
+  /* a wall that hurts nobody spoils nothing — read off the row, never listed */
+  function dealsDamage(k){
+    var c=CREATURES[k];
+    return !!(c.shoot||c.flame||c.burnDps||c.punch||c.sling||c.roller||c.thorns||c.kelp);
+  }
+  var pureFire=true;   /* the level-long promise behind Burning; start() renews it */
   /* counted off the recipe tables so a new recipe can never leave it stale */
   function fusibleTotal(){
     var seen={}, n=0, all=RECIPES.concat(PAIR_RECIPES);
@@ -3439,6 +3453,8 @@
            && (!w.kill.by || w.kill.by===ev.kill.by);
       else if(w.family && ev.unlocked)
         hit = familyDone(w.family);
+      else if(w.pureFire && ev.pureFire)
+        hit = true;
       if(hit){ meta.achievements[k]=1; got.push(k); }
     }
     return got;
@@ -4176,6 +4192,7 @@
     '</svg>';
 
   function addUnit(r,c,k){
+    if(!sandbox && dealsDamage(k) && !FIRE_CREATURES[k]) pureFire=false;
     var d=CREATURES[k], s=statsFor(k);
     var el=document.createElement("div");
     el.className="unit materialise"+(CREATURES[k].ground?" ground":"");
@@ -4687,6 +4704,7 @@
   /* The Bomb Rider is the only thing on your side that moves, so it lives
      outside the grid entirely — its own little list, ticked like a projectile. */
   function launchRider(r,c,k){
+    if(!sandbox && dealsDamage(k) && !FIRE_CREATURES[k]) pureFire=false;
     var d=CREATURES[k];
     var el=document.createElement("div");
     el.className="rider";
@@ -6337,6 +6355,7 @@
   function start(lv,isSand){
     sandbox=!!isSand;
     level=lv;
+    pureFire=true;
     document.getElementById("startScreen").classList.add("hidden");
     document.getElementById("endScreen").classList.add("hidden");
     reset();
@@ -6376,7 +6395,7 @@
     var first=!meta.cleared[key];
     lastOutcome={result:"win", world:WORLD, level:level, first:first};
     meta.cleared[key]=true;
-    earnOn({win:{world:WORLD, level:level}, sand:sandbox}).forEach(toastAch);
+    earnOn({win:{world:WORLD, level:level}, pureFire:pureFire, sand:sandbox}).forEach(toastAch);
     buildLevelGrid();          /* the next level, and maybe the Sky, just opened */
     if(WORLD==="deep"){
       document.getElementById("endTitle").textContent="Deep "+level+" cleared";
@@ -7414,6 +7433,8 @@
       makeArrow:makeArrow, makeShell:makeShell, tickArrows:tickArrows,
       canPlace:canPlace, setRng:setRng, earnOn:earnOn, toastAch:toastAch,
       fusibleTotal:fusibleTotal, achRows:achRows, buildAchScreen:buildAchScreen,
+      FIRE_CREATURES:FIRE_CREATURES, dealsDamage:dealsDamage,
+      pureFireNow:function(){ return pureFire; },
       outcome:function(){ return lastOutcome; },
       setLoadout:function(list){ loadout=list.slice(); }
     };

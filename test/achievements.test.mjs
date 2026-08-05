@@ -137,6 +137,47 @@ test("a real Bomb Rider blast on a real skeleton earns Blowing up", () => {
   assert.equal(g.meta.achievements.blow, 1, "the rider rolled and nothing boomed");
 });
 
+test("Burning — the fire-only promise is tracked through real placements", () => {
+  const g = boot();
+  for (const k of ["bonfire", "slingroc", "bombrider"]) g.meta.unlocked[k] = 1;
+  g.startLevel("caves", 1, false);
+  g.setEnergy(99999);
+
+  g.clearCooldowns(); g.select("bonfire");  g.click(0, 3);
+  assert.equal(g.pureFireNow(), true, "a fire damager keeps the promise");
+  g.clearCooldowns(); g.select("tortoise"); g.click(1, 3);
+  assert.equal(g.pureFireNow(), true, "a harmless wall spoils nothing");
+  g.clearCooldowns(); g.select("slingroc"); g.click(2, 3);
+  assert.equal(g.pureFireNow(), false, "a non-fire damager breaks it");
+
+  g.startLevel("caves", 1, false);
+  assert.equal(g.pureFireNow(), true, "a new level renews the promise");
+  g.setEnergy(99999); g.clearCooldowns();
+  g.select("bombrider"); g.click(2, 1);
+  assert.equal(g.pureFireNow(), false, "the rider counts even though it never holds a square");
+
+  assert.deepEqual(g.earnOn({ pureFire: true }), ["burning"]);
+  assert.deepEqual(g.earnOn({ pureFire: true }), [], "worn once");
+});
+
+test("the sandbox neither spoils nor earns the fire promise", () => {
+  const g = boot();
+  g.startLevel("caves", 1, true);
+  g.setEnergy(99999); g.clearCooldowns();
+  g.select("slingroc"); g.click(2, 3);
+  assert.equal(g.pureFireNow(), true, "sandbox placements are practice");
+});
+
+test("the fire list and the damage test both read straight off the tables", () => {
+  const g = boot();
+  for (const k in g.FIRE_CREATURES)
+    assert.ok(g.CREATURES[k], "fire list names \"" + k + "\", which does not exist");
+  assert.equal(g.dealsDamage("bonfire"), true);
+  assert.equal(g.dealsDamage("bombrider"), true);
+  assert.equal(g.dealsDamage("tortoise"), false, "the Bulwark hurts nobody");
+  assert.equal(g.dealsDamage("frostmoth"), false, "frost stings nothing");
+});
+
 test("the achievements screen lists every medal, veiled until earned", () => {
   const g = boot();
   const rows = g.achRows();
@@ -176,6 +217,8 @@ test("every achievement row is whole, and points at something real", () => {
     } else if (a.when.family) {
       assert.ok(Object.values(g.CREATURES).some(c => c.family === a.when.family),
         k + " points at family \"" + a.when.family + "\", which no creature has");
+    } else if (a.when.pureFire) {
+      assert.equal(a.when.pureFire, true, k + " has a pureFire that is not simply true");
     } else {
       assert.fail(k + " has a when shape earnOn does not understand");
     }
