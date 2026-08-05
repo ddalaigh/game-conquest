@@ -52,6 +52,29 @@ test("sandbox fusions earn nothing", () => {
   assert.equal("binding" in g.meta.achievements, false);
 });
 
+test("Party pooper — either dancer, only before the bubbles", () => {
+  const g = boot();
+  assert.deepEqual(g.earnOn({ kill: { kind: "bubbledancer", undanced: true } }), ["pooper"]);
+  const g2 = boot();
+  assert.deepEqual(g2.earnOn({ kill: { kind: "discodancer", undanced: true } }), ["pooper"],
+    "the disco dancer counts too");
+  const g3 = boot();
+  assert.deepEqual(g3.earnOn({ kill: { kind: "bubbledancer", undanced: false } }), [],
+    "after the bubbles it is just a kill");
+  assert.deepEqual(g3.earnOn({ kill: { kind: "skeleton", undanced: true } }), [],
+    "no other foe pops this party");
+  assert.deepEqual(g3.earnOn({ kill: { kind: "bubbledancer", undanced: true }, sand: true }), []);
+});
+
+test("a dancer killed mid-dance through the real death path earns it", () => {
+  const g = boot();
+  g.startLevel("deep", 1, false);
+  const z = g.spawnFoe("bubbledancer", 1, 300);
+  assert.equal(z.danced, false, "fresh on the board, it has not danced yet");
+  g.hurtFoe(z, 99999);
+  assert.equal(g.meta.achievements.pooper, 1, "the kill did not earn the medal");
+});
+
 test("the toast card carries the medal's name into the corner stack", () => {
   /* no browser playtest — toastAch hands its card back so the suite can read
      it: right words, right class, parented in the fixed top-right stack */
@@ -77,6 +100,11 @@ test("every achievement row is whole, and points at something real", () => {
     } else if (a.when.fused) {
       assert.ok(a.when.fused === "all" || Number.isInteger(a.when.fused),
         k + " has a fused threshold that is neither a count nor \"all\"");
+    } else if (a.when.kill) {
+      assert.ok(Array.isArray(a.when.kill.of) && a.when.kill.of.length,
+        k + " kills nothing in particular");
+      for (const f of a.when.kill.of)
+        assert.ok(g.FOES[f], k + " points at foe \"" + f + "\", which does not exist");
     } else {
       assert.fail(k + " has a when shape earnOn does not understand");
     }

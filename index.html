@@ -3367,7 +3367,9 @@
     binding:{name:"Binding", when:{fused:1},
              how:"Bind your first fusion at the table"},
     federal:{name:"Federal of Fusion Award", when:{fused:"all"},
-             how:"Bind every fusion in the game"}
+             how:"Bind every fusion in the game"},
+    pooper: {name:"Party pooper", when:{kill:{of:["bubbledancer","discodancer"], undanced:true}},
+             how:"Stop a dancer before its bubbles arrive"}
   };
   /* counted off the recipe tables so a new recipe can never leave it stale */
   function fusibleTotal(){
@@ -3387,6 +3389,8 @@
         hit = w.win.world===ev.win.world && w.win.level===ev.win.level;
       else if(w.fused && ev.fused)
         hit = w.fused==="all" ? ev.fused>=fusibleTotal() : ev.fused>=w.fused;
+      else if(w.kill && ev.kill)
+        hit = w.kill.of.indexOf(ev.kill.kind)>-1 && (!w.kill.undanced || !!ev.kill.undanced);
       if(hit){ meta.achievements[k]=1; got.push(k); }
     }
     return got;
@@ -4995,6 +4999,7 @@
     if(!z.extra) killed++;
     /* you learn what a thing is by killing one — the sandbox teaches nothing */
     if(!sandbox) meta.foesBeaten[z.kind]=1;
+    earnOn({kill:{kind:z.kind, undanced:!z.danced}, sand:sandbox}).forEach(toastAch);
     /* a Brood Glob does not simply die \u2014 it comes apart */
     var sp=FOES[z.kind] && FOES[z.kind].splits;
     if(sp && !z.split){
