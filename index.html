@@ -42,6 +42,14 @@
   .btn.hidden{display:none}
   .menurow{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
   .menurow .btn{margin:0}
+  .achwrap{position:fixed;top:14px;right:14px;z-index:80;display:flex;flex-direction:column;
+    gap:8px;pointer-events:none}
+  .ach{background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:10px 16px;
+    box-shadow:0 8px 28px rgba(0,0,0,.5);animation:achin .45s ease, achout .6s ease 4.4s forwards}
+  .ach b{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .ach span{font-family:'Eczar',serif;font-size:17px}
+  @keyframes achin{from{transform:translateX(130%);opacity:0}to{transform:none;opacity:1}}
+  @keyframes achout{to{transform:translateX(130%);opacity:0}}
 
   /* ---------- boost bank ---------- */
   .boosts{display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap;align-items:center}
@@ -3338,8 +3346,31 @@
     fused:{},
     capUp:{forge:0,dragon:0,guardian:0,support:0,winged:0}, /* 4 -> 5, and support uses 2 -> 3 */
     cleared:{},
-    foesBeaten:{}             /* an enemy writes its own almanac page by dying */
+    foesBeaten:{},            /* an enemy writes its own almanac page by dying */
+    achievements:{}           /* medals of the run — session-only, like the rest */
   };
+
+  /* ============================================================
+     Achievements. Rows, like everything else — an achievement is a name
+     and the win that earns it. earnFor decides; the toast in the corner
+     is only the messenger.
+     ============================================================ */
+  var ACHIEVEMENTS={
+    victory:{name:"Victory at last", when:{world:"caves", level:1},
+             how:"Clear the first level of the Caves"}
+  };
+  function earnFor(world, level, sand){
+    if(sand) return [];             /* the sandbox is practice — no medals */
+    var got=[];
+    for(var k in ACHIEVEMENTS){
+      var w=ACHIEVEMENTS[k].when;
+      if(w.world===world && w.level===level && !meta.achievements[k]){
+        meta.achievements[k]=1;
+        got.push(k);
+      }
+    }
+    return got;
+  }
 
   /* Sandbox keeps its own bindings. Anything fused in the sandbox table stays
      in the sandbox — it never reaches the real tray. */
@@ -6245,6 +6276,24 @@
 
   function stopAll(){ running=false; }
 
+  /* the messenger — a small card in the top right corner, gone on its own */
+  function toastAch(k){
+    var wrap=document.getElementById("achToasts");
+    if(!wrap){
+      wrap=document.createElement("div");
+      wrap.className="achwrap"; wrap.id="achToasts";
+      document.body.appendChild(wrap);
+    }
+    var d=document.createElement("div");
+    d.className="ach";
+    d.innerHTML="<b>Achievement</b><span>"+ACHIEVEMENTS[k].name+"</span>";
+    d.addEventListener("animationend",function(e){
+      if(e.animationName==="achout" && d.parentNode) wrap.removeChild(d);
+    });
+    wrap.appendChild(d);
+    return d;                 /* handed back so the suite can read the card */
+  }
+
   function win(){
     stopAll();
     SND.play("menu");
@@ -6253,6 +6302,7 @@
     var first=!meta.cleared[key];
     lastOutcome={result:"win", world:WORLD, level:level, first:first};
     meta.cleared[key]=true;
+    earnFor(WORLD, level, sandbox).forEach(toastAch);
     buildLevelGrid();          /* the next level, and maybe the Sky, just opened */
     if(WORLD==="deep"){
       document.getElementById("endTitle").textContent="Deep "+level+" cleared";
@@ -7215,6 +7265,7 @@
       ORDER:ORDER, UPGRADE_ORDER:UPGRADE_ORDER, sandMeta:sandMeta,
       LEVELS:LEVELS, SKY_LEVELS:SKY_LEVELS, DEEP_LEVELS:DEEP_LEVELS,
       RECIPES:RECIPES, PAIR_RECIPES:PAIR_RECIPES, MYTHICS:MYTHICS,
+      ACHIEVEMENTS:ACHIEVEMENTS,
       CAVE_FOE_ORDER:CAVE_FOE_ORDER, SKY_FOE_ORDER:SKY_FOE_ORDER,
       DEEP_FOE_ORDER:DEEP_FOE_ORDER, DEEP_ITEM:DEEP_ITEM,
       LEVEL_MYTHIC:LEVEL_MYTHIC, SKY_MYTHIC:SKY_MYTHIC,
@@ -7242,7 +7293,7 @@
       spawnFoe:spawnFoe, addUnit:addUnit, refreshLore:refreshLore, hurtFoe:hurtFoe,
       spawnKelp:spawnKelp, hurtKelp:hurtKelp, makeSandBlock:makeSandBlock,
       makeArrow:makeArrow, makeShell:makeShell, tickArrows:tickArrows,
-      canPlace:canPlace, setRng:setRng,
+      canPlace:canPlace, setRng:setRng, earnFor:earnFor, toastAch:toastAch,
       outcome:function(){ return lastOutcome; },
       setLoadout:function(list){ loadout=list.slice(); }
     };
