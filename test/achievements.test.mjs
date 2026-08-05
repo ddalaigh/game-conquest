@@ -160,6 +160,29 @@ test("Burning — the fire-only promise is tracked through real placements", () 
   assert.deepEqual(g.earnOn({ pureFire: true }), [], "worn once");
 });
 
+test("Unproductive — even a harmless Ember Forge spoils the forge-free promise", () => {
+  const g = boot();
+  g.meta.unlocked.bombrider = 1;
+  g.startLevel("caves", 1, false);
+  g.setEnergy(99999);
+
+  g.clearCooldowns(); g.select("bonfire");  g.click(0, 3);
+  g.clearCooldowns(); g.select("tortoise"); g.click(1, 3);
+  assert.equal(g.noForgeNow(), true, "dragons and walls are not forges");
+  g.clearCooldowns(); g.select("forge");    g.click(2, 3);
+  assert.equal(g.noForgeNow(), false, "the Ember Forge deals no damage, and spoils it anyway");
+
+  g.startLevel("caves", 1, false);
+  assert.equal(g.noForgeNow(), true, "a new level renews the promise");
+  g.setEnergy(99999); g.clearCooldowns();
+  g.select("bombrider"); g.click(2, 1);
+  assert.equal(g.noForgeNow(), false, "the Bomb Rider was born a forge");
+  assert.equal(g.pureFireNow(), false, "and it breaks the fire promise too");
+
+  assert.deepEqual(g.earnOn({ noForge: true }), ["unproductive"]);
+  assert.deepEqual(g.earnOn({ noForge: true }), [], "earned once");
+});
+
 test("the sandbox neither spoils nor earns the fire promise", () => {
   const g = boot();
   g.startLevel("caves", 1, true);
@@ -217,8 +240,9 @@ test("every achievement row is whole, and points at something real", () => {
     } else if (a.when.family) {
       assert.ok(Object.values(g.CREATURES).some(c => c.family === a.when.family),
         k + " points at family \"" + a.when.family + "\", which no creature has");
-    } else if (a.when.pureFire) {
-      assert.equal(a.when.pureFire, true, k + " has a pureFire that is not simply true");
+    } else if (a.when.pureFire || a.when.noForge) {
+      assert.equal(a.when.pureFire || a.when.noForge, true,
+        k + " has a challenge flag that is not simply true");
     } else {
       assert.fail(k + " has a when shape earnOn does not understand");
     }
