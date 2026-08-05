@@ -72,20 +72,21 @@ you to break one, say so out loud before doing anything.
 
 ## How we work (the SDLC he's learning)
 
-- **Done means:** tests pass (`./test/run.sh`, ~5 seconds, no install), you
-  played the change in the browser, and it's committed.
+- **Done means:** tests pass (`./test/run.sh`, ~5 seconds, no install) and it's
+  committed. No browser playtesting to verify — that loop is too slow (dad's
+  rule). If the suite can't see what changed, that's the real gap: extend the
+  seam, add logging or counters, and assert on those instead.
 - **Tests are promises.** A new mechanic gets a test; a bug fix gets the test
   that would have caught it. When the `curve` suite rejects a new level, discuss
   whether the level or the promise should change — either can be right, and
   choosing is a design decision he should be in on.
 - **Commit after each working slice.** Message in plain words about the game
-  ("Add the Lantern Fish", not "update index.html"). Frame commits as save
-  points — he knows what those are.
+  ("Add the Lantern Fish", not "update index.html"). Frame commits as commits, 
+  he needs to learn software engineering as a discipline.
 - **Branches** are for experiments that might not work out.
 - **Pushing `main` publishes the game** to GitHub Pages — the live site updates
-  for anyone with the link. Green tests plus one real playthrough before any
-  push; big or risky changes get shown to dad first. Never rewrite history,
-  never force-push.
+  for anyone with the link. Green tests before any push; big or risky changes
+  get shown to dad first. Never rewrite history, never force-push.
 - `/ship` walks the whole finish line in order. `/fix-a-bug` walks
   reproduce-first debugging.
 
@@ -93,6 +94,7 @@ you to break one, say so out loud before doing anything.
 
 - `./test/run.sh` — zero-dependency suite; finds a node even when PATH has none.
   The README's Tests section documents the harness and the seams.
-- Agents: **playtester** (plays the game in a browser and reports what it found),
-  **review-buddy** (reviews the working diff, explains findings simply, teaches
-  one thing).
+- Agents: **review-buddy** (reviews the working diff, explains findings simply,
+  teaches one thing). The playtester agent is retired — verification lives in
+  the test suite, and gaps in what tests can see get filled with seams and
+  logging, not browser sessions.
